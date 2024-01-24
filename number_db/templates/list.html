@@ -1,0 +1,122 @@
+{% extends 'layout/app.html' %} {% load static %} {% block body %}
+<div class="container-fluid px-4">
+  <h1 class="mt-4">DID CRUD</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+    <li class="breadcrumb-item active">DID CRUD</li>
+  </ol>
+  <div class="card mb-4">
+    <div class="card-header">
+      <i class="fas fa-table me-1"></i>
+      DID CRUD List
+      <a
+        class="btn btn-sm btn-success"
+        style="
+          padding: 0.5rem;
+          font-size: 18px;
+          float: right;
+          background-color: green;
+          color: white;
+        "
+        >Export</a
+      >
+      <a
+        class="btn btn-sm btn-success"
+        style="
+          padding: 0.5rem;
+          font-size: 18px;
+          float: right;
+          background-color: green;
+          color: white;
+          margin-right: 20px;
+        "
+        >Import</a
+      >
+    </div>
+    <div class="card-body">
+      {% for message in messages %}
+      <div
+        class="alert alert-{{ message.tags }} alert-dismissible"
+        role="alert"
+      >
+        {{ message }}
+      </div>
+      {% endfor %}
+      <table
+        class="table table-bordered"
+        id="dataTable"
+        width="100%"
+        cellspacing="0"
+      >
+        <thead>
+          <tr>
+            <!-- <th>DID UUID</th> -->
+            <th>DID</th>
+            <th>IN Method</th>
+            <th>Voice Carrier</th>
+            <th>Status</th>
+            <th>Change Date</th>
+            <th>Type</th>
+            <th>SMS Enabled</th>
+            <th>SMS Carrier</th>
+            <th>SMS Type</th>
+            <th>SMS Campaign</th>
+            <th>Term Location</th>
+            <th>Customer</th>
+            <th>Reseller MSP</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Extension</th>
+            <th>Email</th>
+            <th>Extension</th>
+            <th>Onboard Date</th>
+            <th>Note</th>
+            <th>E911 Enabled_Billed</th>
+            <th>E911 CID</th>
+            <th>E911 Address</th>
+            <th>Update Date Time</th>
+            <th>Update By</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for did in dids %}
+          <tr>
+            <td>{{ did.did }}</td>
+            <td>{{ did.in_method }}</td>
+            <td>{{ did.voice_carrier }}</td>
+            <td>{{ did.status }}</td>
+            <td>{{ did.change_date | date:"d-m-Y H:i:s" }}</td>
+            <td>{{ did.type }}</td>
+            <td>{{ did.sms_enabled }}</td>
+            <td>{{ did.sms_carrier }}</td>
+            <td>{{ did.sms_type }}</td>
+            <td>{{ did.sms_campaign }}</td>
+            <td>{{ did.term_location }}</td>
+            <td>{{ did.customer }}</td>
+            <td>{{ did.reseller_msp }}</td>
+            <td>{{ did.user_first_name }}</td>
+            <td>{{ did.extension }}</td>
+            <td>{{ did.email }}</td>
+            <td>{{ did.onboard_date | date:"d-m-Y" }}</td>
+            <td>{{ did.note }}</td>
+            <td>{{ did.e911_enabled_billed }}</td>
+            <td>{{ did.e911_cid }}</td>
+            <td>{{ did.e911_address }}</td>
+            <td>{{ did.update_date_time | date:"d-m-Y H:i:s" }}</td>
+            <td>{{ did.update_by }}</td>
+            <td>
+              <a class="btn btn-sm btn-warning" href="edit/{{ did.id }}">
+                <span class="fa fa-edit"></span> Edit</a
+              >
+              <a class="btn btn-sm btn-danger" href="delete/{{ did.id }}"
+                ><span class="fa fa-trash"></span> Delete</a
+              >
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block javascript %} {% endblock %}
