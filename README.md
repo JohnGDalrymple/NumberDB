@@ -17,3 +17,7 @@ The DB should have a Web UI using Python and Django and on that UI the user shou
 5. We will have to work together to harmonize and move our existing Master DIDs file into the DB.
 
 ```
+
+## Screen Shots
+
+[![SB Admin Preview](https://github.com/JohnGDalrymple/NumberDB/blob/develop/number_db/screen_shots/workflow.jpg)](https://github.com/JohnGDalrymple/NumberDB/tree/develop)
