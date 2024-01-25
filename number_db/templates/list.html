@@ -1,59 +1,59 @@
 
 {#    <div id="content-wrapper">#}
-  {#    <div class="container-fluid">#}
-  {#        <!-- Breadcrumbs-->#}
-  {#        <ol class="breadcrumb">#}
-  {#            <li class="breadcrumb-item">#}
-  {#                <a href="#">Dashboard</a>#}
-  {#            </li>#}
-  {#            <li class="breadcrumb-item active">DID CRUD</li>#}
-  {#        </ol>#}
-  {#        {% for message in messages %}#}
-  {#            <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">#}
-  {#                {{ message }}#}
-  {#            </div>#}
-  {#        {% endfor %}#}
-  {#        <div class="card mb-3">#}
-  {#            <div class="card-header">#}
-  {#                <i class="fas fa-table"></i>#}
-  {#                CSV Upload#}
-  {#               #}
-  {#            </div>#}
-  {#            <div class="card-body">#}
-  {#                <form action="{% url "upload_csv" %}" method="POST" enctype="multipart/form-data"#}
-  {#                      class="form-horizontal">#}
-  {#                    {% csrf_token %}#}
-  {#                    <div class="form-group">#}
-  {#                        <div class="form-row">#}
-  {#                            <div class="col-md-6">#}
-  {#                                <div class="input-group input-group-lg">#}
-  {#                                    <div class="custom-file">#}
-  {#                                        <input type="file" class="form-control custom-file-input file" name="csv_file"#}
-  {#                                               id="input01">#}
-  {#                                        <label class="custom-file-label" id="fileLabel" for="input01">Choose#}
-  {#                                            file</label>#}
-  {#                                    </div>#}
-  {#                                </div>#}
-  {#                            </div>#}
-  {##}
-  {#                            <div class="col-md-6">#}
-  {#                                <div class="input-group input-group-lg">#}
-  {#                                    <div class="custom-file">#}
-  {#                                        <button class="btn btn-primary btn-block" id="submitBtn" disabled type="submit">Upload &nbsp;&nbsp;&nbsp;<span></span>#}
-  {#                                        </button>#}
-  {#                                    </div>#}
-  {#                                </div>#}
-  {#                            </div>#}
-  {#                        </div>#}
-  {#                    </div>#}
-  {#                </form>#}
-  {#            </div>#}
-  {#        </div>#}
-  {#        <div class="card mb-3">#}
-  {#            <div class="card-header">#}
-  {#                <i class="fas fa-table"></i>#}
-  {#                File List#}
-  {#            </div>#}
+{#    <div class="container-fluid">#}
+{#        <!-- Breadcrumbs-->#}
+{#        <ol class="breadcrumb">#}
+{#            <li class="breadcrumb-item">#}
+{#                <a href="#">Dashboard</a>#}
+{#            </li>#}
+{#            <li class="breadcrumb-item active">DID CRUD</li>#}
+{#        </ol>#}
+{#        {% for message in messages %}#}
+{#            <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">#}
+{#                {{ message }}#}
+{#            </div>#}
+{#        {% endfor %}#}
+{#        <div class="card mb-3">#}
+{#            <div class="card-header">#}
+{#                <i class="fas fa-table"></i>#}
+{#                CSV Upload#}
+{#               #}
+{#            </div>#}
+{#            <div class="card-body">#}
+{#                <form action="{% url "upload_csv" %}" method="POST" enctype="multipart/form-data"#}
+{#                      class="form-horizontal">#}
+{#                    {% csrf_token %}#}
+{#                    <div class="form-group">#}
+{#                        <div class="form-row">#}
+{#                            <div class="col-md-6">#}
+{#                                <div class="input-group input-group-lg">#}
+{#                                    <div class="custom-file">#}
+{#                                        <input type="file" class="form-control custom-file-input file" name="csv_file"#}
+{#                                               id="input01">#}
+{#                                        <label class="custom-file-label" id="fileLabel" for="input01">Choose#}
+{#                                            file</label>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </div>#}
+{##}
+{#                            <div class="col-md-6">#}
+{#                                <div class="input-group input-group-lg">#}
+{#                                    <div class="custom-file">#}
+{#                                        <button class="btn btn-primary btn-block" id="submitBtn" disabled type="submit">Upload &nbsp;&nbsp;&nbsp;<span></span>#}
+{#                                        </button>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </form>#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="card mb-3">#}
+{#            <div class="card-header">#}
+{#                <i class="fas fa-table"></i>#}
+{#                File List#}
+{#            </div>#}
 
 
 {% extends 'layout/app.html' %} {% load static %} {% block body %}
@@ -68,26 +68,23 @@
     <div class="card-header">
       <i class="fas fa-table me-1"></i>
       DID CRUD
-       <a class="btn-sm btn btn-success" href="{% static 'sample.csv' %}" download style="float: right"><span class="fa fa-download" ></span> &nbsp;download sample CSV</a>
+       <a class="btn-sm btn btn-success" href="{% static 'sample.csv' %}" download style="float: right"><span class="fa fa-download" ></span> &nbsp;Download Sample CSV</a>
+       <a class="btn-sm btn btn-success" href="#" download style="float: right; margin-right: 10px;"><span class="fa fa-download" ></span> &nbsp;Download Select CSV</a>
   </div>
   <div class="card-body">
-      <form class="form-horizontal"  method="POST" enctype="multipart/form-data">
+      <form class="form-horizontal" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row">
-              <div class="col-6">
+              <div class="col-10">
                   <div class="input-group mb-3">
                       <input type="file" class="form-control custom-file-input file" name="csv_file" id="input01">
                   </div>
               </div>
-              <div class="col-3">
-                  <div class="input-group mb-3">
-                      <button class="btn btn-primary btn-block" type="submit">Submit &nbsp;&nbsp;&nbsp;<span></span></button>
-                  </div>
+              <div class="col-2">
+                  <button class="btn btn-primary btn-block" style="width: 100%" type="submit">Submit</button>
               </div>
           </div>
       </form>
-  </div>
-  <div class="card-body">
       {% for message in messages %}
       <div
         class="alert alert-{{ message.tags }} alert-dismissible"
@@ -104,7 +101,6 @@
       >
         <thead>
           <tr>
-            <!-- <th>DID UUID</th> -->
             <th>DID</th>
             <th>IN Method</th>
             <th>Voice Carrier</th>
@@ -122,7 +118,6 @@
             <th>Last Name</th>
             <th>Extension</th>
             <th>Email</th>
-            <th>Extension</th>
             <th>Onboard Date</th>
             <th>Note</th>
             <th>E911 Enabled_Billed</th>
@@ -139,7 +134,7 @@
             <td>{{ did.in_method }}</td>
             <td>{{ did.voice_carrier }}</td>
             <td>{{ did.status }}</td>
-            <td>{{ did.change_date | date:"d-m-Y H:i:s" }}</td>
+            <td>{{ did.change_date | date:"d-m-Y" }}</td>
             <td>{{ did.type }}</td>
             <td>{{ did.sms_enabled }}</td>
             <td>{{ did.sms_carrier }}</td>
@@ -149,6 +144,7 @@
             <td>{{ did.customer }}</td>
             <td>{{ did.reseller_msp }}</td>
             <td>{{ did.user_first_name }}</td>
+            <td>{{ did.user_last_name }}</td>
             <td>{{ did.extension }}</td>
             <td>{{ did.email }}</td>
             <td>{{ did.onboard_date | date:"d-m-Y" }}</td>
@@ -156,16 +152,8 @@
             <td>{{ did.e911_enabled_billed }}</td>
             <td>{{ did.e911_cid }}</td>
             <td>{{ did.e911_address }}</td>
-            <td>{{ did.update_date_time | date:"d-m-Y H:i:s" }}</td>
+            <td>{{ did.update_date_time | date:"d-m-Y" }}</td>
             <td>{{ did.update_by }}</td>
-            <td>
-              <a class="btn btn-sm btn-warning" href="edit/{{ did.id }}">
-                <span class="fa fa-edit"></span> Edit</a
-              >
-              <a class="btn btn-sm btn-danger" href="delete/{{ did.id }}"
-                ><span class="fa fa-trash"></span> Delete</a
-              >
-            </td>
           </tr>
           {% endfor %}
         </tbody>

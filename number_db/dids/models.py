@@ -21,13 +21,13 @@ class VoiceCarrierValues(models.TextChoices):
 
 
 class SmsCarrierValues(models.TextChoices):
-    INTQ = 'INTQ', _('Intelligent Q Network')
+    INTQ = 'INTQ', _('INTQ')
     TWILIO = 'TWL', _('Twilio')
 
 
 class StatusValues(models.TextChoices):
     ACTIVE = 'A', _('Active')
-    DISCO = 'D', _('Disconnected')
+    DISCO = 'D', _('Disco')
 
 
 class InMethodValues(models.TextChoices):
@@ -55,41 +55,41 @@ class SmsTypeValues(models.TextChoices):
 
 
 class TermLocationValues(models.TextChoices):
-    SBC_EAST = 'SE', _('SBC East')
-    SBC_WEST = 'SW', _('SBC West')
-    HOSTED_EAST = 'HE', _('Hosted East')
-    HOSTED_WEST = 'HW', _('Hosted West')
-    OC_OPERATOR_CONNECT = 'OC', _('Operator Connect')
+    SBC_EAST = 'SE', _('SBC - East')
+    SBC_WEST = 'SW', _('SBC - West')
+    HOSTED_EAST = 'HE', _('Hosted - East')
+    HOSTED_WEST = 'HW', _('Hosted - West')
+    OC_OPERATOR_CONNECT = 'OC', _('OP - Operator Connect')
 
 
 class Did(models.Model):
     did_uuid = models.TextField(max_length=50)
-    did = models.SmallIntegerField()
-    in_method = models.CharField(max_length=2, choices=InMethodValues.choices, null=True)
-    voice_carrier = models.CharField(max_length=3, choices=VoiceCarrierValues.choices, null=True)
-    status = models.CharField(max_length=20, null=True)
-    change_date = models.DateField('%m/%d/%Y', null=True)
-    type = models.CharField(max_length=2, choices=ServiceTypeValues.choices, null=True)
-    sms_enabled = models.BooleanField(max_length=2, choices=SmsEnabledValues.choices, null=True)
-    sms_carrier = models.CharField(max_length=4, choices=SmsCarrierValues.choices, null=True)
-    sms_type = models.CharField(max_length=2, choices=SmsTypeValues.choices, null=True)
-    sms_campaign = models.CharField(max_length=20, null=True)
-    term_location = models.CharField(max_length=2, choices=TermLocationValues.choices, null=True)
-    customer = models.CharField(max_length=30, null=True)
-    reseller_msp = models.CharField(max_length=30, null=True)
-    user_first_name = models.CharField(max_length=30, null=True)
-    user_last_name = models.CharField(max_length=30, null=True)
-    extension = models.SmallIntegerField(null=True)
-    email = models.EmailField(max_length=30, null=True)
-    onboard_date = models.DateField('%m/%d/%Y', null=True)
-    note = models.TextField(max_length=255, null=True)
-    e911_enabled_billed = models.CharField(max_length=2, choices=E911EnabledBilledValues.choices, null=True)
-    e911_cid = models.SmallIntegerField(null=True)
-    e911_address = models.TextField(max_length=150, null=True)
-    service_1 = models.TextField(max_length=100, null=True)
-    service_2 = models.TextField(max_length=100, null=True)
-    service_3 = models.TextField(max_length=100, null=True)
-    service_4 = models.TextField(max_length=100, null=True)
-    update_date_time = models.DateField('%m/%d/%Y %H:%M:%S', null=True)
-    update_by = models.CharField(max_length=50, null=True)
+    did = models.BigIntegerField()
+    in_method = models.CharField(max_length=2, choices=InMethodValues.choices, null=True, blank=True)
+    voice_carrier = models.CharField(max_length=3, choices=VoiceCarrierValues.choices, null=True, blank=True)
+    status = models.CharField(max_length=2, choices=StatusValues.choices, null=True, blank=True)
+    change_date = models.DateField('%m/%d/%Y', null=True, blank=True)
+    type = models.CharField(max_length=2, choices=ServiceTypeValues.choices, null=True, blank=True)
+    sms_enabled = models.CharField(max_length=2, choices=SmsEnabledValues.choices, null=True, blank=True)
+    sms_carrier = models.CharField(max_length=4, choices=SmsCarrierValues.choices, null=True, blank=True)
+    sms_type = models.CharField(max_length=2, choices=SmsTypeValues.choices, null=True, blank=True)
+    sms_campaign = models.CharField(max_length=20, null=True, blank=True)
+    term_location = models.CharField(max_length=2, choices=TermLocationValues.choices, null=True, blank=True)
+    customer = models.CharField(max_length=30, null=True, blank=True)
+    reseller_msp = models.CharField(max_length=30, null=True, blank=True)
+    user_first_name = models.CharField(max_length=30, null=True, blank=True)
+    user_last_name = models.CharField(max_length=30, null=True, blank=True)
+    extension = models.BigIntegerField(null=True, blank=True)
+    email = models.EmailField(max_length=30, null=True, blank=True)
+    onboard_date = models.DateField('%m/%d/%Y', null=True, blank=True)
+    note = models.TextField(max_length=255, null=True, blank=True)
+    e911_enabled_billed = models.CharField(max_length=2, choices=E911EnabledBilledValues.choices, null=True, blank=True)
+    e911_cid = models.BigIntegerField(null=True, blank=True)
+    e911_address = models.TextField(max_length=150, null=True, blank=True)
+    service_1 = models.TextField(max_length=100, null=True, blank=True)
+    service_2 = models.TextField(max_length=100, null=True, blank=True)
+    service_3 = models.TextField(max_length=100, null=True, blank=True)
+    service_4 = models.TextField(max_length=100, null=True, blank=True)
+    update_date_time = models.DateField('%m/%d/%Y %H:%M:%S', null=True, blank=True)
+    update_by = models.CharField(max_length=50, null=True, blank=True)
 
