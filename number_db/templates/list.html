@@ -1,3 +1,61 @@
+
+{#    <div id="content-wrapper">#}
+  {#    <div class="container-fluid">#}
+  {#        <!-- Breadcrumbs-->#}
+  {#        <ol class="breadcrumb">#}
+  {#            <li class="breadcrumb-item">#}
+  {#                <a href="#">Dashboard</a>#}
+  {#            </li>#}
+  {#            <li class="breadcrumb-item active">DID CRUD</li>#}
+  {#        </ol>#}
+  {#        {% for message in messages %}#}
+  {#            <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">#}
+  {#                {{ message }}#}
+  {#            </div>#}
+  {#        {% endfor %}#}
+  {#        <div class="card mb-3">#}
+  {#            <div class="card-header">#}
+  {#                <i class="fas fa-table"></i>#}
+  {#                CSV Upload#}
+  {#               #}
+  {#            </div>#}
+  {#            <div class="card-body">#}
+  {#                <form action="{% url "upload_csv" %}" method="POST" enctype="multipart/form-data"#}
+  {#                      class="form-horizontal">#}
+  {#                    {% csrf_token %}#}
+  {#                    <div class="form-group">#}
+  {#                        <div class="form-row">#}
+  {#                            <div class="col-md-6">#}
+  {#                                <div class="input-group input-group-lg">#}
+  {#                                    <div class="custom-file">#}
+  {#                                        <input type="file" class="form-control custom-file-input file" name="csv_file"#}
+  {#                                               id="input01">#}
+  {#                                        <label class="custom-file-label" id="fileLabel" for="input01">Choose#}
+  {#                                            file</label>#}
+  {#                                    </div>#}
+  {#                                </div>#}
+  {#                            </div>#}
+  {##}
+  {#                            <div class="col-md-6">#}
+  {#                                <div class="input-group input-group-lg">#}
+  {#                                    <div class="custom-file">#}
+  {#                                        <button class="btn btn-primary btn-block" id="submitBtn" disabled type="submit">Upload &nbsp;&nbsp;&nbsp;<span></span>#}
+  {#                                        </button>#}
+  {#                                    </div>#}
+  {#                                </div>#}
+  {#                            </div>#}
+  {#                        </div>#}
+  {#                    </div>#}
+  {#                </form>#}
+  {#            </div>#}
+  {#        </div>#}
+  {#        <div class="card mb-3">#}
+  {#            <div class="card-header">#}
+  {#                <i class="fas fa-table"></i>#}
+  {#                File List#}
+  {#            </div>#}
+
+
 {% extends 'layout/app.html' %} {% load static %} {% block body %}
 <div class="container-fluid px-4">
   <h1 class="mt-4">DID CRUD</h1>
@@ -5,35 +63,31 @@
     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
     <li class="breadcrumb-item active">DID CRUD</li>
   </ol>
+
   <div class="card mb-4">
     <div class="card-header">
       <i class="fas fa-table me-1"></i>
-      DID CRUD List
-      <a
-        class="btn btn-sm btn-success"
-        style="
-          padding: 0.5rem;
-          font-size: 18px;
-          float: right;
-          background-color: green;
-          color: white;
-        "
-        >Export</a
-      >
-      <a
-        class="btn btn-sm btn-success"
-        style="
-          padding: 0.5rem;
-          font-size: 18px;
-          float: right;
-          background-color: green;
-          color: white;
-          margin-right: 20px;
-        "
-        >Import</a
-      >
-    </div>
-    <div class="card-body">
+      DID CRUD
+       <a class="btn-sm btn btn-success" href="{% static 'sample.csv' %}" download style="float: right"><span class="fa fa-download" ></span> &nbsp;download sample CSV</a>
+  </div>
+  <div class="card-body">
+      <form class="form-horizontal"  method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+              <div class="col-6">
+                  <div class="input-group mb-3">
+                      <input type="file" class="form-control custom-file-input file" name="csv_file" id="input01">
+                  </div>
+              </div>
+              <div class="col-3">
+                  <div class="input-group mb-3">
+                      <button class="btn btn-primary btn-block" type="submit">Submit &nbsp;&nbsp;&nbsp;<span></span></button>
+                  </div>
+              </div>
+          </div>
+      </form>
+  </div>
+  <div class="card-body">
       {% for message in messages %}
       <div
         class="alert alert-{{ message.tags }} alert-dismissible"
