@@ -17,10 +17,25 @@ function fullCheck() {
     }
 }
 
-function oneCheck(id) {
+function oneCheck(status, id, event) {
+    event.preventDefault();
+    if (!status) {
+    } else {
+        var checkElemet = window.document.getElementById("select " + id);
+        checkElemet.checked = !checkElemet.checked;
+        checkElemet.checked === true ? selectCount++ : selectCount--;
+        if (selectCount === selectList.length) {
+            fullCheckAction.checked = true;
+        } else {
+            fullCheckAction.checked = false;
+        }
+    }
+}
+
+function oneCellCheck(id) {
     var checkElemet = window.document.getElementById("select " + id);
+    checkElemet.checked = !checkElemet.checked;
     checkElemet.checked === true ? selectCount++ : selectCount--;
-    console.log(selectCount);
     if (selectCount === selectList.length) {
         fullCheckAction.checked = true;
     } else {
@@ -46,3 +61,34 @@ window.addEventListener('DOMContentLoaded', event => {
 
 });
 
+var tableElements = document.getElementsByClassName('table-row');
+
+for (let i = 0; i < tableElements.length; i++) {
+  const element = tableElements[i];
+  element.addEventListener('click', (event) => {
+    var checkElemet = window.document.getElementById(element.id.replace('tr_', 'select_'));
+    checkElemet.checked = !checkElemet.checked;
+    checkElemet.checked === true ? selectCount++ : selectCount--;
+    if (selectCount === selectList.length) {
+        fullCheckAction.checked = true;
+    } else {
+        fullCheckAction.checked = false;
+    }
+  });
+}
+
+var itemsElements = document.getElementsByClassName('item');
+
+for (let i = 0; i < itemsElements.length; i++) {
+  const element = itemsElements[i];
+  element.addEventListener('click', (event) => {
+    var checkElemet = window.document.getElementById(element.id);
+    checkElemet.checked === true ? selectCount++ : selectCount--;
+    if (selectCount === selectList.length) {
+        fullCheckAction.checked = true;
+    } else {
+        fullCheckAction.checked = false;
+    }
+    event.stopPropagation();
+})
+}

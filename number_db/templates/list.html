@@ -93,6 +93,7 @@
         {{ message }}
       </div>
       {% endfor %}
+      <div class="table-container">
       <table
         class="table table-bordered"
         id="dataTable"
@@ -134,10 +135,10 @@
         </thead>
         <tbody>
           {% for did in dids %}
-          <tr>
+          <tr class="table-row" id="tr_{{did.id}}">
             <th scope="row">
               <div class="form-check">
-                <input class="form-check-input item" type="checkbox" value="" id="select {{did.id}}" onclick="oneCheck(`{{ did.id }}`)"/>
+                <input class="form-check-input item" type="checkbox" value="" id="select_{{did.id}}"/>
               </div>
             </th>
             <td>{{ did.did }}</td>
@@ -168,6 +169,7 @@
           {% endfor %}
         </tbody>
       </table>
+    </div>
     </div>
   </div>
 </div>
