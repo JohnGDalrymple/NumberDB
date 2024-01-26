@@ -7,6 +7,27 @@
 // Scripts
 // 
 
+var fullCheckAction = window.document.getElementById("fullCheckAction");
+var selectList = window.document.querySelectorAll(".form-check-input.item");
+var selectCount = 0;
+
+function fullCheck() {
+    for(let i in selectList) {
+        selectList[i].checked = fullCheckAction.checked ? true : false;
+    }
+}
+
+function oneCheck(id) {
+    var checkElemet = window.document.getElementById("select " + id);
+    checkElemet.checked === true ? selectCount++ : selectCount--;
+    console.log(selectCount);
+    if (selectCount === selectList.length) {
+        fullCheckAction.checked = true;
+    } else {
+        fullCheckAction.checked = false;
+    }
+}
+
 window.addEventListener('DOMContentLoaded', event => {
 
     // Toggle the side navigation
@@ -24,3 +45,4 @@ window.addEventListener('DOMContentLoaded', event => {
     }
 
 });
+

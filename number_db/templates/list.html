@@ -101,6 +101,11 @@
       >
         <thead>
           <tr>
+            <th scope="col">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="fullCheckAction" onclick="fullCheck()"/>
+              </div>
+            </th>
             <th>DID</th>
             <th>IN Method</th>
             <th>Voice Carrier</th>
@@ -130,6 +135,11 @@
         <tbody>
           {% for did in dids %}
           <tr>
+            <th scope="row">
+              <div class="form-check">
+                <input class="form-check-input item" type="checkbox" value="" id="select {{did.id}}" onclick="oneCheck(`{{ did.id }}`)"/>
+              </div>
+            </th>
             <td>{{ did.did }}</td>
             <td>{{ did.in_method }}</td>
             <td>{{ did.voice_carrier }}</td>
