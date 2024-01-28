@@ -5,6 +5,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     # path('create', views.create, name='create'),
     path('list', views.list, name='list'),
+    path('export-csv/', views.exportCSV, name='export-csv'),
     # path('fileupload', views.fileupload, name='fileupload'),
     # path('edit/<int:id>', views.edit, name='edit'),
     # path('edit/update/<int:id>', views.update, name='update'),

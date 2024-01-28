@@ -1,18 +1,16 @@
 from django.shortcuts import render, redirect
+import csv
 from .models import Did
 import datetime
 from django.contrib import messages
-from django.core.files.storage import FileSystemStorage
-from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from dids.forms import *
 from django.views.decorators.csrf import csrf_protect
-from django.http import HttpResponseRedirect
-from django.core.exceptions import ValidationError
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import HttpResponse
 import unicodedata
-
 # Create your views here.
+
+default_header = ['did', 'customer', 'reseller', 'in_method', 'status', 'change_date', 'voice_carrier', 'type', 'sms_enabled', 'sms_carrier', 'sms_type', 'sms_campaign', 'term_location', 'user_first_name', 'user_last_name', 'extension', 'email', 'onboard_date', 'note', 'e911_enabled_billed', 'e911_cid', 'e911_address', 'did_uuid', 'service_1', 'service_2', 'service_3', 'service_4', 'updated_date_time', 'updated_by']
 
 def parse_date(date_string):
     return datetime.datetime.strptime(date_string, '%m/%d/%Y').date() if date_string else None
@@ -165,17 +163,62 @@ def index(request):
     return render(request, 'index.html')
 
 @login_required
+def exportCSV(request):
+    ids = request.GET.get('pk')
+    
+    if (ids):
+        id_array = ids.split(",")
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="CurrentStatus.csv"'
+        writer = csv.writer(response)
+        writer.writerow(default_header)
+
+        for id in id_array:
+            data = Did.objects.filter(id = int(id)).values()
+            print("Did----", data[0]['did'])
+            writer.writerow([
+                data[0]['did'],
+                data[0]['customer'],
+                data[0]['reseller'],
+                switch(data[0]['in_method']),
+                status_switch(data[0]['status']),
+                data[0]['change_date'],
+                voice_carrier_switch(data[0]['voice_carrier']),
+                switch(data[0]['sms_enabled']),
+                service_type_switch(data[0]['type']),
+                sms_carrier_switch(data[0]['sms_carrier']),
+                sms_type_switch(data[0]['sms_type']),
+                data[0]['sms_campaign'],
+                term_location_switch(data[0]['term_location']),
+                data[0]['user_first_name'],
+                data[0]['user_last_name'],
+                data[0]['extension'],
+                data[0]['email'],
+                data[0]['onboard_date'],
+                data[0]['note'],
+                switch(data[0]['e911_enabled_billed']),
+                data[0]['e911_cid'],
+                data[0]['e911_address'],
+                data[0]['did_uuid'],
+                data[0]['service_1'],
+                data[0]['service_2'],
+                data[0]['service_3'],
+                data[0]['service_4'],
+                data[0]['updated_date_time'],
+                data[0]['updated_by'],
+                ])
+
+        return response
+
+    else:
+        messages.warning(request, 'Please slect in this table')
+        return redirect('/list')
+
+@login_required
 def list(request):
     if 'GET' == request.method:
         dids_list = Did.objects.all()
-        # paginator = Paginator(dids_list, 10)
-        # page = request.GET.get('page')
-        # try:
-        #     dids = paginator.page(page)
-        # except PageNotAnInteger:
-        #     dids = paginator.page(1)
-        # except EmptyPage:
-        #     dids = paginator.page(paginator.num_pages)
 
         temp = dids_list.values()
 
@@ -189,6 +232,11 @@ def list(request):
             item['sms_type'] = sms_type_switch(item['sms_type'])
             item['term_location'] = term_location_switch(item['term_location'])
             item['e911_enabled_billed'] = switch(item['e911_enabled_billed'])
+            item['change_date'] =  "" if(item['change_date'] == None) else item['change_date']
+            item['extension'] =  "" if(item['extension'] == None) else item['extension']
+            item['onboard_date'] =  "" if(item['onboard_date'] == None) else item['onboard_date']
+            item['e911_cid'] =  "" if(item['e911_cid'] == None) else item['e911_cid']
+            item['updated_date_time'] =  "" if(item['updated_date_time'] == None) else item['updated_date_time']
                 
         return render(request, 'list.html', {'dids': temp})
 
@@ -199,15 +247,15 @@ def list(request):
 
                 if len(csv_file) == 0:
                     messages.warning(request, 'Empty File')
-                    return render(request, 'list.html')
+                    return redirect('/list')
 
                 if not csv_file.name.endswith('.csv'):
                     messages.warning(request, 'File is not CSV type')
-                    return render(request, 'list.html')
+                    return redirect('/list')
 
                 if csv_file.multiple_chunks():
                     messages.warning(request, 'Uploaded file is too big (%.2f MB).' % (csv_file.size / (1000 * 1000),))
-                    return render(request, 'list.html')
+                    return redirect('/list')
 
                 file_data = csv_file.read().decode("utf-8")
                 file_data = unicodedata.normalize("NFC", file_data).replace('\r', '\n')
@@ -216,51 +264,59 @@ def list(request):
                 lines = file_data.strip().split('\n')
                 headers = lines[0].split(',')
 
-                convert_data = []
+                if headers == default_header:
+                    convert_data = []
 
-                for line in lines[1:]:
-                    fields = line.split(',')
-                    if len(fields) != len(headers):
-                        continue
-                    convert_data.append({headers[i]: '' if fields[i] == '#N/A' else fields[i] for i in range(len(headers))})
-                
-                for item in convert_data:
-                    save_data = Did(
-                    did_uuid = item['did_uuid'], 
-                    did = int(item['did']) if item['did'].isdigit() else None, 
-                    in_method = switch(item['in_method']), 
-                    voice_carrier = voice_carrier_switch(item['voice_carrier']), 
-                    status = status_switch(item['status']), 
-                    change_date = parse_date(item['change_date']), 
-                    type = service_type_switch(item['type']), 
-                    sms_enabled = switch(item['sms_enabled']), 
-                    sms_carrier = sms_carrier_switch(item['sms_carrier']), 
-                    sms_type = sms_type_switch(item['sms_type']), 
-                    sms_campaign = item['sms_campaign'], 
-                    term_location = term_location_switch(item['term_location']), 
-                    customer = item['customer'], 
-                    reseller_msp = item['reseller_msp'], 
-                    user_first_name = item['user_first_name'], 
-                    user_last_name = item['user_last_name'], 
-                    extension = int(item['extension']) if item['extension'].isdigit() else None,
-                    email = item['email'], 
-                    onboard_date = parse_date(item['onboard_date']), 
-                    note = item['note'], 
-                    e911_enabled_billed = switch(item['e911_enabled_billed']), 
-                    e911_cid = int(item['e911_cid']) if item['e911_cid'].isdigit() else None, 
-                    e911_address = item['e911_address'], 
-                    service_1 = item['service_1'], 
-                    service_2 = item['service_2'], 
-                    service_3 = item['service_3'], 
-                    service_4 = item['service_4'], 
-                    update_date_time = parse_datetime(item['updated_date_time']), 
-                    update_by = item['updated_by'], 
-                    )
-                    save_data.save()
+                    for line in lines[1:]:
+                        fields = line.split(',')
+                        if len(fields) != len(headers):
+                            continue
+                        convert_data.append({headers[i]: '' if fields[i] == '#N/A' else fields[i] for i in range(len(headers))})
+
+                    for item in convert_data:
+                        save_data = Did(
+                        did_uuid = item['did_uuid'], 
+                        did = int(item['did']) if item['did'].isdigit() else None, 
+                        in_method = switch(item['in_method']), 
+                        voice_carrier = voice_carrier_switch(item['voice_carrier']), 
+                        status = status_switch(item['status']), 
+                        change_date = parse_date(item['change_date']), 
+                        type = service_type_switch(item['type']), 
+                        sms_enabled = switch(item['sms_enabled']), 
+                        sms_carrier = sms_carrier_switch(item['sms_carrier']), 
+                        sms_type = sms_type_switch(item['sms_type']), 
+                        sms_campaign = item['sms_campaign'], 
+                        term_location = term_location_switch(item['term_location']), 
+                        customer = item['customer'], 
+                        reseller = item['reseller'], 
+                        user_first_name = item['user_first_name'], 
+                        user_last_name = item['user_last_name'], 
+                        extension = int(item['extension']) if item['extension'].isdigit() else None,
+                        email = item['email'], 
+                        onboard_date = parse_date(item['onboard_date']), 
+                        note = item['note'], 
+                        e911_enabled_billed = switch(item['e911_enabled_billed']), 
+                        e911_cid = int(item['e911_cid']) if item['e911_cid'].isdigit() else None, 
+                        e911_address = item['e911_address'], 
+                        service_1 = item['service_1'], 
+                        service_2 = item['service_2'], 
+                        service_3 = item['service_3'], 
+                        service_4 = item['service_4'], 
+                        updated_date_time = parse_datetime(item['updated_date_time']), 
+                        updated_by = item['updated_by'], 
+                        )
+                        try:
+                            save_data.save()
+                        except Exception as e:
+                            messages.warning(request, e)
+
+                else:
+                    messages.warning(request, "This file format is not correct. Please download `Sample CSV` and wirte the doc as it")
+                    return redirect('/list')
 
                 messages.success(request, "Successfully Uploaded CSV File and Added to database")
                 return redirect('/list')
 
             except Exception as e:
-                messages.warning(request, "Unable to upload file. " + e)
+                messages.warning(request, "Unable to upload file." + e)
                 return redirect('/list')
