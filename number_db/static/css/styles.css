@@ -12227,3 +12227,16 @@ body {
   font-size: 0.75rem;
   border-radius: 0.25rem !important;
 }
+.table-row {
+  transition: all 0.3s ease;
+}
+.table-row:hover {
+  background-color: #eee;
+  color: black;
+  cursor: pointer;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}

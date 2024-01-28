@@ -7,15 +7,26 @@
 // Scripts
 // 
 
+var fullCheckAction = window.document.getElementById("fullCheckAction");
+var selectList = window.document.querySelectorAll(".form-check-input.item");
+var selectCount = 0;
+
+function fullCheck() {
+    for(let i in selectList) 
+        selectList[i].checked = fullCheckAction.checked ? true : false;
+
+    if (fullCheckAction.checked === true) {
+        selectCount = selectList.length;
+    } else {
+        selectCount = 0;
+    }
+}
+
 window.addEventListener('DOMContentLoaded', event => {
 
     // Toggle the side navigation
     const sidebarToggle = document.body.querySelector('#sidebarToggle');
     if (sidebarToggle) {
-        // Uncomment Below to persist sidebar toggle between refreshes
-        // if (localStorage.getItem('sb|sidebar-toggle') === 'true') {
-        //     document.body.classList.toggle('sb-sidenav-toggled');
-        // }
         sidebarToggle.addEventListener('click', event => {
             event.preventDefault();
             document.body.classList.toggle('sb-sidenav-toggled');
@@ -24,3 +35,46 @@ window.addEventListener('DOMContentLoaded', event => {
     }
 
 });
+
+window.document.getElementById("selectDownloadButton").addEventListener("click", () => {
+    const selectIds = []
+    for(var i in selectList)
+        selectList[i].checked ? selectIds.push(i) : '';
+    document.getElementById("selectDownloadButton").href = `${window.location.origin}/export-csv/?pk=${selectIds}`
+    for(let i in selectList) 
+    selectList[i].checked = false;
+    selectCount = 0;
+});
+
+var tableElements = document.getElementsByClassName('table-row');
+
+for (let i = 0; i < tableElements.length; i++) {
+  const element = tableElements[i];
+  element.addEventListener('click', (event) => {
+    var checkElemet = window.document.getElementById(element.id.replace('tr_', 'select_'));
+    checkElemet.checked = !checkElemet.checked;
+    checkElemet.checked === true ? selectCount++ : selectCount--;
+    if (selectCount === selectList.length) {
+        fullCheckAction.checked = true;
+    } else {
+        fullCheckAction.checked = false;
+    }
+  });
+}
+
+var itemsElements = document.getElementsByClassName('item');
+
+for (let i = 0; i < itemsElements.length; i++) {
+  const element = itemsElements[i];
+  element.addEventListener('click', (event) => {
+    var checkElemet = window.document.getElementById(element.id);
+    checkElemet.checked === true ? selectCount++ : selectCount--;
+    if (selectCount === selectList.length) {
+        fullCheckAction.checked = true;
+    } else {
+        fullCheckAction.checked = false;
+    }
+    console.log(selectCount);
+    event.stopPropagation();
+})
+}
