@@ -176,7 +176,6 @@ def exportCSV(request):
 
         for id in id_array:
             data = Did.objects.filter(id = int(id)).values()
-            print("Did----", data[0]['did'])
             writer.writerow([
                 data[0]['did'],
                 data[0]['customer'],
