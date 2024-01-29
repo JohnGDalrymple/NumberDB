@@ -109,6 +109,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Cors enable
+ALLOWED_HOSTS = ['51.222.178.73', '127,0.0.1', 'localhost', '127.0.0.1']
+
+CSRF_COOKIE_ORIGIN = ['127.0.0.1:8000', 'localhost']
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -139,9 +143,9 @@ LOGIN_REDIRECT_URL = 'home'
 
 # STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static", "static")
 
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "static"),
-)
+# STATICFILES_DIRS = (
+#     os.path.join(BASE_DIR, "static"),
+# )
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
