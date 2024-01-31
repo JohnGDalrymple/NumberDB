@@ -8,6 +8,8 @@ from dids.forms import *
 from django.views.decorators.csrf import csrf_protect
 from django.http import HttpResponse
 import unicodedata
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 # Create your views here.
 
 default_header = ['did', 'customer', 'reseller', 'in_method', 'status', 'change_date', 'voice_carrier', 'type', 'sms_enabled', 'sms_carrier', 'sms_type', 'sms_campaign', 'term_location', 'user_first_name', 'user_last_name', 'extension', 'email', 'onboard_date', 'note', 'e911_enabled_billed', 'e911_cid', 'e911_address', 'did_uuid', 'service_1', 'service_2', 'service_3', 'service_4', 'updated_date_time', 'updated_by']
@@ -238,7 +240,6 @@ def list(request):
             item['updated_date_time'] =  "" if(item['updated_date_time'] == None) else item['updated_date_time']
                 
         return render(request, 'list.html', {'dids': temp})
-
     
     if 'POST' == request.method:
             try:
@@ -319,3 +320,50 @@ def list(request):
             except Exception as e:
                 messages.warning(request, "Unable to upload file." + e)
                 return redirect('/list')
+
+@login_required
+def users(request):
+    users_list = User.objects.all()
+    paginator = Paginator(users_list, 5)
+    page = request.GET.get('page')
+    try:
+        users = paginator.page(page)
+    except PageNotAnInteger:
+        users = paginator.page(1)
+    except EmptyPage:
+        users = paginator.page(paginator.num_pages)
+    return render(request, 'users.html', {'users': users})
+
+@login_required
+def user_delete(request, id):
+    user = User.objects.get(id=id)
+    user.delete()
+    messages.warning(request, 'User was deleted successfully!')
+    return redirect('/users')
+
+@login_required
+def user_edit(request, id):
+    user = User.objects.filter(id=id).values()[0]
+    userData = {
+        'id': user['id'],
+        'first_name': user['first_name'],
+        'last_name': user['last_name'],
+        'username': user['username'],
+        'email': user['email'],
+        'date_joined': user['date_joined'].strftime('%Y-%m-%d'),
+    }
+    context = {'user': userData}
+    return render(request, 'user_edit.html', context)
+
+@login_required
+def user_update(request, id):
+    user = User.objects.get(id=id)
+    if request.method == "POST":
+        user.first_name = request.POST['first_name']
+        user.last_name = request.POST['last_name']
+        user.username = request.POST['username']
+        user.email = request.POST['email']
+        user.date_joined = request.POST['date_joined']
+        user.save()
+        messages.success(request, 'User was updated successfully!')
+        return redirect('/users')
