@@ -11,8 +11,9 @@
             <li class="breadcrumb-item active">User List</li>
         </ol>
         <div class="card mb-4">
-            <div class="card-header">
+            <div class="card-header" style="flex-direction: row;">
                 <i class="fas fa-table me-1"></i>User List
+                <a class="btn btn-sm btn-success" style="float: right;" href="add/"><span class="fa fa-add"></span> Add</a>
             </div>
             <div class="card-body">
                 {% for message in messages %}
