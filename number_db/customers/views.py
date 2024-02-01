@@ -26,6 +26,44 @@ def index(request):
     return render(request, 'index.html')
 
 @login_required
+def export_csv(request):
+    ids = request.GET.get('pk')
+    
+    if (ids):
+        id_array = ids.split(",")
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="CurrentCustomers.csv"'
+        writer = csv.writer(response)
+        writer.writerow(default_header)
+
+        for id in id_array:
+            data = Customer.objects.filter(id = int(id)).values()
+            writer.writerow([
+                data[0]['full_name'],
+                data[0]['phone'],
+                data[0]['fax'],
+                data[0]['mobile'],
+                data[0]['email'],
+                data[0]['billing_address'],
+                data[0]['billing_city'],
+                data[0]['billing_state'],
+                data[0]['billing_zipcode'],
+                data[0]['billing_country'],
+                data[0]['e911_address'],
+                data[0]['e911_city'],
+                data[0]['e911_state'],
+                data[0]['e911_zipcode'],
+                data[0]['e911_country'],
+                ])
+
+        return response
+
+    else:
+        messages.warning(request, 'Please slect in this table')
+        return redirect('/customer')
+
+
+@login_required
 def customer_list(request):
     if 'GET' == request.method:
         customers_list = Customer.objects.all().values()
@@ -119,21 +157,62 @@ def customer_delete(request, id):
 @login_required
 def customer_add(request):
     if request.method == 'POST':
-        # customer_add = Customer(
-        #     firstname=request.POST['firstname'],
-        #     lastname=request.POST['lastname'],
-        #     mobile_number=request.POST['mobile_number'],
-        #     description=request.POST['description'],
-        #     location=request.POST['location'],
-        #     date=request.POST['date'],
-        #     created_at=datetime.datetime.now(),
-        #     updated_at=datetime.datetime.now(), )
-        # try:
-        #     member.full_clean()
-        # except ValidationError as e:
-        #     pass
-        # member.save()
-        # messages.success(request, 'Member was created successfully!')
+        customer = Customer(
+            full_name=request.POST['full_name'],
+            phone=request.POST['phone'],
+            fax=request.POST['fax'],
+            mobile=request.POST['mobile'],
+            email=request.POST['email'],
+            billing_address=request.POST['billing_address'],
+            billing_city=request.POST['billing_city'],
+            billing_state=request.POST['billing_state'],
+            billing_country=request.POST['billing_country'],
+            e911_address=request.POST['e911_address'],
+            e911_city=request.POST['e911_city'],
+            e911_state=request.POST['e911_state'],
+            e911_zipcode=request.POST['e911_zipcode'],
+            e911_country=request.POST['billing_address'],
+            created_at=datetime.datetime.now(),
+            updated_at=datetime.datetime.now(), )
+        try:
+            customer.full_clean()
+        except ValidationError as e:
+            pass
+        customer.save()
+        messages.success(request, 'Customer was created successfully!')
         return redirect('/customer')
     else:
         return render(request, 'customer_create.html')
+    
+@login_required
+def customer_edit(request, id):
+    customer = Customer.objects.filter(id=id).values()[0]
+    context = {'customer': customer}
+    return render(request, 'customer_edit.html', context)
+
+@login_required
+def customer_update(request, id):
+    customer = Customer.objects.get(id=id)
+    if request.method == "POST":
+        customer.full_name = request.POST['full_name']
+        customer.phone = request.POST['phone']
+        customer.fax = request.POST['fax']
+        customer.mobile = request.POST['mobile']
+        customer.email = request.POST['email']
+        customer.billing_address = request.POST['billing_address']
+        customer.billing_city = request.POST['billing_city']
+        customer.billing_state = request.POST['billing_state']
+        customer.billing_zipcode = request.POST['billing_zipcode']
+        customer.billing_country = request.POST['billing_country']
+        customer.e911_address = request.POST['e911_address']
+        customer.e911_city = request.POST['e911_city']
+        customer.e911_state = request.POST['e911_state']
+        customer.e911_zipcode = request.POST['e911_zipcode']
+        customer.e911_country = request.POST['e911_country']
+        customer.updated_at = datetime.datetime.now()
+        try:
+            customer.save()
+            messages.success(request, 'Customer was updated successfully!')
+        except Exception as e:
+            messages.warning(request, e)
+        return redirect('/customer')
