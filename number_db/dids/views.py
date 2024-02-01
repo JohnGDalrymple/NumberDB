@@ -307,14 +307,10 @@ def list(request):
                             except Exception as e:
                                 messages.warning(request, e)
                         messages.success(request, "Successfully Uploaded CSV File and Added to database")
-
                     else:
                         messages.warning(request, "This file format is not correct. Please download `Sample CSV` and wirte the doc as it")
-
                 else:
                     messages.warning(request, "Please upload CSV file.")
-                    
-
             except Exception as e:
                 messages.warning(request, "Unable to upload file." + e)
     return redirect('/list')
