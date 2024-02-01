@@ -68,7 +68,7 @@
       <i class="fas fa-table me-1"></i>
       Customer CRUD
         <a class="btn-sm btn btn-success" href="{% static 'sample_contact.csv' %}" download style="float: right"><span class="fa fa-download"></span> &nbsp;Download Sample CSV</a>
-        <a id="selectCustomerDownloadButton" class="btn-sm btn btn-success" style="float: right; margin-right: 10px;">
+        <a id="selectDownloadButton" class="btn-sm btn btn-success" style="float: right; margin-right: 10px;">
           <span class="fa fa-download" ></span> 
             &nbsp;Download Select CSV
         </a>
@@ -152,9 +152,9 @@
               <td>{{ customer.shipping_zipcode }}</td>
               <td>{{ customer.shipping_country }}</td>
               <td style="display: flex; justify-content: space-between;">
-                <a class="btn btn-sm btn-warning" href="edit/{{ user.id }}"><span class="fa fa-edit"></span> Edit</a>
-                <a class="btn btn-sm btn-danger" href="delete/{{ user.id }}"><span class="fa fa-trash"></span> Delete</a>
-            </td>
+                <a class="btn btn-sm btn-warning" href="edit/{{ customer.id }}"><span class="fa fa-edit"></span> Edit</a>
+                <a class="btn btn-sm btn-danger" href="delete/{{ customer.id }}"><span class="fa fa-trash"></span> Delete</a>
+              </td>
             </tr>
             {% endfor %}
           </tbody>

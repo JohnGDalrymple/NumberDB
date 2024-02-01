@@ -1,0 +1,145 @@
+{% extends 'layout/app.html' %}
+
+{% load static %}
+{% block stylesheet %}
+    <style>
+        .bd-example {
+            /* padding: 1.5rem; */
+            margin-right: 0;
+            margin-left: 0;
+            border-width: 1px;
+            border-top-left-radius: .25rem;
+            border-top-right-radius: .25rem;
+        }
+        .bd-example {
+            position: relative;
+            padding: 1rem;
+            margin: 1rem -.75rem 0;
+            border: solid #dee2e6;
+            border-width: 1px;
+        }
+    </style>
+{% endblock %}
+{% block body %}
+    <div class="container-fluid px-4">
+        <h1 class="mt-4">Customer CRUD</h1>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+            <li class="breadcrumb-item active">Create Customer</li>
+        </ol>
+        <div class="bd-example">
+            <form action="/users/create/" method="POST">
+                {% csrf_token %}
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating mb-3 mb-md-0 ">
+                            <input class="form-control" id="input_full_name" type="text" name="full_name" placeholder="Enter your full name" required/>
+                            <label for="input_full_name">Enter full name</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <input class="form-control" id="input_Phone" type="tel" name="phone" placeholder="Enter your phone"/>
+                            <label for="input_Phone">Enter your phone</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating mb-3 mb-md-0">
+                            <input class="form-control" name="fax" type="text"  placeholder="fax" id="input_fax">
+                            <label for="input_fax">Enter your fax</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <input class="form-control" name="mobile" type="text" placeholder="mobile" id="input_mobile">
+                            <label for="input_mobile">Enter your mobile</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating mb-3 mb-md-0">
+                            <input class="form-control" name="email" type="text"  placeholder="email" id="input_email">
+                            <label for="input_email">Enter your email</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating mb-3 mb-md-0">
+                            <input class="form-control" name="billing_address" type="text"  placeholder="fax" id="billing_address">
+                            <label for="billing_address">Enter billing address</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <input class="form-control" name="billing_city" type="text" placeholder="mobile" id="billing_city">
+                            <label for="billing_city">Enter billing city</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating mb-3 mb-md-0">
+                            <input class="form-control" name="billing_state" type="text"  placeholder="fax" id="billing_state">
+                            <label for="billing_state">Enter billing state</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <input class="form-control" name="billing_zipcode" type="text" placeholder="mobile" id="billing_zipcode">
+                            <label for="billing_zipcode">Enter billing Zipcode</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <input class="form-control" name="billing_country" type="text" placeholder="mobile" id="billing_country">
+                            <label for="billing_country">Enter billing country</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating mb-3 mb-md-0">
+                            <input class="form-control" name="e911_address" type="text"  placeholder="fax" id="e911_address">
+                            <label for="e911_address">Enter E911 address</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <input class="form-control" name="e911_city" type="text" placeholder="mobile" id="e911_city">
+                            <label for="e911_city">Enter E911 city</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating mb-3 mb-md-0">
+                            <input class="form-control" name="e911_state" type="text"  placeholder="fax" id="e911_state">
+                            <label for="e911_state">Enter E911 state</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <input class="form-control" name="e911_zipcode" type="text" placeholder="mobile" id="e911_zipcode">
+                            <label for="e911_zipcode">Enter E911 Zipcode</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <input class="form-control" name="e911_country" type="text" placeholder="mobile" id="e911_country">
+                            <label for="e911_country">Enter E911 country</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 mb-0">
+                    <div class="d-grid"><button class="btn btn-primary btn-block" type="submit">Submit</button></div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block javascript %}
+{% endblock %}

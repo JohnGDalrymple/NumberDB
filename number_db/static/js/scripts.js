@@ -76,7 +76,6 @@ for (let i = 0; i < itemsElements.length; i++) {
     } else {
         fullCheckAction.checked = false;
     }
-    console.log(selectCount);
     event.stopPropagation();
 })
 }
