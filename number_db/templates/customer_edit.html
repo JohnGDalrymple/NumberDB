@@ -25,21 +25,21 @@
         <h1 class="mt-4">Customer CRUD</h1>
         <ol class="breadcrumb mb-4">
             <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-            <li class="breadcrumb-item active">Create Customer</li>
+            <li class="breadcrumb-item active">Edit Customer</li>
         </ol>
         <div class="bd-example">
-            <form action="/customer/add/" method="POST">
+            <form action="/customer/update/{{ customer.id }}" method="POST">
                 {% csrf_token %}
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0 ">
-                            <input class="form-control" id="input_full_name" type="text" name="full_name" placeholder="Enter your full name" required/>
+                            <input class="form-control" id="input_full_name" type="text" value="{{ customer.full_name }}" name="full_name" placeholder="Enter your full name" required/>
                             <label for="input_full_name">Enter full name</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" id="input_Phone" type="tel" name="phone" placeholder="Enter your phone"/>
+                            <input class="form-control" id="input_Phone" type="tel" value="{{ customer.phone }}" name="phone" placeholder="Enter your phone"/>
                             <label for="input_Phone">Enter your phone</label>
                         </div>
                     </div>
@@ -47,13 +47,13 @@
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="fax" type="text"  placeholder="fax" id="input_fax">
+                            <input class="form-control" name="fax" type="text" value="{{ customer.fax }}"  placeholder="fax" id="input_fax">
                             <label for="input_fax">Enter your fax</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="mobile" type="text" placeholder="mobile" id="input_mobile">
+                            <input class="form-control" name="mobile" type="text" value="{{ customer.mobile }}" placeholder="mobile" id="input_mobile">
                             <label for="input_mobile">Enter your mobile</label>
                         </div>
                     </div>
@@ -61,7 +61,7 @@
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="email" type="text"  placeholder="email" id="input_email">
+                            <input class="form-control" name="email" type="text" value="{{ customer.email }}" placeholder="email" id="input_email">
                             <label for="input_email">Enter your email</label>
                         </div>
                     </div>
@@ -69,13 +69,13 @@
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="billing_address" type="text"  placeholder="fax" id="billing_address">
+                            <input class="form-control" name="billing_address" type="text" value="{{ customer.billing_address }}" placeholder="fax" id="billing_address">
                             <label for="billing_address">Enter billing address</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="billing_city" type="text" placeholder="mobile" id="billing_city">
+                            <input class="form-control" name="billing_city" type="text" value="{{ customer.billing_city }}" placeholder="mobile" id="billing_city">
                             <label for="billing_city">Enter billing city</label>
                         </div>
                     </div>
@@ -83,19 +83,19 @@
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="billing_state" type="text"  placeholder="fax" id="billing_state">
+                            <input class="form-control" name="billing_state" type="text" value="{{ customer.billing_state }}" placeholder="fax" id="billing_state">
                             <label for="billing_state">Enter billing state</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="billing_zipcode" type="text" placeholder="mobile" id="billing_zipcode">
+                            <input class="form-control" name="billing_zipcode" type="text" value="{{ customer.billing_zipcode }}" placeholder="mobile" id="billing_zipcode">
                             <label for="billing_zipcode">Enter billing Zipcode</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="billing_country" type="text" placeholder="mobile" id="billing_country">
+                            <input class="form-control" name="billing_country" type="text" value="{{ customer.billing_country }}" placeholder="mobile" id="billing_country">
                             <label for="billing_country">Enter billing country</label>
                         </div>
                     </div>
@@ -103,13 +103,13 @@
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="e911_address" type="text"  placeholder="fax" id="e911_address">
+                            <input class="form-control" name="e911_address" type="text" value="{{ customer.e911_address }}" placeholder="fax" id="e911_address">
                             <label for="e911_address">Enter E911 address</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="e911_city" type="text" placeholder="mobile" id="e911_city">
+                            <input class="form-control" name="e911_city" type="text" value="{{ customer.e911_city }}" placeholder="mobile" id="e911_city">
                             <label for="e911_city">Enter E911 city</label>
                         </div>
                     </div>
@@ -117,19 +117,19 @@
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="e911_state" type="text"  placeholder="fax" id="e911_state">
+                            <input class="form-control" name="e911_state" type="text" value="{{ customer.e911_state }}" placeholder="fax" id="e911_state">
                             <label for="e911_state">Enter E911 state</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="e911_zipcode" type="text" placeholder="mobile" id="e911_zipcode">
+                            <input class="form-control" name="e911_zipcode" type="text" value="{{ customer.e911_zipcode }}" placeholder="mobile" id="e911_zipcode">
                             <label for="e911_zipcode">Enter E911 Zipcode</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="e911_country" type="text" placeholder="mobile" id="e911_country">
+                            <input class="form-control" name="e911_country" type="text" value="{{ customer.e911_country }}" placeholder="mobile" id="e911_country">
                             <label for="e911_country">Enter E911 country</label>
                         </div>
                     </div>

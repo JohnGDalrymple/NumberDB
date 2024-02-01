@@ -36,12 +36,24 @@ window.addEventListener('DOMContentLoaded', event => {
 
 });
 
-window.document.getElementById("selectDownloadButton").addEventListener("click", () => {
+window.document.getElementById("selectDownloadButton")?.addEventListener("click", () => {
     const selectIds = []
     for(var i in selectList)
         selectList[i].checked ? selectIds.push(selectList[i].id.replace("select_", "")) : '';
 
     document.getElementById("selectDownloadButton").href = `${window.location.origin}/export-csv/?pk=${selectIds}`
+
+    for(let i in selectList) 
+    selectList[i].checked = false;
+    selectCount = 0;
+});
+
+window.document.getElementById("selectCustomerDownloadButton")?.addEventListener("click", () => {
+    const selectIds = []
+    for(var i in selectList)
+        selectList[i].checked ? selectIds.push(selectList[i].id.replace("select_", "")) : '';
+
+    document.getElementById("selectCustomerDownloadButton").href = `${window.location.origin}/customer/export-csv/?pk=${selectIds}`
 
     for(let i in selectList) 
     selectList[i].checked = false;

@@ -220,11 +220,9 @@ def export_csv(request):
 @login_required
 def list(request):
     if 'GET' == request.method:
-        dids_list = Did.objects.all()
+        dids_list = Did.objects.all().values()
 
-        temp = dids_list.values()
-
-        for item in temp:
+        for item in dids_list:
             item['in_method'] = switch(item['in_method'])
             item['voice_carrier'] = status_switch(item['voice_carrier'])
             item['status'] = status_switch(item['status'])
@@ -240,7 +238,7 @@ def list(request):
             item['e911_cid'] =  "" if(item['e911_cid'] == None) else item['e911_cid']
             item['updated_date_time'] =  "" if(item['updated_date_time'] == None) else item['updated_date_time']
                 
-        return render(request, 'dids.html', {'dids': temp})
+        return render(request, 'dids.html', {'dids': dids_list})
     
     if 'POST' == request.method:
             try:

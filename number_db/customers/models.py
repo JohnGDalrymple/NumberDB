@@ -1,4 +1,5 @@
 from django.db import models
+import datetime
 
 # Create your models here.
 
@@ -18,3 +19,5 @@ class Customer(models.Model):
     e911_state = models.CharField(max_length=20, null=True, blank=True)
     e911_zipcode = models.CharField(max_length=20, null=True, blank=True)
     e911_country = models.CharField(max_length=50, null=True, blank=True)
+    created_at = models.DateTimeField(default=datetime.datetime.now, editable=False)
+    updated_at = models.DateTimeField(default=datetime.datetime.now)
