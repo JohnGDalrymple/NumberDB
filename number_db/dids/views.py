@@ -6,8 +6,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from dids.forms import *
 from django.views.decorators.csrf import csrf_protect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.core.exceptions import ValidationError
 import unicodedata
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.auth.hashers import make_password
 # Create your views here.
 
 default_header = ['did', 'customer', 'reseller', 'in_method', 'status', 'change_date', 'voice_carrier', 'type', 'sms_enabled', 'sms_carrier', 'sms_type', 'sms_campaign', 'term_location', 'user_first_name', 'user_last_name', 'extension', 'email', 'onboard_date', 'note', 'e911_enabled_billed', 'e911_cid', 'e911_address', 'did_uuid', 'service_1', 'service_2', 'service_3', 'service_4', 'updated_date_time', 'updated_by']
@@ -163,7 +166,7 @@ def index(request):
     return render(request, 'index.html')
 
 @login_required
-def exportCSV(request):
+def export_csv(request):
     ids = request.GET.get('pk')
     
     if (ids):
@@ -237,85 +240,185 @@ def list(request):
             item['e911_cid'] =  "" if(item['e911_cid'] == None) else item['e911_cid']
             item['updated_date_time'] =  "" if(item['updated_date_time'] == None) else item['updated_date_time']
                 
-        return render(request, 'list.html', {'dids': temp})
-
+        return render(request, 'dids.html', {'dids': temp})
     
     if 'POST' == request.method:
             try:
-                csv_file = request.FILES["csv_file"]
+                if request.FILES:
+                    csv_file = request.FILES["csv_file"]
 
-                if len(csv_file) == 0:
-                    messages.warning(request, 'Empty File')
-                    return redirect('/list')
+                    if len(csv_file) == 0:
+                        messages.warning(request, 'Empty File')
 
-                if not csv_file.name.endswith('.csv'):
-                    messages.warning(request, 'File is not CSV type')
-                    return redirect('/list')
+                    if not csv_file.name.endswith('.csv'):
+                        messages.warning(request, 'File is not CSV type')
 
-                if csv_file.multiple_chunks():
-                    messages.warning(request, 'Uploaded file is too big (%.2f MB).' % (csv_file.size / (1000 * 1000),))
-                    return redirect('/list')
+                    if csv_file.multiple_chunks():
+                        messages.warning(request, 'Uploaded file is too big (%.2f MB).' % (csv_file.size / (1000 * 1000),))
 
-                file_data = csv_file.read().decode("utf-8")
-                file_data = unicodedata.normalize("NFC", file_data).replace('\r', '\n')
+                    file_data = csv_file.read().decode("utf-8")
+                    file_data = unicodedata.normalize("NFC", file_data).replace('\r', '\n')
 
-                file_data = file_data.replace('\ufeff', '')
-                lines = file_data.strip().split('\n')
-                headers = lines[0].split(',')
+                    file_data = file_data.replace('\ufeff', '')
+                    lines = file_data.strip().split('\n')
+                    headers = lines[0].split(',')
 
-                if headers == default_header:
-                    convert_data = []
+                    if headers == default_header:
+                        convert_data = []
 
-                    for line in lines[1:]:
-                        fields = line.split(',')
-                        if len(fields) != len(headers):
-                            continue
-                        convert_data.append({headers[i]: '' if fields[i] == '#N/A' else fields[i] for i in range(len(headers))})
+                        for line in lines[1:]:
+                            fields = line.split(',')
+                            if len(fields) != len(headers):
+                                continue
+                            convert_data.append({headers[i]: '' if fields[i] == '#N/A' else fields[i] for i in range(len(headers))})
 
-                    for item in convert_data:
-                        save_data = Did(
-                        did_uuid = item['did_uuid'], 
-                        did = int(item['did']) if item['did'].isdigit() else None, 
-                        in_method = switch(item['in_method']), 
-                        voice_carrier = voice_carrier_switch(item['voice_carrier']), 
-                        status = status_switch(item['status']), 
-                        change_date = parse_date(item['change_date']), 
-                        type = service_type_switch(item['type']), 
-                        sms_enabled = switch(item['sms_enabled']), 
-                        sms_carrier = sms_carrier_switch(item['sms_carrier']), 
-                        sms_type = sms_type_switch(item['sms_type']), 
-                        sms_campaign = item['sms_campaign'], 
-                        term_location = term_location_switch(item['term_location']), 
-                        customer = item['customer'], 
-                        reseller = item['reseller'], 
-                        user_first_name = item['user_first_name'], 
-                        user_last_name = item['user_last_name'], 
-                        extension = int(item['extension']) if item['extension'].isdigit() else None,
-                        email = item['email'], 
-                        onboard_date = parse_date(item['onboard_date']), 
-                        note = item['note'], 
-                        e911_enabled_billed = switch(item['e911_enabled_billed']), 
-                        e911_cid = int(item['e911_cid']) if item['e911_cid'].isdigit() else None, 
-                        e911_address = item['e911_address'], 
-                        service_1 = item['service_1'], 
-                        service_2 = item['service_2'], 
-                        service_3 = item['service_3'], 
-                        service_4 = item['service_4'], 
-                        updated_date_time = parse_datetime(item['updated_date_time']), 
-                        updated_by = item['updated_by'], 
-                        )
-                        try:
-                            save_data.save()
-                        except Exception as e:
-                            messages.warning(request, e)
+                        for item in convert_data:
+                            save_data = Did(
+                            did_uuid = item['did_uuid'], 
+                            did = int(item['did']) if item['did'].isdigit() else None, 
+                            in_method = switch(item['in_method']), 
+                            voice_carrier = voice_carrier_switch(item['voice_carrier']), 
+                            status = status_switch(item['status']), 
+                            change_date = parse_date(item['change_date']), 
+                            type = service_type_switch(item['type']), 
+                            sms_enabled = switch(item['sms_enabled']), 
+                            sms_carrier = sms_carrier_switch(item['sms_carrier']), 
+                            sms_type = sms_type_switch(item['sms_type']), 
+                            sms_campaign = item['sms_campaign'], 
+                            term_location = term_location_switch(item['term_location']), 
+                            customer = item['customer'], 
+                            reseller = item['reseller'], 
+                            user_first_name = item['user_first_name'], 
+                            user_last_name = item['user_last_name'], 
+                            extension = int(item['extension']) if item['extension'].isdigit() else None,
+                            email = item['email'], 
+                            onboard_date = parse_date(item['onboard_date']), 
+                            note = item['note'], 
+                            e911_enabled_billed = switch(item['e911_enabled_billed']), 
+                            e911_cid = int(item['e911_cid']) if item['e911_cid'].isdigit() else None, 
+                            e911_address = item['e911_address'], 
+                            service_1 = item['service_1'], 
+                            service_2 = item['service_2'], 
+                            service_3 = item['service_3'], 
+                            service_4 = item['service_4'], 
+                            updated_date_time = parse_datetime(item['updated_date_time']), 
+                            updated_by = item['updated_by'], 
+                            )
+                            try:
+                                save_data.save()
+                            except Exception as e:
+                                messages.warning(request, e)
+                        messages.success(request, "Successfully Uploaded CSV File and Added to database")
+
+                    else:
+                        messages.warning(request, "This file format is not correct. Please download `Sample CSV` and wirte the doc as it")
 
                 else:
-                    messages.warning(request, "This file format is not correct. Please download `Sample CSV` and wirte the doc as it")
-                    return redirect('/list')
-
-                messages.success(request, "Successfully Uploaded CSV File and Added to database")
-                return redirect('/list')
+                    messages.warning(request, "Please upload CSV file.")
+                    
 
             except Exception as e:
                 messages.warning(request, "Unable to upload file." + e)
-                return redirect('/list')
+    return redirect('/list')
+
+@login_required
+def users(request):
+    users_list = User.objects.all()
+    paginator = Paginator(users_list, 5)
+    page = request.GET.get('page')
+    try:
+        users = paginator.page(page)
+    except PageNotAnInteger:
+        users = paginator.page(1)
+    except EmptyPage:
+        users = paginator.page(paginator.num_pages)
+    return render(request, 'users.html', {'users': users})
+
+@login_required
+def user_delete(request, id):
+    user = User.objects.get(id=id)
+    user.delete()
+    messages.warning(request, 'User was deleted successfully!')
+    return redirect('/users')
+
+@login_required
+def user_edit(request, id):
+    user = User.objects.filter(id=id).values()[0]
+    userData = {
+        'id': user['id'],
+        'first_name': user['first_name'],
+        'last_name': user['last_name'],
+        'username': user['username'],
+        'email': user['email'],
+        'date_joined': user['date_joined'].strftime('%Y-%m-%d'),
+    }
+    context = {'user': userData}
+    return render(request, 'user_edit.html', context)
+
+@login_required
+def user_add(request):
+    return render(request, 'user_create.html')
+
+@login_required
+def user_create(request):
+    if request.method == "POST":
+        print(request.POST)
+        # form = RegistrationForm(request.POST)
+        # users = User(
+        #     username=form.cleaned_data['username'],
+        #     password=make_password(form.cleaned_data['password1']),
+        #     is_staff=True,
+        #     is_active=True,
+        #     is_superuser=True,
+        #     email=form.cleaned_data['email'],
+        #     first_name=form.cleaned_data['first_name'],
+        #     last_name=form.cleaned_data['last_name'],
+        # )
+        # try:
+        #     users.full_clean()
+        # except ValidationError as e:
+        #     pass
+        # users.save()
+        messages.success(request, 'User was created successfully!')
+        return HttpResponseRedirect('/users')
+
+@login_required
+def user_update(request, id):
+    user = User.objects.get(id=id)
+    if request.method == "POST":
+        user.first_name = request.POST['first_name']
+        user.last_name = request.POST['last_name']
+        user.username = request.POST['username']
+        user.email = request.POST['email']
+        user.date_joined = request.POST['date_joined']
+        user.save()
+        messages.success(request, 'User was updated successfully!')
+        return redirect('/users')
+
+def register(request):
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            users = User(
+                username=form.cleaned_data['username'],
+                password=make_password(form.cleaned_data['password1']),
+                is_staff=True,
+                is_active=True,
+                is_superuser=True,
+                email=form.cleaned_data['email'],
+                first_name=form.cleaned_data['first_name'],
+                last_name=form.cleaned_data['last_name'],
+            )
+            try:
+                users.full_clean()
+            except ValidationError as e:
+                pass
+            users.save()
+            messages.success(request, 'Member was created successfully!')
+            return HttpResponseRedirect('/register/success/')
+    else:
+        form = RegistrationForm()
+    return render(request, 'register.html', {'form': form})
+
+def register_success(request):
+    return render(request, 'success.html')

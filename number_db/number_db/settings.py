@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',   
     'widget_tweaks',
     'dids',
+    'customers',
 ]
 
 MIDDLEWARE = [
@@ -143,9 +144,9 @@ LOGIN_REDIRECT_URL = 'home'
 
 # STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static", "static")
 
-# STATICFILES_DIRS = (
-#     os.path.join(BASE_DIR, "static"),
-# )
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
