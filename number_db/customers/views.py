@@ -130,17 +130,12 @@ def customer_list(request):
                             except Exception as e:
                                 messages.warning(request, e)
                         messages.success(request, "Successfully Uploaded CSV File and Added to database")
-
-
                     else:
                         messages.warning(request, "This file format is not correct. Please download `Sample CSV` and wirte the doc as it")
-
                 else: 
                     messages.warning(request, "This file is empty!")
-                
             else:
                 messages.warning(request, "Please upload CSV file.")
-        
         except Exception as e:
             messages.warning(request, "Unable to upload file." + e)
             return redirect('/customer')
@@ -177,7 +172,8 @@ def customer_add(request):
         try:
             customer.full_clean()
         except ValidationError as e:
-            pass
+            messages.warning(request, e)
+
         customer.save()
         messages.success(request, 'Customer was created successfully!')
         return redirect('/customer')

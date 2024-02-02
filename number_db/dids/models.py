@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+import datetime
+import uuid
 
 # Create your models here.
 
@@ -85,10 +87,10 @@ class Did(models.Model):
     e911_enabled_billed = models.CharField(max_length=2, choices=E911EnabledBilledValues.choices, null=True, blank=True)
     e911_cid = models.BigIntegerField(null=True, blank=True)
     e911_address = models.TextField(max_length=150, null=True, blank=True)
-    did_uuid = models.TextField(max_length=50, unique=True)
+    did_uuid = models.UUIDField(max_length=50,default=uuid.uuid4(), unique=True)
     service_1 = models.TextField(max_length=100, null=True, blank=True)
     service_2 = models.TextField(max_length=100, null=True, blank=True)
     service_3 = models.TextField(max_length=100, null=True, blank=True)
     service_4 = models.TextField(max_length=100, null=True, blank=True)
-    updated_date_time = models.DateField('%m/%d/%Y %H:%M:%S', null=True, blank=True)
+    updated_date_time = models.DateField('%m/%d/%Y %H:%M:%S', default=datetime.datetime.now, null=True, blank=True)
     updated_by = models.CharField(max_length=50, null=True, blank=True)

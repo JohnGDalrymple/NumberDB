@@ -74,19 +74,29 @@
         </a>
     </div>
     <div class="card-body">
-      <form class="form-horizontal" method="POST" enctype="multipart/form-data">
+      <form class="form-horizontal mb-3" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
-          <div class="row">
-              <div class="col-10">
-                  <div class="input-group mb-3">
-                      <input type="file" class="form-control custom-file-input file" name="csv_file" id="input01">
-                  </div>
-              </div>
-              <div class="col-2">
-                  <button class="btn btn-primary btn-block" style="width: 100%" type="submit">Submit</button>
+          <div class="d-flex align-items-sm-start align-items-stretch flex-column flex-sm-row gap-2">
+            <div class="flex-grow-1">
+              <div class="input-group">
+                  <input type="file" class="form-control custom-file-input file" name="csv_file">
               </div>
           </div>
+              <div class="d-flex">
+                <button class="btn btn-primary btn-block" type="submit">Submit</button>
+                <a class="btn btn-success ms-2" href="add/"><span class="fa fa-add"></span> Add</a>
+            </div>
+          </div>
       </form>
+      <hr>
+      <div class="d-flex mb-3">
+          <form class="form-inline ms-auto w-100">
+            <div class="input-group">
+                <input class="form-control " type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
+                <button class="btn btn-secondary" type="button"><i class="fas fa-search"></i></button>
+            </div>
+          </form>
+      </div>
       {% for message in messages %}
       <div
         class="alert alert-{{ message.tags }} alert-dismissible"
@@ -133,6 +143,7 @@
               <th>E911 Address</th>
               <th>Update Date Time</th>
               <th>Update By</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -167,6 +178,11 @@
               <td>{{ did.e911_address }}</td>
               <td>{{ did.updated_date_time | date:"d-m-Y" }}</td>
               <td>{{ did.updated_by }}</td>
+              <td style="display: flex; justify-content: space-between;">
+                <a class="btn btn-sm btn-warning" href="edit/{{ did.id }}"><span class="fa fa-edit"></span> Edit</a>
+                <a class="btn btn-sm btn-danger" href="delete/{{ did.id }}"><span class="fa fa-trash"></span> Delete</a>
+              </td>
+            </tr>
             </tr>
             {% endfor %}
           </tbody>
