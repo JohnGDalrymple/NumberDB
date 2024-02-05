@@ -66,8 +66,8 @@ class TermLocationValues(models.TextChoices):
 
 class Did(models.Model):
     did = models.BigIntegerField()
-    customer = models.CharField(max_length=30, null=True, blank=True)
-    reseller = models.CharField(max_length=30, null=True, blank=True)
+    customer = models.CharField(max_length=200, null=True, blank=True)
+    reseller = models.CharField(max_length=200, null=True, blank=True)
     in_method = models.CharField(max_length=3, choices=InMethodValues.choices, null=True, blank=True)
     status = models.CharField(max_length=6, choices=StatusValues.choices, null=True, blank=True)
     change_date = models.DateField('%m/%d/%Y', null=True, blank=True)

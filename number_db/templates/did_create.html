@@ -36,7 +36,7 @@
                         <select name="customer" class="form-select p-3" aria-label="Choose Customer">
                             <option value="" selected>Select customer</option>
                             {% for customer in customers %}
-                            <option value="{{ customer.id }}">{{ customer.full_name }}</option>
+                            <option value="{{ customer.full_name }}">{{ customer.full_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -44,7 +44,7 @@
                         <select name="reseller" class="form-select p-3" aria-label="Choose reseller">
                             <option value="" selected>Select reseller</option>
                             {% for customer in customers %}
-                            <option value="{{ customer.id }}">{{ customer.full_name }}</option>
+                            <option value="{{ customer.full_name }}">{{ customer.full_name }}</option>
                             {% endfor %}
                         </select>
                     </div>

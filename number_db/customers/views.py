@@ -16,10 +16,13 @@ from io import StringIO
 import pandas as pd
 import math
 import numpy as np
+from django.db.models import Q
 
 # Create your views here.
 
 default_header = ['Customer full name', 'Phone', 'Fax', 'Mobile', 'Email', 'Billing address', 'Billing city', 'Billing state', 'Billing ZIP code', 'Billing country', 'E911 address', 'E911 city', 'E911 state', 'E911 ZIP code', 'E911 country']
+
+default_data_header = ['full_name', 'phone', 'fax', 'mobile', 'email', 'billing_address', 'billing_city', 'billing_state', 'billing_zipcode', 'billing_country', 'e911_address', 'e911_city', 'e911_state', 'e911_zipcode', 'e911_country']
 
 @login_required
 def index(request):
@@ -66,26 +69,54 @@ def export_csv(request):
 @login_required
 def customer_list(request):
     if 'GET' == request.method:
-        customers_list = Customer.objects.all().values()
+        customers_list = []
+        if request.GET:
+            query = request.GET['search']
+            q_objects = Q()
+            for field in default_data_header:
+                q_objects |= Q(**{field + '__icontains': query})
 
-        for item in customers_list:
-            item['full_name'] =  "" if(item['full_name'] == None) else item['full_name']
-            item['phone'] =  "" if(item['phone'] == None) else item['phone']
-            item['fax'] =  "" if(item['fax'] == None) else item['fax']
-            item['mobile'] =  "" if(item['mobile'] == None) else item['mobile']
-            item['email'] =  "" if(item['email'] == None) else item['email']
-            item['billing_address'] =  "" if(item['billing_address'] == None) else item['billing_address']
-            item['billing_city'] =  "" if(item['billing_city'] == None) else item['billing_city']
-            item['billing_state'] =  "" if(item['billing_state'] == None) else item['billing_state']
-            item['billing_zipcode'] =  "" if(item['billing_zipcode'] == None) else item['billing_zipcode']
-            item['billing_country'] =  "" if(item['billing_country'] == None) else item['billing_country']
-            item['e911_address'] =  "" if(item['e911_address'] == None) else item['e911_address']
-            item['e911_city'] =  "" if(item['e911_city'] == None) else item['e911_city']
-            item['e911_state'] =  "" if(item['e911_state'] == None) else item['e911_state']
-            item['e911_zipcode'] =  "" if(item['e911_zipcode'] == None) else item['e911_zipcode']
-            item['e911_country'] =  "" if(item['e911_country'] == None) else item['e911_country']
+            customers_list = Customer.objects.filter(q_objects).distinct().values()
 
-        return render(request, 'customers.html', {'customers': customers_list})
+            for item in customers_list:
+                item['full_name'] =  "" if(item['full_name'] == None) else item['full_name']
+                item['phone'] =  "" if(item['phone'] == None) else item['phone']
+                item['fax'] =  "" if(item['fax'] == None) else item['fax']
+                item['mobile'] =  "" if(item['mobile'] == None) else item['mobile']
+                item['email'] =  "" if(item['email'] == None) else item['email']
+                item['billing_address'] =  "" if(item['billing_address'] == None) else item['billing_address']
+                item['billing_city'] =  "" if(item['billing_city'] == None) else item['billing_city']
+                item['billing_state'] =  "" if(item['billing_state'] == None) else item['billing_state']
+                item['billing_zipcode'] =  "" if(item['billing_zipcode'] == None) else item['billing_zipcode']
+                item['billing_country'] =  "" if(item['billing_country'] == None) else item['billing_country']
+                item['e911_address'] =  "" if(item['e911_address'] == None) else item['e911_address']
+                item['e911_city'] =  "" if(item['e911_city'] == None) else item['e911_city']
+                item['e911_state'] =  "" if(item['e911_state'] == None) else item['e911_state']
+                item['e911_zipcode'] =  "" if(item['e911_zipcode'] == None) else item['e911_zipcode']
+                item['e911_country'] =  "" if(item['e911_country'] == None) else item['e911_country']
+
+            return render(request, 'customers.html', {'customers': customers_list, 'search': query})
+        else:
+            customers_list = Customer.objects.all().values()
+
+            for item in customers_list:
+                item['full_name'] =  "" if(item['full_name'] == None) else item['full_name']
+                item['phone'] =  "" if(item['phone'] == None) else item['phone']
+                item['fax'] =  "" if(item['fax'] == None) else item['fax']
+                item['mobile'] =  "" if(item['mobile'] == None) else item['mobile']
+                item['email'] =  "" if(item['email'] == None) else item['email']
+                item['billing_address'] =  "" if(item['billing_address'] == None) else item['billing_address']
+                item['billing_city'] =  "" if(item['billing_city'] == None) else item['billing_city']
+                item['billing_state'] =  "" if(item['billing_state'] == None) else item['billing_state']
+                item['billing_zipcode'] =  "" if(item['billing_zipcode'] == None) else item['billing_zipcode']
+                item['billing_country'] =  "" if(item['billing_country'] == None) else item['billing_country']
+                item['e911_address'] =  "" if(item['e911_address'] == None) else item['e911_address']
+                item['e911_city'] =  "" if(item['e911_city'] == None) else item['e911_city']
+                item['e911_state'] =  "" if(item['e911_state'] == None) else item['e911_state']
+                item['e911_zipcode'] =  "" if(item['e911_zipcode'] == None) else item['e911_zipcode']
+                item['e911_country'] =  "" if(item['e911_country'] == None) else item['e911_country']
+
+            return render(request, 'customers.html', {'customers': customers_list})
     
     if 'POST' == request.method:
         try:
@@ -153,22 +184,22 @@ def customer_delete(request, id):
 def customer_add(request):
     if request.method == 'POST':
         customer = Customer(
-            full_name=request.POST['full_name'],
-            phone=request.POST['phone'],
-            fax=request.POST['fax'],
-            mobile=request.POST['mobile'],
-            email=request.POST['email'],
-            billing_address=request.POST['billing_address'],
-            billing_city=request.POST['billing_city'],
-            billing_state=request.POST['billing_state'],
-            billing_country=request.POST['billing_country'],
-            e911_address=request.POST['e911_address'],
-            e911_city=request.POST['e911_city'],
-            e911_state=request.POST['e911_state'],
-            e911_zipcode=request.POST['e911_zipcode'],
-            e911_country=request.POST['billing_address'],
-            created_at=datetime.datetime.now(),
-            updated_at=datetime.datetime.now(), )
+            full_name = request.POST['full_name'],
+            phone = request.POST['phone'],
+            fax = request.POST['fax'],
+            mobile = request.POST['mobile'],
+            email = request.POST['email'],
+            billing_address = request.POST['billing_address'],
+            billing_city = request.POST['billing_city'],
+            billing_state = request.POST['billing_state'],
+            billing_country = request.POST['billing_country'],
+            e911_address = request.POST['e911_address'],
+            e911_city = request.POST['e911_city'],
+            e911_state = request.POST['e911_state'],
+            e911_zipcode = request.POST['e911_zipcode'],
+            e911_country = request.POST['billing_address'],
+            created_at = datetime.datetime.now(),
+            updated_at = datetime.datetime.now(), )
         try:
             customer.full_clean()
         except ValidationError as e:

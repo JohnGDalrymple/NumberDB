@@ -28,23 +28,23 @@
             <li class="breadcrumb-item active">Edit DID</li>
         </ol>
         <div class="bd-example">
-            <form action="/did/edit/{{ did.id }}" method="POST">
+            <form action="/did/update/{{ did.id }}" method="POST">
                 {% csrf_token %}
                 
                 <div class="row mb-3">
                     <div class="col">
                         <select name="customer" class="form-select p-3" aria-label="Choose Customer">
-                            <option value="" selected>Select customer</option>
+                            <option value="">Select customer</option>
                             {% for customer in customers %}
-                            <option value="{{ customer.id }}">{{ customer.full_name }}</option>
+                            <option value="{{ customer.full_name }}" {% if did.customer == customer.full_name %}selected{% endif %}>{{ customer.full_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="col">
                         <select name="reseller" class="form-select p-3" aria-label="Choose reseller">
-                            <option value="" selected>Select reseller</option>
+                            <option value="">Select reseller</option>
                             {% for customer in customers %}
-                            <option value="{{ customer.id }}">{{ customer.full_name }}</option>
+                            <option value="{{ customer.full_name }}" {% if did.reseller == customer.full_name %}selected{% endif %}>{{ customer.full_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
