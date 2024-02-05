@@ -38,26 +38,38 @@ window.addEventListener('DOMContentLoaded', event => {
 
 window.document.getElementById("selectDownloadButton")?.addEventListener("click", () => {
     const selectIds = []
-    for(var i in selectList)
-        selectList[i].checked ? selectIds.push(selectList[i].id.replace("select_", "")) : '';
+    for(var i in selectList) {
+        if(selectList[i].checked && selectList[i].id) {
+            if(selectList[i].id.includes("select_")) {
+                selectIds.push(selectList[i].id.replace("select_", ""))
+            }
+        }
+    }
 
     document.getElementById("selectDownloadButton").href = `${window.location.origin}/export-csv/?pk=${selectIds}`
 
     for(let i in selectList) 
-    selectList[i].checked = false;
+        selectList[i].checked = false;
     selectCount = 0;
+    fullCheckAction.checked = false
 });
 
 window.document.getElementById("selectCustomerDownloadButton")?.addEventListener("click", () => {
     const selectIds = []
-    for(var i in selectList)
-        selectList[i].checked ? selectIds.push(selectList[i].id.replace("select_", "")) : '';
+    for(var i in selectList) {
+        if(selectList[i].checked && selectList[i].id) {
+            if(selectList[i].id.includes("select_")) {
+                selectIds.push(selectList[i].id.replace("select_", ""))
+            }
+        }
+    }
 
     document.getElementById("selectCustomerDownloadButton").href = `${window.location.origin}/customer/export-csv/?pk=${selectIds}`
 
     for(let i in selectList) 
-    selectList[i].checked = false;
+        selectList[i].checked = false;
     selectCount = 0;
+    fullCheckAction.checked = false
 });
 
 var tableElements = document.getElementsByClassName('table-row');

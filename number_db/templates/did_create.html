@@ -36,7 +36,7 @@
                         <select name="customer" class="form-select p-3" aria-label="Choose Customer">
                             <option value="" selected>Select customer</option>
                             {% for customer in customers %}
-                            <option value="{{ customer.id }}">{{ customer.full_name }}</option>
+                            <option value="{{ customer.full_name }}">{{ customer.full_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -44,7 +44,7 @@
                         <select name="reseller" class="form-select p-3" aria-label="Choose reseller">
                             <option value="" selected>Select reseller</option>
                             {% for customer in customers %}
-                            <option value="{{ customer.id }}">{{ customer.full_name }}</option>
+                            <option value="{{ customer.full_name }}">{{ customer.full_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -59,8 +59,8 @@
                     <div class="col">
                         <select name="in_method" class="form-select p-3" aria-label="Choose in method">
                             <option value="" selected>Select in method</option>
-                            <option value="Y">Yes</option>
-                            <option value="N">No</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
                         </select>
                     </div>
                 </div>
@@ -68,8 +68,8 @@
                     <div class="col">
                         <select name="status" class="form-select p-3" aria-label="Choose status">
                             <option value="" selected>Select status</option>
-                            <option value="A">Active</option>
-                            <option value="D">Dixco</option>
+                            <option value="Active">Active</option>
+                            <option value="Dixco">Dixco</option>
                         </select>
                     </div>
                     <div class="col">
@@ -83,22 +83,22 @@
                     <div class="col">
                         <select name="voice_carrier" class="form-select p-3" aria-label="Choose voice carrier">
                             <option value="" selected>Select voice carrier</option>
-                            <option value="IW">INTQ - Wholesale</option>
-                            <option value="IO">INTQ - OC</option>
-                            <option value="TWI">Twilio</option>
+                            <option value="INTQ - Wholesale">INTQ - Wholesale</option>
+                            <option value="INTQ - OC">INTQ - OC</option>
+                            <option value="Twilio">Twilio</option>
                         </select>
                     </div>
                     <div class="col">
                         <select name="type" class="form-select p-3" aria-label="Choose type">
                             <option value="" selected>Select service type</option>
-                            <option value="F">Fusion</option>
-                            <option value="T">Teams</option>
-                            <option value="HS">Hosted SMS</option>
-                            <option value="PK">Parked</option>
-                            <option value="IV">Inventory</option>
-                            <option value="EF">Efax</option>
-                            <option value="OP">Orphaned</option>
-                            <option value="CL">Comelit</option>
+                            <option value="Fusion">Fusion</option>
+                            <option value="Teams">Teams</option>
+                            <option value="Hosted SMS">Hosted SMS</option>
+                            <option value="Parked">Parked</option>
+                            <option value="Inventory">Inventory</option>
+                            <option value="Efax">Efax</option>
+                            <option value="Orphaned">Orphaned</option>
+                            <option value="Comelit">Comelit</option>
                         </select>
                     </div>
                 </div>
@@ -106,15 +106,15 @@
                     <div class="col">
                         <select name="sms_enabled" class="form-select p-3" aria-label="Choose sms enable">
                             <option value="" selected>Select SMS activation</option>
-                            <option value="Y">Yes</option>
-                            <option value="N">No</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
                         </select>
                     </div>
                     <div class="col">
                         <select name="sms_carrier" class="form-select p-3" aria-label="Choose sms carrier">
                             <option value="" selected>Select SMS carrier</option>
                             <option value="INTQ">INTQ</option>
-                            <option value="TWL">Twilio</option>
+                            <option value="Twilio">Twilio</option>
                         </select>
                     </div>
                 </div>
@@ -122,12 +122,12 @@
                     <div class="col">
                         <select name="sms_type" class="form-select p-3" aria-label="Choose sms type">
                             <option value="" selected>Select SMS type</option>
-                            <option value="YP">Yak Personal</option>
-                            <option value="YS">Yak Shared</option>
-                            <option value="YB">Yak Personal and Shared</option>
-                            <option value="IA">INTQ API</option>
-                            <option value="CL">Clerk</option>
-                            <option value="SI">SIP/Simple</option>
+                            <option value="Yak Personal">Yak Personal</option>
+                            <option value="Yak Shared">Yak Shared</option>
+                            <option value="Yak Personal and Shared">Yak Personal and Shared</option>
+                            <option value="INTQ API">INTQ API</option>
+                            <option value="Clerk">Clerk</option>
+                            <option value="SIP/Simple">SIP/Simple</option>
                         </select>
                     </div>
                     <div class="col">
@@ -139,11 +139,11 @@
                     <div class="col">
                         <select name="term_location" class="form-select p-3" aria-label="Choose term location">
                             <option value="" selected>Select term location</option>
-                            <option value="SE">SBC - East</option>
-                            <option value="SW">SBC - West</option>
-                            <option value="HE">Hosted - East</option>
-                            <option value="HW">Hosted - West</option>
-                            <option value="OC">OP - Operator Connect</option>
+                            <option value="SBC - East">SBC - East</option>
+                            <option value="SBC - West">SBC - West</option>
+                            <option value="Hosted - East">Hosted - East</option>
+                            <option value="Hosted - West">Hosted - West</option>
+                            <option value="OP - Operator Connect">OP - Operator Connect</option>
                         </select>
                     </div>
                 </div>
@@ -191,8 +191,8 @@
                     <div class="col-3">
                         <select name="e911_enabled_billed" class="form-select p-3" aria-label="Choose e911 enable and billed">
                             <option value="" selected>Select E911 enable and billed</option>
-                            <option value="Y">Yes</option>
-                            <option value="N">No</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
                         </select>
                     </div>
                     <div class="col-3">

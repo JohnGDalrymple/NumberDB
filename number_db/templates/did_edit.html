@@ -28,23 +28,23 @@
             <li class="breadcrumb-item active">Edit DID</li>
         </ol>
         <div class="bd-example">
-            <form action="/did/edit/{{ did.id }}" method="POST">
+            <form action="/did/update/{{ did.id }}" method="POST">
                 {% csrf_token %}
                 
                 <div class="row mb-3">
                     <div class="col">
                         <select name="customer" class="form-select p-3" aria-label="Choose Customer">
-                            <option value="" selected>Select customer</option>
+                            <option value="">Select customer</option>
                             {% for customer in customers %}
-                            <option value="{{ customer.id }}">{{ customer.full_name }}</option>
+                            <option value="{{ customer.full_name }}" {% if did.customer == customer.full_name %}selected{% endif %}>{{ customer.full_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="col">
                         <select name="reseller" class="form-select p-3" aria-label="Choose reseller">
-                            <option value="" selected>Select reseller</option>
+                            <option value="">Select reseller</option>
                             {% for customer in customers %}
-                            <option value="{{ customer.id }}">{{ customer.full_name }}</option>
+                            <option value="{{ customer.full_name }}" {% if did.reseller == customer.full_name %}selected{% endif %}>{{ customer.full_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -58,18 +58,18 @@
                     </div>
                     <div class="col">
                         <select name="in_method" class="form-select p-3" aria-label="Choose in method">
-                            <option value="" selected>Select in method</option>
-                            <option value="Y">Yes</option>
-                            <option value="N">No</option>
+                            <option value="">Select in method</option>
+                            <option value="Yes" {% if did.in_method == "Yes" %}selected{% endif %}>Yes</option>
+                            <option value="No" {% if did.in_method == "No" %}selected{% endif %}>No</option>
                         </select>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col">
                         <select name="status" class="form-select p-3" aria-label="Choose status">
-                            <option value="" selected>Select status</option>
-                            <option value="A">Active</option>
-                            <option value="D">Dixco</option>
+                            <option value="">Select status</option>
+                            <option value="Active" {% if did.status == "Active" %}selected{% endif %}>Active</option>
+                            <option value="Dixco" {% if did.status == "Dixco" %}selected{% endif %}>Dixco</option>
                         </select>
                     </div>
                     <div class="col">
@@ -81,24 +81,24 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col">
-                        <select name="voice_carrier" class="form-select p-3" aria-label="Choose voice carrier">
-                            <option value="" selected>Select voice carrier</option>
-                            <option value="IW">INTQ - Wholesale</option>
-                            <option value="IO">INTQ - OC</option>
-                            <option value="TWI">Twilio</option>
+                        <select id="voice_carrier" name="voice_carrier" class="form-select p-3" aria-label="{{ did.voice_carrier }}">
+                            <option value="">Select voice carrier</option>
+                            <option value="INTQ - Wholesale" {% if did.voice_carrier == "INTQ - Wholesale" %}selected{% endif %}>INTQ - Wholesale</option>
+                            <option value="INTQ - OC" {% if did.voice_carrier == "INTQ - OC" %}selected{% endif %}>INTQ - OC</option>
+                            <option value="Twilio" {% if did.voice_carrier == "Twilio" %}selected{% endif %}>Twilio</option>
                         </select>
                     </div>
                     <div class="col">
                         <select name="type" class="form-select p-3" aria-label="Choose type">
-                            <option value="" selected>Select service type</option>
-                            <option value="F">Fusion</option>
-                            <option value="T">Teams</option>
-                            <option value="HS">Hosted SMS</option>
-                            <option value="PK">Parked</option>
-                            <option value="IV">Inventory</option>
-                            <option value="EF">Efax</option>
-                            <option value="OP">Orphaned</option>
-                            <option value="CL">Comelit</option>
+                            <option value="">Select service type</option>
+                            <option value="Fusion" {% if did.type == "Fusion" %}selected{% endif %}>Fusion</option>
+                            <option value="Teams" {% if did.type == "Teams" %}selected{% endif %}>Teams</option>
+                            <option value="Hosted SMS" {% if did.type == "Hosted SMS" %}selected{% endif %}>Hosted SMS</option>
+                            <option value="Parked" {% if did.type == "Parked" %}selected{% endif %}>Parked</option>
+                            <option value="Inventory" {% if did.type == "Inventory" %}selected{% endif %}>Inventory</option>
+                            <option value="Efax" {% if did.type == "Efax" %}selected{% endif %}>Efax</option>
+                            <option value="Orphaned" {% if did.type == "Orphaned" %}selected{% endif %}>Orphaned</option>
+                            <option value="Comelit" {% if did.type == "Comelit" %}selected{% endif %}>Comelit</option>
                         </select>
                     </div>
                 </div>
@@ -106,63 +106,63 @@
                     <div class="col">
                         <select name="sms_enabled" class="form-select p-3" aria-label="Choose sms enable">
                             <option value="" selected>Select SMS activation</option>
-                            <option value="Y">Yes</option>
-                            <option value="N">No</option>
+                            <option value="Yes" {% if did.sms_enabled == "Yes" %}selected{% endif %}>Yes</option>
+                            <option value="No" {% if did.sms_enabled == "No" %}selected{% endif %}>No</option>
                         </select>
                     </div>
                     <div class="col">
                         <select name="sms_carrier" class="form-select p-3" aria-label="Choose sms carrier">
-                            <option value="" selected>Select SMS carrier</option>
-                            <option value="INTQ">INTQ</option>
-                            <option value="TWL">Twilio</option>
+                            <option value="">Select SMS carrier</option>
+                            <option value="INTQ" {% if did.sms_carrier == "INTQ" %}selected{% endif %}>INTQ</option>
+                            <option value="Twilio" {% if did.sms_carrier == "Twilio" %}selected{% endif %}>Twilio</option>
                         </select>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col">
                         <select name="sms_type" class="form-select p-3" aria-label="Choose sms type">
-                            <option value="" selected>Select SMS type</option>
-                            <option value="YP">Yak Personal</option>
-                            <option value="YS">Yak Shared</option>
-                            <option value="YB">Yak Personal and Shared</option>
-                            <option value="IA">INTQ API</option>
-                            <option value="CL">Clerk</option>
-                            <option value="SI">SIP/Simple</option>
+                            <option value="">Select SMS type</option>
+                            <option value="Yak Personal" {% if did.sms_type == "Yak Personal" %}selected{% endif %}>Yak Personal</option>
+                            <option value="Yak Shared" {% if did.sms_type == "Yak Shared" %}selected{% endif %}>Yak Shared</option>
+                            <option value="Yak Personal and Shared" {% if did.sms_type == "Yak Personal and Shared" %}selected{% endif %}>Yak Personal and Shared</option>
+                            <option value="INTQ API" {% if did.sms_type == "INTQ API" %}selected{% endif %}>INTQ API</option>
+                            <option value="Clerk" {% if did.sms_type == "Clerk" %}selected{% endif %}>Clerk</option>
+                            <option value="SIP/Simple" {% if did.sms_type == "SIP/Simple" %}selected{% endif %}>SIP/Simple</option>
                         </select>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="sms_campaign" type="text" placeholder="sms_campaign" id="sms_campaign">
+                            <input class="form-control" name="sms_campaign" type="text" value="{{ did.sms_campaign }}" placeholder="sms_campaign" id="sms_campaign">
                             <label for="sms_campaign">Enter SMS campagin</label>
                         </div>
                     </div>
                     <div class="col">
                         <select name="term_location" class="form-select p-3" aria-label="Choose term location">
-                            <option value="" selected>Select term location</option>
-                            <option value="SE">SBC - East</option>
-                            <option value="SW">SBC - West</option>
-                            <option value="HE">Hosted - East</option>
-                            <option value="HW">Hosted - West</option>
-                            <option value="OC">OP - Operator Connect</option>
+                            <option value="">Select term location</option>
+                            <option value="SBC - East" {% if did.term_location == "SBC - East" %}selected{% endif %}>SBC - East</option>
+                            <option value="SBC - West" {% if did.term_location == "SBC - West" %}selected{% endif %}>SBC - West</option>
+                            <option value="Hosted - East" {% if did.term_location == "Hosted - East" %}selected{% endif %}>Hosted - East</option>
+                            <option value="Hosted - West" {% if did.term_location == "Hosted - West" %}selected{% endif %}>Hosted - West</option>
+                            <option value="OP - Operator Connect" {% if did.term_location == "OP - Operator Connect" %}selected{% endif %}>OP - Operator Connect</option>
                         </select>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="user_first_name" type="text"  placeholder="user_first_name" id="user_first_name">
+                            <input class="form-control" name="user_first_name" type="text" value="{{ did.user_first_name }}" placeholder="user_first_name" id="user_first_name">
                             <label for="user_first_name">Enter first name</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="user_last_name" type="text"  placeholder="user_last_name" id="user_last_name">
+                            <input class="form-control" name="user_last_name" type="text" value="{{ did.user_last_name }}" placeholder="user_last_name" id="user_last_name">
                             <label for="user_last_name">Enter last name</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="extension" type="number"  placeholder="extension" id="extension">
+                            <input class="form-control" name="extension" type="number" value="{{ did.extension }}" placeholder="extension" id="extension">
                             <label for="extension">Enter extension</label>
                         </div>
                     </div>
@@ -170,19 +170,19 @@
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="email" type="email"  placeholder="email" id="email">
+                            <input class="form-control" name="email" type="email" value="{{ did.email }}" placeholder="email" id="email">
                             <label for="email">Enter email</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="onboard_date" type="date"  placeholder="onboard_date" id="onboard_date">
+                            <input class="form-control" name="onboard_date" type="date" value="{{ did.onboard_date }}" placeholder="onboard_date" id="onboard_date">
                             <label for="onboard_date">Enter onboard date</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="note" type="text"  placeholder="note" id="note">
+                            <input class="form-control" name="note" type="text" value="{{ did.note }}" placeholder="note" id="note">
                             <label for="note">Enter note</label>
                         </div>
                     </div>
@@ -190,20 +190,20 @@
                 <div class="row mb-3">
                     <div class="col-3">
                         <select name="e911_enabled_billed" class="form-select p-3" aria-label="Choose e911 enable and billed">
-                            <option value="" selected>Select E911 enable and billed</option>
-                            <option value="Y">Yes</option>
-                            <option value="N">No</option>
+                            <option value="">Select E911 enable and billed</option>
+                            <option value="Yes" {% if did.e911_enabled_billed == "Yes" %}selected{% endif %}>Yes</option>
+                            <option value="No" {% if did.e911_enabled_billed == "No" %}selected{% endif %}>No</option>
                         </select>
                     </div>
                     <div class="col-3">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="e911_cid" type="number"  placeholder="e911_cid" id="e911_cid">
+                            <input class="form-control" name="e911_cid" type="number" value="{{ did.e911_cid }}" placeholder="e911_cid" id="e911_cid">
                             <label for="e911_cid">Enter E911 cid</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="e911_address" type="text"  placeholder="e911_address" id="e911_address">
+                            <input class="form-control" name="e911_address" type="text" value="{{ did.e911_address }}" placeholder="e911_address" id="e911_address">
                             <label for="e911_address">Enter E911 Address</label>
                         </div>
                     </div>
@@ -211,25 +211,25 @@
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="service_1" type="text"  placeholder="service_1" id="service_1">
+                            <input class="form-control" name="service_1" type="text" value="{{ did.service_1 }}" placeholder="service_1" id="service_1">
                             <label for="service_1">Enter service_1</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="service_2" type="text"  placeholder="service_2" id="service_2">
+                            <input class="form-control" name="service_2" type="text" value="{{ did.service_2 }}" placeholder="service_2" id="service_2">
                             <label for="service_2">Enter service_2</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="service_3" type="text"  placeholder="service_3" id="service_3">
+                            <input class="form-control" name="service_3" type="text" value="{{ did.service_3 }}" placeholder="service_3" id="service_3">
                             <label for="service_3">Enter service_3</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="service_4" type="text"  placeholder="service_4" id="service_4">
+                            <input class="form-control" name="service_4" type="text" value="{{ did.service_4 }}" placeholder="service_4" id="service_4">
                             <label for="service_4">Enter service_4</label>
                         </div>
                     </div>
