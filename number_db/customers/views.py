@@ -135,7 +135,7 @@ def customer_list(request):
                 data_dict = data_df.to_dict('records')
                 
                 if data_dict != []:
-                    if list(data_dict[0].keys()) == default_header:
+                    if set(data_dict[0].keys()) == set(default_header):
                         filter_data = data_df.fillna('')
                         filter_data = filter_data.to_dict('records')
                         for item in filter_data:

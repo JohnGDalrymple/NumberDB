@@ -27,7 +27,11 @@ def parse_date(date_string):
         return datetime.datetime.strptime(date_string, '%m/%d/%Y').date() if date_string else None
 
 def parse_datetime(datetime_string):
-    return datetime.datetime.strptime(datetime_string, '%m/%d/%Y %H:%M:%S') if datetime_string else None
+    try:
+        return datetime.datetime.strptime(datetime_string, '%m/%d/%Y %H:%M:%S').date()
+    except ValueError:
+        return datetime.datetime.strptime(datetime_string, '%m/%d/%Y %H:%M:%S').date() if datetime_string else None
+    
 
 def service_type_switch(value):
     if value.lower() == "fusion":
@@ -46,6 +50,8 @@ def service_type_switch(value):
         return "Orphaned"
     elif value.lower() == "comelit":
         return "Comelit"
+    elif value:
+        return False
     return ""
     
 def voice_carrier_switch(value):
@@ -55,6 +61,8 @@ def voice_carrier_switch(value):
         return "INTQ - OC"
     elif value.lower() == "twilio":
         return "Twilio"
+    elif value:
+        return False
     return ""
     
 def sms_carrier_switch(value):
@@ -62,6 +70,8 @@ def sms_carrier_switch(value):
         return "INTQ"
     elif value.lower() == "twilio":
         return "TWL"
+    elif value:
+        return False
     return ""
     
 def status_switch(value):
@@ -69,6 +79,8 @@ def status_switch(value):
         return "Active"
     elif value.lower() == "disco":
         return "Disco"
+    elif value:
+        return False
     return ""
     
 def switch(value):
@@ -91,6 +103,8 @@ def sms_type_switch(value):
         return "Clerk"
     elif value.lower() == "sip/simple":
         return "SIP/Simple"
+    elif value:
+        return False
     return ""
     
 def term_location_switch(value):
@@ -104,6 +118,8 @@ def term_location_switch(value):
         return "Hosted - West"
     elif value.lower() == "op - operator connect":
         return "OP - Operator Connect"
+    elif value:
+        return False
     return ""
 
 @login_required
@@ -213,7 +229,7 @@ def did(request):
                     data_dict = data_df.to_dict('records')
                     
                     if data_dict != []:
-                        if list(data_dict[0].keys()) == default_header:
+                        if set(data_dict[0].keys()) == set(default_header):
                             convert_data = data_df.fillna('')
                             convert_data = convert_data.to_dict('records')
 
@@ -246,7 +262,8 @@ def did(request):
                                 service_2 = item['Service 2'], 
                                 service_3 = item['Service 3'], 
                                 service_4 = item['Service 4'], 
-                                updated_date_time = parse_datetime(item['Updated Date Time']), 
+                                # updated_date_time = parse_datetime(item['Updated Date Time']), 
+                                updated_date_time = datetime.datetime.now(),
                                 updated_by = item['Updated By'], 
                                 )
                                 try:
