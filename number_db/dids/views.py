@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 import csv
-from .models import Did
+from .models import *
 from django.db.models import Q
 from customers.models import *
 import datetime
@@ -51,7 +51,7 @@ def service_type_switch(value):
     elif value.lower() == "comelit":
         return "Comelit"
     elif value:
-        return False
+        return True
     return ""
     
 def voice_carrier_switch(value):
@@ -62,7 +62,7 @@ def voice_carrier_switch(value):
     elif value.lower() == "twilio":
         return "Twilio"
     elif value:
-        return False
+        return True
     return ""
     
 def sms_carrier_switch(value):
@@ -71,7 +71,7 @@ def sms_carrier_switch(value):
     elif value.lower() == "twilio":
         return "TWL"
     elif value:
-        return False
+        return True
     return ""
     
 def status_switch(value):
@@ -80,7 +80,7 @@ def status_switch(value):
     elif value.lower() == "disco":
         return "Disco"
     elif value:
-        return False
+        return True
     return ""
     
 def switch(value):
@@ -104,7 +104,7 @@ def sms_type_switch(value):
     elif value.lower() == "sip/simple":
         return "SIP/Simple"
     elif value:
-        return False
+        return True
     return ""
     
 def term_location_switch(value):
@@ -119,8 +119,18 @@ def term_location_switch(value):
     elif value.lower() == "op - operator connect":
         return "OP - Operator Connect"
     elif value:
-        return False
+        return True
     return ""
+
+def check_in_customers(customer_name, customers):
+    if customers == []:
+        return True
+    elif customer_name == '':
+        return ''
+    for item in customers:
+        if customer_name.lower() == item.lower():
+            return item
+    return True
 
 @login_required
 def index(request):
@@ -179,8 +189,54 @@ def export_csv(request):
         return redirect('/did')
 
 @login_required
+def export_error_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="ErrorReport.csv"'
+    writer = csv.writer(response)
+    writer.writerow(default_header)
+
+    error_data = Did_Error.objects.all().values()
+    
+    for item in error_data:
+        writer.writerow([
+            item['did'],
+            item['customer'],
+            item['reseller'],
+            item['in_method'],
+            item['status'],
+            item['change_date'],
+            item['voice_carrier'],
+            item['sms_enabled'],
+            item['type'],
+            item['sms_carrier'],
+            item['sms_type'],
+            item['sms_campaign'],
+            item['term_location'],
+            item['user_first_name'],
+            item['user_last_name'],
+            item['extension'],
+            item['email'],
+            item['onboard_date'],
+            item['note'],
+            item['e911_enabled_billed'],
+            item['e911_cid'],
+            item['e911_address'],
+            item['did_uuid'],
+            item['service_1'],
+            item['service_2'],
+            item['service_3'],
+            item['service_4'],
+            item['updated_date_time'],
+            item['updated_by'],
+            ])
+        
+    Did_Error.objects.all().delete()
+    return response
+
+@login_required
 def did(request):
     if 'GET' == request.method:
+        did_error = Did_Error.objects.all().values()
         dids_list = []
         if request.GET:
             query = request.GET['search']
@@ -197,7 +253,7 @@ def did(request):
                 item['e911_cid'] =  "" if(item['e911_cid'] == None) else item['e911_cid']
                 item['updated_date_time'] =  "" if(item['updated_date_time'] == None) else item['updated_date_time']
                 
-            return render(request, 'dids.html', {'dids': dids_list, 'search': query})
+            return render(request, 'dids.html', {'dids': dids_list, 'search': query, 'error': did_error})
 
         else:
             dids_list = Did.objects.all().values()
@@ -209,7 +265,7 @@ def did(request):
                 item['e911_cid'] =  "" if(item['e911_cid'] == None) else item['e911_cid']
                 item['updated_date_time'] =  "" if(item['updated_date_time'] == None) else item['updated_date_time']
                     
-            return render(request, 'dids.html', {'dids': dids_list})
+            return render(request, 'dids.html', {'dids': dids_list, 'error': did_error})
     
     if 'POST' == request.method:
             try:
@@ -233,43 +289,92 @@ def did(request):
                             convert_data = data_df.fillna('')
                             convert_data = convert_data.to_dict('records')
 
+                            customers_data = Customer.objects.values_list('full_name')
+                            customers = []
+                            for item in customers_data:
+                                customers.append(item[0])
+
+                            error_flag = False
+
                             for item in convert_data:
-                                save_data = Did(
-                                did_uuid = item['DID uuid'], 
-                                did = item['DID'] if item['DID'] else None, 
-                                in_method = switch(item['In Method']), 
-                                voice_carrier = voice_carrier_switch(item['Voice Carrier']), 
-                                status = status_switch(item['Status']), 
-                                change_date = parse_date(item['Change Date']), 
-                                type = service_type_switch(item['Type']), 
-                                sms_enabled = switch(item['SMS Enabled']), 
-                                sms_carrier = sms_carrier_switch(item['SMS Carrier']), 
-                                sms_type = sms_type_switch(item['SMS Type']), 
-                                sms_campaign = item['SMS Campaign'], 
-                                term_location = term_location_switch(item['Term Location']), 
-                                customer = item['Customer'], 
-                                reseller = item['Reseller'], 
-                                user_first_name = item['User First Name'], 
-                                user_last_name = item['User Last Name'], 
-                                extension = item['Extension'] if item['Extension'] else None,
-                                email = item['Email'], 
-                                onboard_date = parse_date(item['Onboard Date']), 
-                                note = item['Note'], 
-                                e911_enabled_billed = switch(item['E911 Enabled Billed']), 
-                                e911_cid = item['E911 CID'] if item['E911 CID'] else None, 
-                                e911_address = item['E911 Address'], 
-                                service_1 = item['Service 1'], 
-                                service_2 = item['Service 2'], 
-                                service_3 = item['Service 3'], 
-                                service_4 = item['Service 4'], 
-                                # updated_date_time = parse_datetime(item['Updated Date Time']), 
-                                updated_date_time = datetime.datetime.now(),
-                                updated_by = item['Updated By'], 
-                                )
-                                try:
-                                    save_data.save()
-                                except Exception as e:
-                                    messages.warning(request, e)
+                                if not item['DID'] or switch(item['In Method']) == True or voice_carrier_switch(item['Voice Carrier']) == True or status_switch(item['Status']) == True or service_type_switch(item['Type']) == True or switch(item['SMS Enabled']) == True or sms_carrier_switch(item['SMS Carrier']) == True or sms_type_switch(item['SMS Type']) == True or term_location_switch(item['Term Location']) == True or switch(item['E911 Enabled Billed']) == True or check_in_customers(item['Customer'], customers) == True or check_in_customers(item['Reseller'], customers) == True:
+                                    error_flag = True
+                                    save_data = Did_Error(
+                                    did_uuid = item['DID uuid'], 
+                                    did = item['DID'], 
+                                    in_method = item['In Method'], 
+                                    voice_carrier = item['Voice Carrier'], 
+                                    status = item['Status'], 
+                                    change_date = item['Change Date'], 
+                                    type = item['Type'], 
+                                    sms_enabled = item['SMS Enabled'], 
+                                    sms_carrier = item['SMS Carrier'], 
+                                    sms_type = item['SMS Type'], 
+                                    sms_campaign = item['SMS Campaign'], 
+                                    term_location = item['Term Location'], 
+                                    customer = item['Customer'], 
+                                    reseller = item['Reseller'], 
+                                    user_first_name = item['User First Name'], 
+                                    user_last_name = item['User Last Name'], 
+                                    extension = item['Extension'],
+                                    email = item['Email'], 
+                                    onboard_date = item['Onboard Date'], 
+                                    note = item['Note'], 
+                                    e911_enabled_billed = item['E911 Enabled Billed'], 
+                                    e911_cid = item['E911 CID'],
+                                    e911_address = item['E911 Address'], 
+                                    service_1 = item['Service 1'], 
+                                    service_2 = item['Service 2'], 
+                                    service_3 = item['Service 3'], 
+                                    service_4 = item['Service 4'], 
+                                    updated_date_time = item['Updated Date Time'], 
+                                    updated_by = item['Updated By'], 
+                                    )
+
+                                    try:
+                                        save_data.save()
+                                    except Exception as e:
+                                        messages.warning(request, e)
+                                else:
+                                    save_data = Did(
+                                    did_uuid = item['DID uuid'], 
+                                    did = item['DID'] if item['DID'] else None, 
+                                    in_method = switch(item['In Method']), 
+                                    voice_carrier = voice_carrier_switch(item['Voice Carrier']), 
+                                    status = status_switch(item['Status']), 
+                                    # change_date = parse_date(item['Change Date']), 
+                                    change_date =  datetime.datetime.now(), 
+                                    type = service_type_switch(item['Type']), 
+                                    sms_enabled = switch(item['SMS Enabled']), 
+                                    sms_carrier = sms_carrier_switch(item['SMS Carrier']), 
+                                    sms_type = sms_type_switch(item['SMS Type']), 
+                                    sms_campaign = item['SMS Campaign'], 
+                                    term_location = term_location_switch(item['Term Location']), 
+                                    customer = check_in_customers(item['Customer'], customers), 
+                                    reseller = check_in_customers(item['Reseller'], customers), 
+                                    user_first_name = item['User First Name'], 
+                                    user_last_name = item['User Last Name'], 
+                                    extension = item['Extension'] if item['Extension'] else None,
+                                    email = item['Email'], 
+                                    onboard_date = parse_date(item['Onboard Date']), 
+                                    note = item['Note'], 
+                                    e911_enabled_billed = switch(item['E911 Enabled Billed']), 
+                                    e911_cid = item['E911 CID'] if item['E911 CID'] else None, 
+                                    e911_address = item['E911 Address'], 
+                                    service_1 = item['Service 1'], 
+                                    service_2 = item['Service 2'], 
+                                    service_3 = item['Service 3'], 
+                                    service_4 = item['Service 4'], 
+                                    # updated_date_time = parse_datetime(item['Updated Date Time']), 
+                                    updated_date_time = datetime.datetime.now(),
+                                    updated_by = item['Updated By'], 
+                                    )
+                                    try:
+                                        save_data.save()
+                                    except Exception as e:
+                                        messages.warning(request, e)
+                            if error_flag:
+                                messages.warning(request, "There are uncorrect field in the CSV file, Please check it and upload again.")
                             messages.success(request, "Successfully Uploaded CSV File and Added to database")
                             
                         else:
@@ -426,9 +531,9 @@ def did_add(request):
         messages.success(request, 'DID was created successfully!')
         return redirect('/did')
     else:
-        customersData = Customer.objects.values_list('id', 'full_name')
+        customers_data = Customer.objects.values_list('id', 'full_name')
         customers = []
-        for item in customersData:
+        for item in customers_data:
             customers.append({'id': item[0], 'full_name': item[1]})
         return render(request, 'did_create.html', {'customers': customers})
     
@@ -475,9 +580,9 @@ def did_edit(request, id):
         'updated_by': did['updated_by'],
     }
 
-    customersData = Customer.objects.values_list('full_name')
+    customers_data = Customer.objects.values_list('full_name')
     customers = []
-    for item in customersData:
+    for item in customers_data:
         customers.append({'full_name': item[0]})
     context = {'did': didData, 'customers': customers}
 

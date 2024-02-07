@@ -15,8 +15,8 @@
         <span class="fa fa-download" ></span> 
         &nbsp;Download Select CSV
       </a>
-      {% if dids %}
-      <a class="btn-sm btn btn-danger" href="{% static 'sample.csv' %}" download style="float: right; margin-right: 10px;"><span class="fa fa-download"></span> &nbsp;Download Error Report CSV</a>
+      {% if error %}
+      <a id="errorReportButton" class="btn-sm btn btn-danger" download style="float: right; margin-right: 10px;"><span class="fa fa-download"></span> &nbsp;Download Error Report CSV</a>
       {% endif %}
     </div>
     <div class="card-body">
