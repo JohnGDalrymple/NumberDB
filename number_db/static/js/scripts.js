@@ -54,6 +54,13 @@ window.document.getElementById("selectDownloadButton")?.addEventListener("click"
     fullCheckAction.checked = false
 });
 
+window.document.getElementById("errorReportButton")?.addEventListener("click", () => {
+    document.getElementById("errorReportButton").href = `${window.location.origin}/export-error-report-csv`;
+    setTimeout(() => {
+        location.reload();
+    }, 150);
+});
+
 window.document.getElementById("selectCustomerDownloadButton")?.addEventListener("click", () => {
     const selectIds = []
     for(var i in selectList) {
