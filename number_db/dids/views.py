@@ -3,7 +3,9 @@ import csv
 from .models import *
 from django.db.models import Q
 from customers.models import *
+from assist_dids.models import *
 import datetime
+from functools import reduce
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from dids.forms import *
@@ -14,6 +16,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.hashers import make_password
 import pandas as pd
 import uuid
+from operator import or_
+
 # Create your views here.
 
 default_data_header = ['did', 'customer', 'reseller', 'in_method', 'status', 'change_date', 'voice_carrier', 'type', 'sms_enabled', 'sms_carrier', 'sms_type', 'sms_campaign', 'term_location', 'user_first_name', 'user_last_name', 'extension', 'email', 'onboard_date', 'note', 'e911_enabled_billed', 'e911_cid', 'e911_address', 'did_uuid', 'service_1', 'service_2', 'service_3', 'service_4', 'updated_date_time', 'updated_by']
@@ -33,61 +37,7 @@ def parse_datetime(datetime_string):
         return datetime.datetime.strptime(datetime_string, '%m/%d/%Y %H:%M:%S').date()
     except ValueError:
         return datetime.datetime.strptime(datetime_string, '%m/%d/%Y %H:%M:%S').date() if datetime_string else None
-    
-
-def service_type_switch(value):
-    if value.lower() == "fusion":
-        return "Fusion"
-    elif value.lower() == "teams":
-        return "Teams"
-    elif value.lower() == "hosted sms":
-        return "Hosted SMS"
-    elif value.lower() == "parked":
-        return "Parked"
-    elif value.lower() == "inventory":
-        return "Inventory"
-    elif value.lower() == "efax":
-        return "Efax"
-    elif value.lower() == "orphaned":
-        return "Orphaned"
-    elif value.lower() == "comelit":
-        return "Comelit"
-    elif value:
-        return True
-    return ""
-    
-
-def voice_carrier_switch(value):
-    if value.lower() == "intq - wholesale":
-        return "INTQ - Wholesale"
-    elif value.lower() == "intq - oc":
-        return "INTQ - OC"
-    elif value.lower() == "twilio":
-        return "Twilio"
-    elif value:
-        return True
-    return ""
-    
-
-def sms_carrier_switch(value):
-    if value.lower() == "intq":
-        return "INTQ"
-    elif value.lower() == "twilio":
-        return "TWL"
-    elif value:
-        return True
-    return ""
-    
-
-def status_switch(value):
-    if value.lower() == "active":
-        return "Active"
-    elif value.lower() == "disco":
-        return "Disco"
-    elif value:
-        return True
-    return ""
-    
+   
 
 def switch(value):
     if value.lower() == "yes":
@@ -97,49 +47,60 @@ def switch(value):
     return ""
 
 
-def sms_type_switch(value):
-    if value.lower() == "yak personal":
-        return "Yak Personal"
-    elif value.lower() == "yak shared":
-        return "Yak Shared"
-    elif value.lower() == "yak personal and shared":
-        return "Yak Personal and Shared"
-    elif value.lower() == "intq api":
-        return "INTQ API"
-    elif value.lower() == "clerk":
-        return "Clerk"
-    elif value.lower() == "sip/simple":
-        return "SIP/Simple"
-    elif value:
-        return True
-    return ""
+def check_customer(customer_name):
+    try:
+        customer = Customer.objects.get(full_name__iexact = customer_name)
+        return customer
+    except Exception as e:
+        return True if customer_name else None
+
+
+def check_service_status(status_value):
+    try:
+        service_status = Status.objects.get(name__iexact = status_value)
+        return service_status
+    except Exception as e:
+        return True if status_value else None
+
+
+def check_service_type(type_value):
+    try:
+        service_type = Service_Type.objects.get(name__iexact = type_value)
+        return service_type
+    except Exception as e:
+        return True if type_value else None
+
+
+def check_voice_carrier(voice_carrier_value):
+    try:
+        voice_carrier = Voice_Carrier.objects.get(name__iexact = voice_carrier_value)
+        return voice_carrier
+    except Exception as e:
+        return True if voice_carrier_value else None
     
 
-def term_location_switch(value):
-    if value.lower() == "sbc - east":
-        return "SBC - East"
-    elif value.lower() == "sbc - west":
-        return "SBC - West"
-    elif value.lower() == "hosted - east":
-        return "Hosted - East"
-    elif value.lower() == "hosted - west":
-        return "Hosted - West"
-    elif value.lower() == "op - operator connect":
-        return "OP - Operator Connect"
-    elif value:
-        return True
-    return ""
+def check_sms_carrier(sms_carrier_value):
+    try:
+        sms_carrier = SMS_Carrier.objects.get(name__iexact = sms_carrier_value)
+        return sms_carrier
+    except Exception as e:
+        return True if sms_carrier_value else None
+    
 
+def check_sms_type(sms_type_value):
+    try:
+        sms_type = SMS_Type.objects.get(name__iexact = sms_type_value)
+        return sms_type
+    except Exception as e:
+        return True if sms_type_value else None
+    
 
-def check_in_customers(customer_name, customers):
-    if customers == []:
-        return True
-    elif customer_name == '':
-        return ''
-    for item in customers:
-        if customer_name.lower() == item.lower():
-            return item
-    return True
+def check_term_location(term_location_value):
+    try:
+        term_location = Term_Location.objects.get(name__iexact = term_location_value)
+        return term_location
+    except Exception as e:
+        return True if term_location_value else None
 
 
 @login_required
@@ -154,30 +115,59 @@ def did(request):
         dids_list = []
         if request.GET:
             query = request.GET['search']
-            q_objects = Q()
-            for field in default_data_header:
-                q_objects |= Q(**{field + '__icontains': query})
 
-            dids_list = Did.objects.filter(q_objects).distinct().values()
+            # dids_list = Did.objects.filter(q_objects).distinct().values()
+            q_objects = []
+            q_objects.append((Q(did__icontains = query)))
+            q_objects.append((Q(user_first_name__icontains = query)))
+            q_objects.append((Q(user_last_name__icontains = query)))
+            q_objects.append((Q(email__icontains = query)))
+            q_objects.append((Q(onboard_date__contains = query)))
+            q_objects.append((Q(note__icontains = query)))
+            q_objects.append((Q(in_method__icontains = query)))
+            q_objects.append((Q(sms_campaign__icontains = query)))
+            q_objects.append((Q(sms_enabled__icontains = query)))
+            q_objects.append((Q(extension__icontains = query)))
+            q_objects.append((Q(e911_enabled_billed__icontains = query)))
+            q_objects.append((Q(e911_cid__icontains = query)))
+            q_objects.append((Q(e911_address__icontains = query)))
+            q_objects.append((Q(service_1__icontains = query)))
+            q_objects.append((Q(service_2__icontains = query)))
+            q_objects.append((Q(service_3__icontains = query)))
+            q_objects.append((Q(service_4__icontains = query)))
+            q_objects.append((Q(updated_by__icontains = query)))
+            
+            # Add Q objects for foreign key fields
+            q_objects.append((Q(status__name__icontains = query)))
+            q_objects.append((Q(type__name__icontains = query)))
+            q_objects.append((Q(voice_carrier__name__icontains = query)))
+            q_objects.append((Q(sms_carrier__name__icontains = query)))
+            q_objects.append((Q(sms_type__name__icontains = query)))
+            q_objects.append((Q(term_location__name__icontains = query)))
+            q_objects.append((Q(customer__full_name__icontains = query)))
+            q_objects.append((Q(reseller__full_name__icontains = query)))
+            
+            # Use Q object to query the database with OR condition
+            dids_list = Did.objects.filter(reduce(or_, q_objects))
 
             for item in dids_list:
-                item['change_date'] =  "" if(item['change_date'] == None) else item['change_date']
-                item['extension'] =  "" if(item['extension'] == None) else item['extension']
-                item['onboard_date'] =  "" if(item['onboard_date'] == None) else item['onboard_date']
-                item['e911_cid'] =  "" if(item['e911_cid'] == None) else item['e911_cid']
-                item['updated_date_time'] =  "" if(item['updated_date_time'] == None) else item['updated_date_time']
+                item.change_date =  "" if(item.change_date == None) else item.change_date
+                item.extension =  "" if(item.extension == None) else item.extension
+                item.onboard_date =  "" if(item.onboard_date == None) else item.onboard_date
+                item.e911_cid =  "" if(item.e911_cid == None) else item.e911_cid
+                item.updated_date_time =  "" if(item.updated_date_time == None) else item.updated_date_time
                 
             return render(request, 'dids.html', {'dids': dids_list, 'search': query, 'error': did_error})
 
         else:
-            dids_list = Did.objects.all().values()
-
+            # dids_list = Did.objects.all().values()
+            dids_list = Did.objects.all().select_related('customer', 'reseller', 'status', 'type', 'voice_carrier', 'sms_carrier', 'sms_type', 'term_location')
             for item in dids_list:
-                item['change_date'] =  "" if(item['change_date'] == None) else item['change_date']
-                item['extension'] =  "" if(item['extension'] == None) else item['extension']
-                item['onboard_date'] =  "" if(item['onboard_date'] == None) else item['onboard_date']
-                item['e911_cid'] =  "" if(item['e911_cid'] == None) else item['e911_cid']
-                item['updated_date_time'] =  "" if(item['updated_date_time'] == None) else item['updated_date_time']
+                item.change_date =  "" if(item.change_date == None) else item.change_date
+                item.extension =  "" if(item.extension == None) else item.extension
+                item.onboard_date =  "" if(item.onboard_date == None) else item.onboard_date
+                item.e911_cid =  "" if(item.e911_cid == None) else item.e911_cid
+                item.updated_date_time =  "" if(item.updated_date_time == None) else item.updated_date_time
                     
             return render(request, 'dids.html', {'dids': dids_list, 'error': did_error})
     
@@ -203,15 +193,29 @@ def did(request):
                             convert_data = data_df.fillna('')
                             convert_data = convert_data.to_dict('records')
 
-                            customers_data = Customer.objects.values_list('full_name')
-                            customers = []
-                            for item in customers_data:
-                                customers.append(item[0])
-
                             error_flag = False
 
                             for item in convert_data:
-                                if not item['DID'] or switch(item['In Method']) == True or voice_carrier_switch(item['Voice Carrier']) == True or status_switch(item['Status']) == True or service_type_switch(item['Type']) == True or switch(item['SMS Enabled']) == True or sms_carrier_switch(item['SMS Carrier']) == True or sms_type_switch(item['SMS Type']) == True or term_location_switch(item['Term Location']) == True or switch(item['E911 Enabled Billed']) == True or check_in_customers(item['Customer'], customers) == True or check_in_customers(item['Reseller'], customers) == True:
+                                customer_value = check_customer(item['Customer'])
+                                resller_value = check_customer(item['Reseller'])
+                                service_status_value = check_service_status(item['Status'])
+                                service_type_value = check_service_type(item['Type'])
+                                voice_carrier_value = check_voice_carrier(item['Voice Carrier'])
+                                sms_carrier_value = check_sms_carrier(item['SMS Carrier'])
+                                sms_type_value = check_sms_type(item['SMS Type'])
+                                term_location_value = check_term_location(item['Term Location'])
+
+                                # print(item)
+                                # print("voice_carrier_value", voice_carrier_value)
+                                # print("customer_value", customer_value)
+                                # print("resller_value", resller_value)
+                                # print("service_status_value", service_status_value)
+                                # print("service_type_value", service_type_value)
+                                # print("sms_carrier_value", sms_carrier_value)
+                                # print("sms_type_value", sms_type_value)
+                                # print("term_location_value", term_location_value)
+
+                                if not item['DID'] or switch(item['In Method']) == True or voice_carrier_value == True or service_status_value == True or service_type_value == True or switch(item['SMS Enabled']) == True or sms_carrier_value == True or sms_type_value == True or term_location_value == True or switch(item['E911 Enabled Billed']) == True or customer_value == True or resller_value == True:
                                     error_flag = True
                                     save_data = Did_Error(
                                     did_uuid = item['DID uuid'], 
@@ -244,51 +248,51 @@ def did(request):
                                     updated_date_time = item['Updated Date Time'], 
                                     updated_by = item['Updated By'], 
                                     )
-
                                     try:
                                         save_data.save()
                                     except Exception as e:
                                         messages.warning(request, e)
                                 else:
-                                    save_data = Did(
-                                    did_uuid = item['DID uuid'], 
-                                    did = item['DID'] if item['DID'] else None, 
-                                    in_method = switch(item['In Method']), 
-                                    voice_carrier = voice_carrier_switch(item['Voice Carrier']), 
-                                    status = status_switch(item['Status']), 
-                                    # change_date = parse_date(item['Change Date']), 
-                                    change_date =  datetime.datetime.now(), 
-                                    type = service_type_switch(item['Type']), 
-                                    sms_enabled = switch(item['SMS Enabled']), 
-                                    sms_carrier = sms_carrier_switch(item['SMS Carrier']), 
-                                    sms_type = sms_type_switch(item['SMS Type']), 
-                                    sms_campaign = item['SMS Campaign'], 
-                                    term_location = term_location_switch(item['Term Location']), 
-                                    customer = check_in_customers(item['Customer'], customers), 
-                                    reseller = check_in_customers(item['Reseller'], customers), 
-                                    user_first_name = item['User First Name'], 
-                                    user_last_name = item['User Last Name'], 
-                                    extension = item['Extension'] if item['Extension'] else None,
-                                    email = item['Email'], 
-                                    onboard_date = parse_date(item['Onboard Date']), 
-                                    note = item['Note'], 
-                                    e911_enabled_billed = switch(item['E911 Enabled Billed']), 
-                                    e911_cid = item['E911 CID'] if item['E911 CID'] else None, 
-                                    e911_address = item['E911 Address'], 
-                                    service_1 = item['Service 1'], 
-                                    service_2 = item['Service 2'], 
-                                    service_3 = item['Service 3'], 
-                                    service_4 = item['Service 4'], 
-                                    # updated_date_time = parse_datetime(item['Updated Date Time']), 
-                                    updated_date_time = datetime.datetime.now(),
-                                    updated_by = item['Updated By'], 
-                                    )
                                     try:
+                                        save_data = Did(
+                                        did_uuid = item['DID uuid'], 
+                                        did = item['DID'] if item['DID'] else None, 
+                                        in_method = switch(item['In Method']), 
+                                        voice_carrier = voice_carrier_value, 
+                                        status = service_status_value, 
+                                        # change_date = parse_date(item['Change Date']), 
+                                        change_date =  datetime.datetime.now(), 
+                                        type = sms_type_value, 
+                                        sms_enabled = switch(item['SMS Enabled']), 
+                                        sms_carrier = sms_carrier_value, 
+                                        sms_type = service_type_value, 
+                                        sms_campaign = item['SMS Campaign'], 
+                                        term_location = term_location_value, 
+                                        customer = customer_value, 
+                                        reseller = resller_value, 
+                                        user_first_name = item['User First Name'], 
+                                        user_last_name = item['User Last Name'], 
+                                        extension = item['Extension'] if item['Extension'] else None,
+                                        email = item['Email'], 
+                                        onboard_date = parse_date(item['Onboard Date']), 
+                                        note = item['Note'], 
+                                        e911_enabled_billed = switch(item['E911 Enabled Billed']), 
+                                        e911_cid = item['E911 CID'] if item['E911 CID'] else None, 
+                                        e911_address = item['E911 Address'], 
+                                        service_1 = item['Service 1'], 
+                                        service_2 = item['Service 2'], 
+                                        service_3 = item['Service 3'], 
+                                        service_4 = item['Service 4'], 
+                                        # updated_date_time = parse_datetime(item['Updated Date Time']), 
+                                        updated_date_time = datetime.datetime.now(),
+                                        updated_by = item['Updated By'], 
+                                        )
                                         save_data.save()
                                     except Exception as e:
+                                        print(e)
                                         messages.warning(request, e)
                             if error_flag:
-                                messages.warning(request, "There are uncorrect field in the CSV file, Please check it and upload again.")
+                                messages.warning(request, "There are uncorrect fields in the CSV file, Please check it and upload again.")
                             messages.success(request, "Successfully Uploaded CSV File and Added to database")
                             
                         else:

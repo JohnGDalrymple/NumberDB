@@ -101,18 +101,18 @@
                 </div>
               </th>
               <td>{{ did.did }}</td>
-              <td>{{ did.customer }}</td>
-              <td>{{ did.reseller }}</td>
+              <td>{{ did.customer.full_name }}</td>
+              <td>{{ did.reseller.full_name }}</td>
               <td>{{ did.in_method }}</td>
-              <td>{{ did.voice_carrier }}</td>
-              <td>{{ did.status }}</td>
+              <td>{{ did.voice_carrier.name }}</td>
+              <td>{{ did.status.name }}</td>
               <td>{{ did.change_date | date:"d-m-Y" }}</td>
-              <td>{{ did.type }}</td>
+              <td>{{ did.type.name }}</td>
               <td>{{ did.sms_enabled }}</td>
-              <td>{{ did.sms_carrier }}</td>
-              <td>{{ did.sms_type }}</td>
+              <td>{{ did.sms_carrier.name }}</td>
+              <td>{{ did.sms_type.name }}</td>
               <td>{{ did.sms_campaign }}</td>
-              <td>{{ did.term_location }}</td>
+              <td>{{ did.term_location.name }}</td>
               <td>{{ did.user_first_name }}</td>
               <td>{{ did.user_last_name }}</td>
               <td>{{ did.extension }}</td>
