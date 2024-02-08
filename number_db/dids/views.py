@@ -20,11 +20,13 @@ default_data_header = ['did', 'customer', 'reseller', 'in_method', 'status', 'ch
 
 default_header = ['DID', 'Customer', 'Reseller', 'In Method', 'Status', 'Change Date', 'Voice Carrier', 'Type', 'SMS Enabled', 'SMS Carrier', 'SMS Type', 'SMS Campaign', 'Term Location', 'User First Name', 'User Last Name', 'Extension', 'Email', 'Onboard Date', 'Note', 'E911 Enabled Billed', 'E911 CID', 'E911 Address', 'DID uuid', 'Service 1', 'Service 2', 'Service 3', 'Service 4', 'Updated Date Time', 'Updated By']
 
+
 def parse_date(date_string):
     try:
         return datetime.datetime.strptime(date_string, '%Y-%m-%d').date()
     except ValueError:
         return datetime.datetime.strptime(date_string, '%m/%d/%Y').date() if date_string else None
+
 
 def parse_datetime(datetime_string):
     try:
@@ -54,6 +56,7 @@ def service_type_switch(value):
         return True
     return ""
     
+
 def voice_carrier_switch(value):
     if value.lower() == "intq - wholesale":
         return "INTQ - Wholesale"
@@ -65,6 +68,7 @@ def voice_carrier_switch(value):
         return True
     return ""
     
+
 def sms_carrier_switch(value):
     if value.lower() == "intq":
         return "INTQ"
@@ -74,6 +78,7 @@ def sms_carrier_switch(value):
         return True
     return ""
     
+
 def status_switch(value):
     if value.lower() == "active":
         return "Active"
@@ -83,12 +88,14 @@ def status_switch(value):
         return True
     return ""
     
+
 def switch(value):
     if value.lower() == "yes":
         return "Yes"
     elif value.lower() == "no":
         return "No"
     return ""
+
 
 def sms_type_switch(value):
     if value.lower() == "yak personal":
@@ -107,6 +114,7 @@ def sms_type_switch(value):
         return True
     return ""
     
+
 def term_location_switch(value):
     if value.lower() == "sbc - east":
         return "SBC - East"
@@ -122,6 +130,7 @@ def term_location_switch(value):
         return True
     return ""
 
+
 def check_in_customers(customer_name, customers):
     if customers == []:
         return True
@@ -132,106 +141,11 @@ def check_in_customers(customer_name, customers):
             return item
     return True
 
+
 @login_required
 def index(request):
     return render(request, 'index.html')
 
-@login_required
-def export_csv(request):
-    ids = request.GET.get('pk')
-    
-    if (ids):
-        id_array = ids.split(",")
-        
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="CurrentStatus.csv"'
-        writer = csv.writer(response)
-        writer.writerow(default_header)
-
-        for id in id_array:
-            data = Did.objects.filter(id = int(id)).values()
-            writer.writerow([
-                data[0]['did'],
-                data[0]['customer'],
-                data[0]['reseller'],
-                data[0]['in_method'],
-                data[0]['status'],
-                data[0]['change_date'],
-                data[0]['voice_carrier'],
-                data[0]['sms_enabled'],
-                data[0]['type'],
-                data[0]['sms_carrier'],
-                data[0]['sms_type'],
-                data[0]['sms_campaign'],
-                data[0]['term_location'],
-                data[0]['user_first_name'],
-                data[0]['user_last_name'],
-                data[0]['extension'],
-                data[0]['email'],
-                data[0]['onboard_date'],
-                data[0]['note'],
-                data[0]['e911_enabled_billed'],
-                data[0]['e911_cid'],
-                data[0]['e911_address'],
-                data[0]['did_uuid'],
-                data[0]['service_1'],
-                data[0]['service_2'],
-                data[0]['service_3'],
-                data[0]['service_4'],
-                data[0]['updated_date_time'],
-                data[0]['updated_by'],
-                ])
-
-        return response
-
-    else:
-        messages.warning(request, 'Please slect in this table')
-        return redirect('/did')
-
-@login_required
-def export_error_csv(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="ErrorReport.csv"'
-    writer = csv.writer(response)
-    writer.writerow(default_header)
-
-    error_data = Did_Error.objects.all().values()
-    
-    for item in error_data:
-        writer.writerow([
-            item['did'],
-            item['customer'],
-            item['reseller'],
-            item['in_method'],
-            item['status'],
-            item['change_date'],
-            item['voice_carrier'],
-            item['sms_enabled'],
-            item['type'],
-            item['sms_carrier'],
-            item['sms_type'],
-            item['sms_campaign'],
-            item['term_location'],
-            item['user_first_name'],
-            item['user_last_name'],
-            item['extension'],
-            item['email'],
-            item['onboard_date'],
-            item['note'],
-            item['e911_enabled_billed'],
-            item['e911_cid'],
-            item['e911_address'],
-            item['did_uuid'],
-            item['service_1'],
-            item['service_2'],
-            item['service_3'],
-            item['service_4'],
-            item['updated_date_time'],
-            item['updated_by'],
-            ])
-        
-    Did_Error.objects.all().delete()
-    return response
 
 @login_required
 def did(request):
@@ -387,6 +301,7 @@ def did(request):
                 messages.warning(request, "Unable to upload file." + e)
     return redirect('/did')
 
+
 @login_required
 def users(request):
     users_list = User.objects.all()
@@ -400,12 +315,14 @@ def users(request):
         users = paginator.page(paginator.num_pages)
     return render(request, 'users.html', {'users': users})
 
+
 @login_required
 def user_delete(request, id):
     user = User.objects.get(id=id)
     user.delete()
     messages.warning(request, 'User was deleted successfully!')
     return redirect('/user')
+
 
 @login_required
 def user_edit(request, id):
@@ -421,9 +338,11 @@ def user_edit(request, id):
     context = {'user': userData}
     return render(request, 'user_edit.html', context)
 
+
 @login_required
 def user_add(request):
     return render(request, 'user_create.html')
+
 
 @login_required
 def user_create(request):
@@ -448,6 +367,7 @@ def user_create(request):
         messages.success(request, 'User was created successfully!')
         return HttpResponseRedirect('/user')
 
+
 @login_required
 def user_update(request, id):
     user = User.objects.get(id=id)
@@ -460,6 +380,7 @@ def user_update(request, id):
         user.save()
         messages.success(request, 'User was updated successfully!')
         return redirect('/user')
+
 
 def register(request):
     if request.method == 'POST':
@@ -486,8 +407,10 @@ def register(request):
         form = RegistrationForm()
     return render(request, 'register.html', {'form': form})
 
+
 def register_success(request):
     return render(request, 'success.html')
+
 
 @login_required
 def did_add(request):
@@ -537,12 +460,14 @@ def did_add(request):
             customers.append({'id': item[0], 'full_name': item[1]})
         return render(request, 'did_create.html', {'customers': customers})
     
+
 @login_required
 def did_delete(request, id):
     did = Did.objects.get(id=id)
     did.delete()
     messages.warning(request, 'DID was deleted successfully!')
     return redirect('/did')
+
 
 @login_required
 def did_edit(request, id):
@@ -588,6 +513,7 @@ def did_edit(request, id):
 
     return render(request, 'did_edit.html', context)
 
+
 @login_required
 def did_update(request, id):
     did = Did.objects.get(id=id)
@@ -626,3 +552,102 @@ def did_update(request, id):
         except Exception as e:
             messages.warning(request, e)
         return redirect('/did')
+    
+
+@login_required
+def export_csv(request):
+    ids = request.GET.get('pk')
+    
+    if (ids):
+        id_array = ids.split(",")
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="CurrentStatus.csv"'
+        writer = csv.writer(response)
+        writer.writerow(default_header)
+
+        for id in id_array:
+            data = Did.objects.filter(id = int(id)).values()
+            writer.writerow([
+                data[0]['did'],
+                data[0]['customer'],
+                data[0]['reseller'],
+                data[0]['in_method'],
+                data[0]['status'],
+                data[0]['change_date'],
+                data[0]['voice_carrier'],
+                data[0]['sms_enabled'],
+                data[0]['type'],
+                data[0]['sms_carrier'],
+                data[0]['sms_type'],
+                data[0]['sms_campaign'],
+                data[0]['term_location'],
+                data[0]['user_first_name'],
+                data[0]['user_last_name'],
+                data[0]['extension'],
+                data[0]['email'],
+                data[0]['onboard_date'],
+                data[0]['note'],
+                data[0]['e911_enabled_billed'],
+                data[0]['e911_cid'],
+                data[0]['e911_address'],
+                data[0]['did_uuid'],
+                data[0]['service_1'],
+                data[0]['service_2'],
+                data[0]['service_3'],
+                data[0]['service_4'],
+                data[0]['updated_date_time'],
+                data[0]['updated_by'],
+                ])
+
+        return response
+
+    else:
+        messages.warning(request, 'Please slect in this table')
+        return redirect('/did')
+
+
+@login_required
+def export_error_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="ErrorReport.csv"'
+    writer = csv.writer(response)
+    writer.writerow(default_header)
+
+    error_data = Did_Error.objects.all().values()
+    
+    for item in error_data:
+        writer.writerow([
+            item['did'],
+            item['customer'],
+            item['reseller'],
+            item['in_method'],
+            item['status'],
+            item['change_date'],
+            item['voice_carrier'],
+            item['sms_enabled'],
+            item['type'],
+            item['sms_carrier'],
+            item['sms_type'],
+            item['sms_campaign'],
+            item['term_location'],
+            item['user_first_name'],
+            item['user_last_name'],
+            item['extension'],
+            item['email'],
+            item['onboard_date'],
+            item['note'],
+            item['e911_enabled_billed'],
+            item['e911_cid'],
+            item['e911_address'],
+            item['did_uuid'],
+            item['service_1'],
+            item['service_2'],
+            item['service_3'],
+            item['service_4'],
+            item['updated_date_time'],
+            item['updated_by'],
+            ])
+        
+    Did_Error.objects.all().delete()
+    return response
