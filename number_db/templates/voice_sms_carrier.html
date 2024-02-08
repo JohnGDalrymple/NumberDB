@@ -1,0 +1,114 @@
+{% extends 'layout/app.html' %} {% load static %} {% block body %}
+<div class="container-fluid px-4">
+  <h1 class="mt-4">Voice & SMS Carrier</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+    <li class="breadcrumb-item active">Voice & SMS Carrier</li>
+  </ol>
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <div class="d-flex flex-row justify-content-around">
+          <div>
+            <i class="fas fa-table me-1"></i>
+            Voice Carrier
+          </div>
+          <div>
+            <i class="fas fa-table me-1"></i>
+            SMS Carrier
+          </div>
+      </div>
+    </div>
+    <div class="card-body d-flex flex-row gap-3">
+      <div class="w-50">
+        <div class="d-flex align-items-sm-start align-items-stretch flex-column flex-sm-row mb-3">
+          <div class="d-flex">
+            <a class="btn btn-success" href="add/"><span class="fa fa-add"></span> Add</a>
+          </div>
+        </div>
+        {% for message in messages %}
+        <div
+          class="alert alert-{{ message.tags }} alert-dismissible"
+          role="alert"
+        >
+          {{ message }}
+        </div>
+        {% endfor %}
+        <div class="table-container">
+          <table
+            class="table table-bordered"
+            id="dataTable"
+            width="100%"
+            cellspacing="0"
+          >
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in voice_carrier %}
+              <tr class="table-row" id="tr_{{did.id}}">
+                <td>{{ item.name }}</td>
+                <td>{{ item.description }}</td>
+                <td style="display: flex; justify-content: space-between;">
+                  <a class="btn btn-sm btn-warning" href="edit/{{ did.id }}"><span class="fa fa-edit"></span> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="delete/{{ did.id }}"><span class="fa fa-trash"></span> Delete</a>
+                </td>
+              </tr>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="w-50">
+        <div class="d-flex align-items-sm-start align-items-stretch flex-column flex-sm-row mb-3">
+          <div class="d-flex">
+            <a class="btn btn-success" href="add/"><span class="fa fa-add"></span> Add</a>
+          </div>
+        </div>
+        {% for message in messages %}
+        <div
+          class="alert alert-{{ message.tags }} alert-dismissible"
+          role="alert"
+        >
+          {{ message }}
+        </div>
+        {% endfor %}
+        <div class="table-container">
+          <table
+            class="table table-bordered"
+            id="dataTable"
+            width="100%"
+            cellspacing="0"
+          >
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in sms_carrier %}
+              <tr class="table-row" id="tr_{{did.id}}">
+                <td>{{ item.name }}</td>
+                <td>{{ item.description }}</td>
+                <td style="display: flex; justify-content: space-between;">
+                  <a class="btn btn-sm btn-warning" href="edit/{{ did.id }}"><span class="fa fa-edit"></span> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="delete/{{ did.id }}"><span class="fa fa-trash"></span> Delete</a>
+                </td>
+              </tr>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block javascript %} {% endblock %}

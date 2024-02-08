@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'dids',
     'customers',
+    'assist_dids',
 ]
 
 MIDDLEWARE = [
