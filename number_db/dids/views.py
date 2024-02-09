@@ -419,50 +419,59 @@ def register_success(request):
 @login_required
 def did_add(request):
     if request.method == 'POST':
-        did = Did(
-            did = int(request.POST['did']) if request.POST['did'].isdigit() else None,
-            customer = request.POST['customer'],
-            reseller = request.POST['reseller'],
-            in_method = request.POST['in_method'],
-            status = request.POST['status'],
-            change_date = parse_date(request.POST['change_date']),
-            voice_carrier = request.POST['voice_carrier'],
-            type = request.POST['type'],
-            sms_enabled = request.POST['sms_enabled'],
-            sms_carrier = request.POST['sms_carrier'],
-            sms_type = request.POST['sms_type'],
-            sms_campaign = request.POST['sms_campaign'],
-            term_location = request.POST['term_location'],
-            user_first_name = request.POST['user_first_name'],
-            user_last_name = request.POST['user_last_name'],
-            extension = int(request.POST['extension']) if request.POST['extension'].isdigit() else None,
-            email = request.POST['email'],
-            onboard_date = parse_date(request.POST['onboard_date']),
-            note = request.POST['note'],
-            e911_enabled_billed = request.POST['e911_enabled_billed'],
-            e911_cid = int(request.POST['e911_cid']) if request.POST['e911_cid'].isdigit() else None,
-            e911_address = request.POST['e911_address'],
-            did_uuid = uuid.uuid4(),
-            service_1 = request.POST['service_1'],
-            service_2 = request.POST['service_2'],
-            service_3 = request.POST['service_3'],
-            service_4 = request.POST['service_4'],
-            updated_date_time = datetime.datetime.now(),
-            updated_by = request.user,
-            )
         try:
+            did = Did(
+                did = int(request.POST['did']) if request.POST['did'].isdigit() else None,
+                customer = Customer.objects.get(id = int(request.POST['customer'])) if request.POST['customer'] else None,
+                reseller = Customer.objects.get(id = int(request.POST['reseller'])) if request.POST['reseller'] else None,
+                in_method = request.POST['in_method'],
+                status = Status.objects.get(id = int(request.POST['status'])) if request.POST['status'] else None,
+                change_date = parse_date(request.POST['change_date']),
+                voice_carrier = Voice_Carrier.objects.get(id = int(request.POST['voice_carrier'])) if request.POST['voice_carrier'] else None,
+                type = Service_Type.objects.get(id = int(request.POST['type'])) if request.POST['type'] else None,
+                sms_enabled = request.POST['sms_enabled'],
+                sms_carrier = SMS_Carrier.objects.get(id = int(request.POST['sms_carrier'])) if request.POST['sms_carrier'] else None,
+                sms_type = SMS_Type.objects.get(id = int(request.POST['sms_type'])) if request.POST['sms_type'] else None,
+                sms_campaign = request.POST['sms_campaign'],
+                term_location = Term_Location.objects.get(id = int(request.POST['term_location'])) if request.POST['term_location'] else None,
+                user_first_name = request.POST['user_first_name'],
+                user_last_name = request.POST['user_last_name'],
+                extension = int(request.POST['extension']) if request.POST['extension'].isdigit() else None,
+                email = request.POST['email'],
+                onboard_date = parse_date(request.POST['onboard_date']),
+                note = request.POST['note'],
+                e911_enabled_billed = request.POST['e911_enabled_billed'],
+                e911_cid = int(request.POST['e911_cid']) if request.POST['e911_cid'].isdigit() else None,
+                e911_address = request.POST['e911_address'],
+                did_uuid = uuid.uuid4(),
+                service_1 = request.POST['service_1'],
+                service_2 = request.POST['service_2'],
+                service_3 = request.POST['service_3'],
+                service_4 = request.POST['service_4'],
+                updated_date_time = datetime.datetime.now(),
+                updated_by = request.user,
+                )
+            
             did.full_clean()
-        except ValidationError as e:
+
+            did.save()
+        
+        except Exception as e:
             messages.warning(request, e)
-        did.save()
         messages.success(request, 'DID was created successfully!')
         return redirect('/did')
     else:
         customers_data = Customer.objects.values_list('id', 'full_name')
+        status = Status.objects.all()
+        voice_carrier = Voice_Carrier.objects.all()
+        service_type = Service_Type.objects.all()
+        sms_carrier = SMS_Carrier.objects.all()
+        sms_type = SMS_Type.objects.all()
+        term_location = Term_Location.objects.all()
         customers = []
         for item in customers_data:
             customers.append({'id': item[0], 'full_name': item[1]})
-        return render(request, 'did_create.html', {'customers': customers})
+        return render(request, 'did_create.html', {'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'service_type': service_type, 'sms_carrier': sms_carrier, 'sms_type': sms_type, 'term_location': term_location})
     
 
 @login_required
@@ -479,18 +488,18 @@ def did_edit(request, id):
     didData = {
         'id': did['id'],
         'did': did['did'],
-        'customer': did['customer'],
-        'reseller': did['reseller'],
+        'customer': did['customer_id'],
+        'reseller': did['reseller_id'],
         'in_method': did['in_method'],
-        'status': did['status'],
+        'status': did['status_id'],
         'change_date': did['change_date'] if not did['change_date'] else did['change_date'].strftime('%Y-%m-%d'),
-        'voice_carrier': did['voice_carrier'],
-        'type': did['type'],
+        'voice_carrier': did['voice_carrier_id'],
+        'type': did['type_id'],
         'sms_enabled': did['sms_enabled'],
-        'sms_carrier': did['sms_carrier'],
-        'sms_type': did['sms_type'],
+        'sms_carrier': did['sms_carrier_id'],
+        'sms_type': did['sms_type_id'],
         'sms_campaign': did['sms_campaign'],
-        'term_location': did['term_location'],
+        'term_location': did['term_location_id'],
         'user_first_name': did['user_first_name'],
         'user_last_name': did['user_last_name'],
         'extension': did['extension'],
@@ -509,48 +518,53 @@ def did_edit(request, id):
         'updated_by': did['updated_by'],
     }
 
-    customers_data = Customer.objects.values_list('full_name')
+    customers_data = Customer.objects.values_list('id', 'full_name')
+    status = Status.objects.all()
+    voice_carrier = Voice_Carrier.objects.all()
+    service_type = Service_Type.objects.all()
+    sms_carrier = SMS_Carrier.objects.all()
+    sms_type = SMS_Type.objects.all()
+    term_location = Term_Location.objects.all()
     customers = []
     for item in customers_data:
-        customers.append({'full_name': item[0]})
-    context = {'did': didData, 'customers': customers}
+            customers.append({'id': item[0], 'full_name': item[1]})
 
-    return render(request, 'did_edit.html', context)
+    return render(request, 'did_edit.html', {'did': didData, 'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'service_type': service_type, 'sms_carrier': sms_carrier, 'sms_type': sms_type, 'term_location': term_location})
 
 
 @login_required
 def did_update(request, id):
     did = Did.objects.get(id=id)
     if request.method == "POST":
-        did.did = int(request.POST['did']) if request.POST['did'].isdigit() else None
-        did.customer = request.POST['customer']
-        did.reseller = request.POST['reseller']
-        did.in_method = request.POST['in_method']
-        did.status = request.POST['status']
-        did.change_date = parse_date(request.POST['change_date'])
-        did.voice_carrier = request.POST['voice_carrier']
-        did.type = request.POST['type']
-        did.sms_enabled = request.POST['sms_enabled']
-        did.sms_carrier = request.POST['sms_carrier']
-        did.sms_type = request.POST['sms_type']
-        did.sms_campaign = request.POST['sms_campaign']
-        did.term_location = request.POST['term_location']
-        did.user_first_name = request.POST['user_first_name']
-        did.user_last_name = request.POST['user_last_name']
-        did.extension = int(request.POST['extension']) if request.POST['extension'].isdigit() else None
-        did.email = request.POST['email']
-        did.onboard_date = parse_date(request.POST['onboard_date'])
-        did.note = request.POST['note']
-        did.e911_enabled_billed = request.POST['e911_enabled_billed']
-        did.e911_cid = int(request.POST['e911_cid']) if request.POST['e911_cid'].isdigit() else None
-        did.e911_address = request.POST['e911_address']
-        did.service_1 = request.POST['service_1']
-        did.service_2 = request.POST['service_2']
-        did.service_3 = request.POST['service_3']
-        did.service_4 = request.POST['service_4']
-        did.updated_date_time = datetime.datetime.now()
-        did.updated_by = request.user.username
         try:
+            did.did = int(request.POST['did']) if request.POST['did'].isdigit() else None
+            did.customer = Customer.objects.get(id = int(request.POST['customer'])) if request.POST['customer'] else None
+            did.reseller = Customer.objects.get(id = int(request.POST['reseller'])) if request.POST['reseller'] else None
+            did.in_method = request.POST['in_method']
+            did.status = Status.objects.get(id = int(request.POST['status'])) if request.POST['status'] else None
+            did.change_date = parse_date(request.POST['change_date'])
+            did.voice_carrier = Voice_Carrier.objects.get(id = int(request.POST['voice_carrier'])) if request.POST['voice_carrier'] else None
+            did.type = Service_Type.objects.get(id = int(request.POST['type'])) if request.POST['type'] else None
+            did.sms_enabled = request.POST['sms_enabled']
+            did.sms_carrier = SMS_Carrier.objects.get(id = int(request.POST['sms_carrier'])) if request.POST['sms_carrier'] else None
+            did.sms_type = SMS_Type.objects.get(id = int(request.POST['sms_type'])) if request.POST['sms_type'] else None
+            did.sms_campaign = request.POST['sms_campaign']
+            did.term_location = Term_Location.objects.get(id = int(request.POST['term_location'])) if request.POST['term_location'] else None
+            did.user_first_name = request.POST['user_first_name']
+            did.user_last_name = request.POST['user_last_name']
+            did.extension = int(request.POST['extension']) if request.POST['extension'].isdigit() else None
+            did.email = request.POST['email']
+            did.onboard_date = parse_date(request.POST['onboard_date'])
+            did.note = request.POST['note']
+            did.e911_enabled_billed = request.POST['e911_enabled_billed']
+            did.e911_cid = int(request.POST['e911_cid']) if request.POST['e911_cid'].isdigit() else None
+            did.e911_address = request.POST['e911_address']
+            did.service_1 = request.POST['service_1']
+            did.service_2 = request.POST['service_2']
+            did.service_3 = request.POST['service_3']
+            did.service_4 = request.POST['service_4']
+            did.updated_date_time = datetime.datetime.now()
+            did.updated_by = request.user.username
             did.save()
             messages.success(request, 'DID was updated successfully!')
         except Exception as e:

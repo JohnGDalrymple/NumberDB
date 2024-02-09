@@ -36,7 +36,7 @@
                         <select name="customer" class="form-select p-3" aria-label="Choose Customer">
                             <option value="">Select customer</option>
                             {% for customer in customers %}
-                            <option value="{{ customer.full_name }}" {% if did.customer == customer.full_name %}selected{% endif %}>{{ customer.full_name }}</option>
+                            <option value="{{ customer.id }}" {% if did.customer == customer.id %}selected{% endif %}>{{ customer.full_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -44,7 +44,7 @@
                         <select name="reseller" class="form-select p-3" aria-label="Choose reseller">
                             <option value="">Select reseller</option>
                             {% for customer in customers %}
-                            <option value="{{ customer.full_name }}" {% if did.reseller == customer.full_name %}selected{% endif %}>{{ customer.full_name }}</option>
+                            <option value="{{ customer.id }}" {% if did.reseller == customer.id %}selected{% endif %}>{{ customer.full_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -68,8 +68,9 @@
                     <div class="col">
                         <select name="status" class="form-select p-3" aria-label="Choose status">
                             <option value="">Select status</option>
-                            <option value="Active" {% if did.status == "Active" %}selected{% endif %}>Active</option>
-                            <option value="Dixco" {% if did.status == "Dixco" %}selected{% endif %}>Dixco</option>
+                            {% for item in status %}
+                            <option value="{{ item.id }}" {% if did.status == item.id %}selected{% endif %}>{{ item.name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="col">
@@ -83,22 +84,17 @@
                     <div class="col">
                         <select id="voice_carrier" name="voice_carrier" class="form-select p-3" aria-label="{{ did.voice_carrier }}">
                             <option value="">Select voice carrier</option>
-                            <option value="INTQ - Wholesale" {% if did.voice_carrier == "INTQ - Wholesale" %}selected{% endif %}>INTQ - Wholesale</option>
-                            <option value="INTQ - OC" {% if did.voice_carrier == "INTQ - OC" %}selected{% endif %}>INTQ - OC</option>
-                            <option value="Twilio" {% if did.voice_carrier == "Twilio" %}selected{% endif %}>Twilio</option>
+                            {% for item in voice_carrier %}
+                            <option value="{{ item.id }}" {% if did.voice_carrier == item.id %}selected{% endif %}>{{ item.name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="col">
                         <select name="type" class="form-select p-3" aria-label="Choose type">
                             <option value="">Select service type</option>
-                            <option value="Fusion" {% if did.type == "Fusion" %}selected{% endif %}>Fusion</option>
-                            <option value="Teams" {% if did.type == "Teams" %}selected{% endif %}>Teams</option>
-                            <option value="Hosted SMS" {% if did.type == "Hosted SMS" %}selected{% endif %}>Hosted SMS</option>
-                            <option value="Parked" {% if did.type == "Parked" %}selected{% endif %}>Parked</option>
-                            <option value="Inventory" {% if did.type == "Inventory" %}selected{% endif %}>Inventory</option>
-                            <option value="Efax" {% if did.type == "Efax" %}selected{% endif %}>Efax</option>
-                            <option value="Orphaned" {% if did.type == "Orphaned" %}selected{% endif %}>Orphaned</option>
-                            <option value="Comelit" {% if did.type == "Comelit" %}selected{% endif %}>Comelit</option>
+                            {% for item in service_type %}
+                            <option value="{{ item.id }}" {% if did.type == item.id %}selected{% endif %}>{{ item.name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                 </div>
@@ -113,8 +109,9 @@
                     <div class="col">
                         <select name="sms_carrier" class="form-select p-3" aria-label="Choose sms carrier">
                             <option value="">Select SMS carrier</option>
-                            <option value="INTQ" {% if did.sms_carrier == "INTQ" %}selected{% endif %}>INTQ</option>
-                            <option value="Twilio" {% if did.sms_carrier == "Twilio" %}selected{% endif %}>Twilio</option>
+                            {% for item in sms_carrier %}
+                            <option value="{{ item.id }}" {% if did.sms_carrier == item.id %}selected{% endif %}>{{ item.name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                 </div>
@@ -122,12 +119,9 @@
                     <div class="col">
                         <select name="sms_type" class="form-select p-3" aria-label="Choose sms type">
                             <option value="">Select SMS type</option>
-                            <option value="Yak Personal" {% if did.sms_type == "Yak Personal" %}selected{% endif %}>Yak Personal</option>
-                            <option value="Yak Shared" {% if did.sms_type == "Yak Shared" %}selected{% endif %}>Yak Shared</option>
-                            <option value="Yak Personal and Shared" {% if did.sms_type == "Yak Personal and Shared" %}selected{% endif %}>Yak Personal and Shared</option>
-                            <option value="INTQ API" {% if did.sms_type == "INTQ API" %}selected{% endif %}>INTQ API</option>
-                            <option value="Clerk" {% if did.sms_type == "Clerk" %}selected{% endif %}>Clerk</option>
-                            <option value="SIP/Simple" {% if did.sms_type == "SIP/Simple" %}selected{% endif %}>SIP/Simple</option>
+                            {% for item in sms_type %}
+                            <option value="{{ item.id }}" {% if did.sms_type == item.id %}selected{% endif %}>{{ item.name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="col">
@@ -139,11 +133,9 @@
                     <div class="col">
                         <select name="term_location" class="form-select p-3" aria-label="Choose term location">
                             <option value="">Select term location</option>
-                            <option value="SBC - East" {% if did.term_location == "SBC - East" %}selected{% endif %}>SBC - East</option>
-                            <option value="SBC - West" {% if did.term_location == "SBC - West" %}selected{% endif %}>SBC - West</option>
-                            <option value="Hosted - East" {% if did.term_location == "Hosted - East" %}selected{% endif %}>Hosted - East</option>
-                            <option value="Hosted - West" {% if did.term_location == "Hosted - West" %}selected{% endif %}>Hosted - West</option>
-                            <option value="OP - Operator Connect" {% if did.term_location == "OP - Operator Connect" %}selected{% endif %}>OP - Operator Connect</option>
+                            {% for item in term_location %}
+                            <option value="{{ item.id }}" {% if did.term_location == item.id %}selected{% endif %}>{{ item.name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                 </div>
