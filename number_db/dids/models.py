@@ -1,36 +1,12 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from assist_dids.models import *
+from customers.models import *
+from django.db.models import Q
 import datetime
 import uuid
 
 # Create your models here.
-
-class ServiceTypeValues(models.TextChoices):
-    FUSION = 'Fusion', _('Fusion')
-    TEAMS = 'Teams', _('Teams')
-    HOSTED_SMS = 'Hosted SMS', _('Hosted SMS')
-    PARKED = 'Parked', _('Parked')
-    INVENTORY = 'Inventory', _('Inventory')
-    EFAX = 'Efax', _('Efax')
-    ORPHANED = 'Orphaned', _('Orphaned')
-    COMELIT = 'Comelit', _('Comelit')
-
-
-class VoiceCarrierValues(models.TextChoices):
-    INTQ_WHOLESALE = 'INTQ - Wholesale', _('INTQ - Wholesale')
-    INTQ_OC = 'INTQ - OC', _('INTQ - OC')
-    TWILIO = 'Twilio', _('Twilio')
-
-
-class SmsCarrierValues(models.TextChoices):
-    INTQ = 'INTQ', _('INTQ')
-    TWILIO = 'Twilio', _('Twilio')
-
-
-class StatusValues(models.TextChoices):
-    ACTIVE = 'Active', _('Active')
-    DISCO = 'Disco', _('Disco')
-
 
 class InMethodValues(models.TextChoices):
     YES = 'Yes', _('Yes')
@@ -47,37 +23,20 @@ class E911EnabledBilledValues(models.TextChoices):
     NO = 'No', _('No')
 
 
-class SmsTypeValues(models.TextChoices):
-    YAK_PERSONAL = 'Yak Personal', _('Yak Personal')
-    YAK_SHARED = 'Yak Shared', _('Yak Shared')
-    YAK_BOTH = 'Yak Personal and Shared', _('Yak Personal and Shared')
-    INTQ_API = 'INTQ API', _('INTQ API')
-    CLERK = 'Clerk', _('Clerk')
-    SIPS = 'SIP/Simple', _('SIP/Simple')
-
-
-class TermLocationValues(models.TextChoices):
-    SBC_EAST = 'SBC - East', _('SBC - East')
-    SBC_WEST = 'SW', _('SBC - West')
-    HOSTED_EAST = 'Hosted - East', _('Hosted - East')
-    HOSTED_WEST = 'Hosted - West', _('Hosted - West')
-    OC_OPERATOR_CONNECT = 'OP - Operator Connect', _('OP - Operator Connect')
-
-
 class Did(models.Model):
     did = models.BigIntegerField()
-    customer = models.CharField(max_length=200, null=True, blank=True)
-    reseller = models.CharField(max_length=200, null=True, blank=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True, related_name='customer_dids')
+    reseller = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True, related_name='reseller_dids')
+    status = models.ForeignKey(Status, on_delete=models.CASCADE, null=True, blank=True)
+    type = models.ForeignKey(Service_Type, on_delete=models.CASCADE, null=True, blank=True)
+    voice_carrier = models.ForeignKey(Voice_Carrier, on_delete=models.CASCADE, null=True, blank=True)
+    sms_carrier = models.ForeignKey(SMS_Carrier, on_delete=models.CASCADE, null=True, blank=True)
+    sms_type = models.ForeignKey(SMS_Type, on_delete=models.CASCADE, null=True, blank=True)
+    term_location = models.ForeignKey(Term_Location, on_delete=models.CASCADE, null=True, blank=True)
     in_method = models.CharField(max_length=3, choices=InMethodValues.choices, null=True, blank=True)
-    status = models.CharField(max_length=6, choices=StatusValues.choices, null=True, blank=True)
     change_date = models.DateField('%m/%d/%Y', null=True, blank=True)
-    voice_carrier = models.CharField(max_length=16, choices=VoiceCarrierValues.choices, null=True, blank=True)
-    type = models.CharField(max_length=10, choices=ServiceTypeValues.choices, null=True, blank=True)
     sms_enabled = models.CharField(max_length=3, choices=SmsEnabledValues.choices, null=True, blank=True)
-    sms_carrier = models.CharField(max_length=6, choices=SmsCarrierValues.choices, null=True, blank=True)
-    sms_type = models.CharField(max_length=23, choices=SmsTypeValues.choices, null=True, blank=True)
     sms_campaign = models.CharField(max_length=20, null=True, blank=True)
-    term_location = models.CharField(max_length=21, choices=TermLocationValues.choices, null=True, blank=True)
     user_first_name = models.CharField(max_length=30, null=True, blank=True)
     user_last_name = models.CharField(max_length=30, null=True, blank=True)
     extension = models.BigIntegerField(null=True, blank=True)
@@ -94,6 +53,27 @@ class Did(models.Model):
     service_4 = models.TextField(max_length=100, null=True, blank=True)
     updated_date_time = models.DateField('%m/%d/%Y %H:%M:%S', default=datetime.datetime.now, null=True, blank=True)
     updated_by = models.CharField(max_length=50, null=True, blank=True)
+
+    def search(self, query):
+        qs = self.objects.filter(
+            Q(did__icontains=query)|
+            Q(customer__full_name__icontains=query)|
+            Q(reseller__full_name__icontains=query)|
+            Q(in_method__iexact=query)|
+            Q(status__name__icontains=query)|
+            Q(service_type__name__icontains=query)|
+            Q(voice_carrier__name__icontains=query)|
+            Q(sms_carrier__name__icontains=query)|
+            Q(sms_type__name__icontains=query)|
+            Q(sms_campaign__icontains=query)|
+            Q(term_location__name__icontains=query)|
+            Q(user_first_name__icontains=query)|
+            Q(user_last_name__icontains=query)|
+            Q(extension__icontains=query)|
+            Q(email__icontains=query)|
+            Q(note__icontains=query)
+        )
+        return qs
 
 
 class Did_Error(models.Model):
