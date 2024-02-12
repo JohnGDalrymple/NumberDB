@@ -10,6 +10,7 @@
 var fullCheckAction = window.document.getElementById("fullCheckAction");
 var selectList = window.document.querySelectorAll(".form-check-input.item");
 var selectCount = 0;
+var id;
 
 function fullCheck() {
     for(let i in selectList) 
@@ -83,7 +84,7 @@ var tableElements = document.getElementsByClassName('table-row');
 
 for (let i = 0; i < tableElements.length; i++) {
   const element = tableElements[i];
-  element.addEventListener('click', (event) => {
+  element?.addEventListener('click', (event) => {
     var checkElemet = window.document.getElementById(element.id.replace('tr_', 'select_'));
     checkElemet.checked = !checkElemet.checked;
     checkElemet.checked === true ? selectCount++ : selectCount--;
@@ -110,3 +111,99 @@ for (let i = 0; i < itemsElements.length; i++) {
     event.stopPropagation();
 })
 }
+
+function editStatus(id) {
+    $.ajax({
+        url: `${window.location.origin}/assist_did/service_status_read/${id}`,
+        method: 'GET',
+        success: function(response) {
+            document.getElementById("edit_status_name").value = response.name
+            document.getElementById("edit_status_description").value = response.description
+            document.getElementById("edit_status_button").name = response.id
+        }
+    });
+}
+
+document.getElementById("edit_status_form")?.addEventListener('submit', ()=>[
+    document.getElementById("edit_status_form").action = `${window.location.origin}/assist_did/service_status_update/${document.getElementById("edit_status_button").name}`
+])
+
+function editType(id) {
+    $.ajax({
+        url: `${window.location.origin}/assist_did/service_type_read/${id}`,
+        method: 'GET',
+        success: function(response) {
+            document.getElementById("edit_type_name").value = response.name
+            document.getElementById("edit_type_description").value = response.description
+            document.getElementById("edit_type_button").name = response.id
+        }
+    });
+}
+
+document.getElementById("edit_type_form")?.addEventListener('submit', ()=>[
+    document.getElementById("edit_type_form").action = `${window.location.origin}/assist_did/service_type_update/${document.getElementById("edit_type_button").name}`
+])
+
+function editVoiceCarrier(id) {
+    $.ajax({
+        url: `${window.location.origin}/assist_did/voice_carrier_read/${id}`,
+        method: 'GET',
+        success: function(response) {
+            document.getElementById("edit_voice_carrier_name").value = response.name
+            document.getElementById("edit_voice_carrier_description").value = response.description
+            document.getElementById("edit_voice_carrier_button").name = response.id
+        }
+    });
+}
+
+document.getElementById("edit_voice_carrier_form")?.addEventListener('submit', ()=>[
+    document.getElementById("edit_voice_carrier_form").action = `${window.location.origin}/assist_did/voice_carrier_update/${document.getElementById("edit_voice_carrier_button").name}`
+])
+
+function editSMSCarrier(id) {
+    $.ajax({
+        url: `${window.location.origin}/assist_did/sms_carrier_read/${id}`,
+        method: 'GET',
+        success: function(response) {
+            document.getElementById("edit_sms_carrier_name").value = response.name
+            document.getElementById("edit_sms_carrier_description").value = response.description
+            document.getElementById("edit_sms_carrier_button").name = response.id
+        }
+    });
+}
+
+document.getElementById("edit_sms_carrier_form")?.addEventListener('submit', ()=>[
+    document.getElementById("edit_sms_carrier_form").action = `${window.location.origin}/assist_did/sms_carrier_update/${document.getElementById("edit_sms_carrier_button").name}`
+])
+
+function editSMSType(id) {
+    $.ajax({
+        url: `${window.location.origin}/assist_did/sms_type_read/${id}`,
+        method: 'GET',
+        success: function(response) {
+            document.getElementById("edit_sms_type_name").value = response.name
+            document.getElementById("edit_sms_type_description").value = response.description
+            document.getElementById("edit_sms_type_button").name = response.id
+        }
+    });
+}
+
+document.getElementById("edit_sms_type_form")?.addEventListener('submit', ()=>[
+    document.getElementById("edit_sms_type_form").action = `${window.location.origin}/assist_did/sms_type_update/${document.getElementById("edit_sms_type_button").name}`
+])
+
+function editTermLocation(id) {
+    $.ajax({
+        url: `${window.location.origin}/assist_did/term_location_read/${id}`,
+        method: 'GET',
+        success: function(response) {
+            document.getElementById("edit_term_location_name").value = response.name
+            document.getElementById("edit_term_location_description").value = response.description
+            document.getElementById("edit_term_location_button").name = response.id
+        }
+    });
+}
+
+document.getElementById("edit_term_location_form")?.addEventListener('submit', ()=>[
+    document.getElementById("edit_term_location_form").action = `${window.location.origin}/assist_did/term_location_update/${document.getElementById("edit_term_location_button").name}`
+])
