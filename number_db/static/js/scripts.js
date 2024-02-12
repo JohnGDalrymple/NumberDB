@@ -128,15 +128,82 @@ document.getElementById("edit_status_form")?.addEventListener('submit', ()=>[
     document.getElementById("edit_status_form").action = `${window.location.origin}/assist_did/service_status_update/${document.getElementById("edit_status_button").name}`
 ])
 
-function updateStatus() {
-    var formData = new FormData();
-    formData.append("name", document.getElementById("edit_status_name").value)
-    formData.append("description", document.getElementById("edit_status_description").value)
-
+function editType(id) {
     $.ajax({
-        url: `${window.location.origin}/assist_did/service_status_update/${document.getElementById("edit_status_button").name}`,
-        method: 'POST',
-        data: formdata,
+        url: `${window.location.origin}/assist_did/service_type_read/${id}`,
+        method: 'GET',
+        success: function(response) {
+            document.getElementById("edit_type_name").value = response.name
+            document.getElementById("edit_type_description").value = response.description
+            document.getElementById("edit_type_button").name = response.id
+        }
     });
 }
 
+document.getElementById("edit_type_form")?.addEventListener('submit', ()=>[
+    document.getElementById("edit_type_form").action = `${window.location.origin}/assist_did/service_type_update/${document.getElementById("edit_type_button").name}`
+])
+
+function editVoiceCarrier(id) {
+    $.ajax({
+        url: `${window.location.origin}/assist_did/voice_carrier_read/${id}`,
+        method: 'GET',
+        success: function(response) {
+            document.getElementById("edit_voice_carrier_name").value = response.name
+            document.getElementById("edit_voice_carrier_description").value = response.description
+            document.getElementById("edit_voice_carrier_button").name = response.id
+        }
+    });
+}
+
+document.getElementById("edit_voice_carrier_form")?.addEventListener('submit', ()=>[
+    document.getElementById("edit_voice_carrier_form").action = `${window.location.origin}/assist_did/voice_carrier_update/${document.getElementById("edit_voice_carrier_button").name}`
+])
+
+function editSMSCarrier(id) {
+    $.ajax({
+        url: `${window.location.origin}/assist_did/sms_carrier_read/${id}`,
+        method: 'GET',
+        success: function(response) {
+            document.getElementById("edit_sms_carrier_name").value = response.name
+            document.getElementById("edit_sms_carrier_description").value = response.description
+            document.getElementById("edit_sms_carrier_button").name = response.id
+        }
+    });
+}
+
+document.getElementById("edit_sms_carrier_form")?.addEventListener('submit', ()=>[
+    document.getElementById("edit_sms_carrier_form").action = `${window.location.origin}/assist_did/sms_carrier_update/${document.getElementById("edit_sms_carrier_button").name}`
+])
+
+function editSMSType(id) {
+    $.ajax({
+        url: `${window.location.origin}/assist_did/sms_type_read/${id}`,
+        method: 'GET',
+        success: function(response) {
+            document.getElementById("edit_sms_type_name").value = response.name
+            document.getElementById("edit_sms_type_description").value = response.description
+            document.getElementById("edit_sms_type_button").name = response.id
+        }
+    });
+}
+
+document.getElementById("edit_sms_type_form")?.addEventListener('submit', ()=>[
+    document.getElementById("edit_sms_type_form").action = `${window.location.origin}/assist_did/sms_type_update/${document.getElementById("edit_sms_type_button").name}`
+])
+
+function editTermLocation(id) {
+    $.ajax({
+        url: `${window.location.origin}/assist_did/term_location_read/${id}`,
+        method: 'GET',
+        success: function(response) {
+            document.getElementById("edit_term_location_name").value = response.name
+            document.getElementById("edit_term_location_description").value = response.description
+            document.getElementById("edit_term_location_button").name = response.id
+        }
+    });
+}
+
+document.getElementById("edit_term_location_form")?.addEventListener('submit', ()=>[
+    document.getElementById("edit_term_location_form").action = `${window.location.origin}/assist_did/term_location_update/${document.getElementById("edit_term_location_button").name}`
+])
