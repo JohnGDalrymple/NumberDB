@@ -11,7 +11,6 @@ from django.contrib.auth.decorators import login_required
 from dids.forms import *
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.exceptions import ValidationError
-import unicodedata
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.hashers import make_password
 import pandas as pd
@@ -20,9 +19,9 @@ from operator import or_
 
 # Create your views here.
 
-default_data_header = ['did', 'customer', 'reseller', 'in_method', 'status', 'change_date', 'voice_carrier', 'type', 'sms_enabled', 'sms_carrier', 'sms_type', 'sms_campaign', 'term_location', 'user_first_name', 'user_last_name', 'extension', 'email', 'onboard_date', 'note', 'e911_enabled_billed', 'e911_cid', 'e911_address', 'did_uuid', 'service_1', 'service_2', 'service_3', 'service_4', 'updated_date_time', 'updated_by']
+default_data_header = ['did', 'customer', 'reseller', 'in_method', 'status', 'change_date', 'voice_carrier', 'sms_enabled', 'sms_carrier', 'sms_type', 'sms_campaign', 'term_location', 'user_first_name', 'user_last_name', 'extension', 'email', 'onboard_date', 'note', 'e911_enabled_billed', 'e911_cid', 'e911_address', 'did_uuid', 'service_1', 'service_2', 'service_3', 'service_4', 'updated_date_time', 'updated_by']
 
-default_header = ['DID', 'Customer', 'Reseller', 'In Method', 'Status', 'Change Date', 'Voice Carrier', 'Type', 'SMS Enabled', 'SMS Carrier', 'SMS Type', 'SMS Campaign', 'Term Location', 'User First Name', 'User Last Name', 'Extension', 'Email', 'Onboard Date', 'Note', 'E911 Enabled Billed', 'E911 CID', 'E911 Address', 'DID uuid', 'Service 1', 'Service 2', 'Service 3', 'Service 4', 'Updated Date Time', 'Updated By']
+default_header = ['DID', 'Customer', 'Reseller', 'In Method', 'Status', 'Change Date', 'Voice Carrier', 'SMS Enabled', 'SMS Carrier', 'SMS Type', 'SMS Campaign', 'Term Location', 'User First Name', 'User Last Name', 'Extension', 'Email', 'Onboard Date', 'Note', 'E911 Enabled Billed', 'E911 CID', 'E911 Address', 'DID uuid', 'Service 1', 'Service 2', 'Service 3', 'Service 4', 'Updated Date Time', 'Updated By']
 
 
 def parse_date(date_string):
@@ -61,14 +60,6 @@ def check_service_status(status_value):
         return service_status
     except Exception as e:
         return True if status_value else None
-
-
-def check_service_type(type_value):
-    try:
-        service_type = Service_Type.objects.get(name__iexact = type_value)
-        return service_type
-    except Exception as e:
-        return True if type_value else None
 
 
 def check_voice_carrier(voice_carrier_value):
@@ -139,7 +130,6 @@ def did(request):
             
             # Add Q objects for foreign key fields
             q_objects.append((Q(status__name__icontains = query)))
-            q_objects.append((Q(type__name__icontains = query)))
             q_objects.append((Q(voice_carrier__name__icontains = query)))
             q_objects.append((Q(sms_carrier__name__icontains = query)))
             q_objects.append((Q(sms_type__name__icontains = query)))
@@ -161,7 +151,7 @@ def did(request):
 
         else:
             # dids_list = Did.objects.all().values()
-            dids_list = Did.objects.all().select_related('customer', 'reseller', 'status', 'type', 'voice_carrier', 'sms_carrier', 'sms_type', 'term_location')
+            dids_list = Did.objects.all().select_related('customer', 'reseller', 'status', 'voice_carrier', 'sms_carrier', 'sms_type', 'term_location')
             for item in dids_list:
                 item.change_date =  "" if(item.change_date == None) else item.change_date
                 item.extension =  "" if(item.extension == None) else item.extension
@@ -199,7 +189,6 @@ def did(request):
                                 customer_value = check_customer(item['Customer'])
                                 resller_value = check_customer(item['Reseller'])
                                 service_status_value = check_service_status(item['Status'])
-                                service_type_value = check_service_type(item['Type'])
                                 voice_carrier_value = check_voice_carrier(item['Voice Carrier'])
                                 sms_carrier_value = check_sms_carrier(item['SMS Carrier'])
                                 sms_type_value = check_sms_type(item['SMS Type'])
@@ -215,7 +204,7 @@ def did(request):
                                 # print("sms_type_value", sms_type_value)
                                 # print("term_location_value", term_location_value)
 
-                                if not item['DID'] or switch(item['In Method']) == True or voice_carrier_value == True or service_status_value == True or service_type_value == True or switch(item['SMS Enabled']) == True or sms_carrier_value == True or sms_type_value == True or term_location_value == True or switch(item['E911 Enabled Billed']) == True or customer_value == True or resller_value == True:
+                                if not item['DID'] or switch(item['In Method']) == True or voice_carrier_value == True or service_status_value == True or switch(item['SMS Enabled']) == True or sms_carrier_value == True or sms_type_value == True or term_location_value == True or switch(item['E911 Enabled Billed']) == True or customer_value == True or resller_value == True:
                                     error_flag = True
                                     save_data = Did_Error(
                                     did_uuid = item['DID uuid'], 
@@ -224,7 +213,6 @@ def did(request):
                                     voice_carrier = item['Voice Carrier'], 
                                     status = item['Status'], 
                                     change_date = item['Change Date'], 
-                                    type = item['Type'], 
                                     sms_enabled = item['SMS Enabled'], 
                                     sms_carrier = item['SMS Carrier'], 
                                     sms_type = item['SMS Type'], 
@@ -262,10 +250,9 @@ def did(request):
                                         status = service_status_value, 
                                         # change_date = parse_date(item['Change Date']), 
                                         change_date =  datetime.datetime.now(), 
-                                        type = sms_type_value, 
                                         sms_enabled = switch(item['SMS Enabled']), 
                                         sms_carrier = sms_carrier_value, 
-                                        sms_type = service_type_value, 
+                                        sms_type = sms_type_value, 
                                         sms_campaign = item['SMS Campaign'], 
                                         term_location = term_location_value, 
                                         customer = customer_value, 
@@ -428,7 +415,6 @@ def did_add(request):
                 status = Status.objects.get(id = int(request.POST['status'])) if request.POST['status'] else None,
                 change_date = parse_date(request.POST['change_date']),
                 voice_carrier = Voice_Carrier.objects.get(id = int(request.POST['voice_carrier'])) if request.POST['voice_carrier'] else None,
-                type = Service_Type.objects.get(id = int(request.POST['type'])) if request.POST['type'] else None,
                 sms_enabled = request.POST['sms_enabled'],
                 sms_carrier = SMS_Carrier.objects.get(id = int(request.POST['sms_carrier'])) if request.POST['sms_carrier'] else None,
                 sms_type = SMS_Type.objects.get(id = int(request.POST['sms_type'])) if request.POST['sms_type'] else None,
@@ -464,14 +450,13 @@ def did_add(request):
         customers_data = Customer.objects.values_list('id', 'full_name')
         status = Status.objects.all()
         voice_carrier = Voice_Carrier.objects.all()
-        service_type = Service_Type.objects.all()
         sms_carrier = SMS_Carrier.objects.all()
         sms_type = SMS_Type.objects.all()
         term_location = Term_Location.objects.all()
         customers = []
         for item in customers_data:
             customers.append({'id': item[0], 'full_name': item[1]})
-        return render(request, 'did_create.html', {'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'service_type': service_type, 'sms_carrier': sms_carrier, 'sms_type': sms_type, 'term_location': term_location})
+        return render(request, 'did_create.html', {'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'sms_carrier': sms_carrier, 'sms_type': sms_type, 'term_location': term_location})
     
 
 @login_required
@@ -494,7 +479,6 @@ def did_edit(request, id):
         'status': did['status_id'],
         'change_date': did['change_date'] if not did['change_date'] else did['change_date'].strftime('%Y-%m-%d'),
         'voice_carrier': did['voice_carrier_id'],
-        'type': did['type_id'],
         'sms_enabled': did['sms_enabled'],
         'sms_carrier': did['sms_carrier_id'],
         'sms_type': did['sms_type_id'],
@@ -521,7 +505,6 @@ def did_edit(request, id):
     customers_data = Customer.objects.values_list('id', 'full_name')
     status = Status.objects.all()
     voice_carrier = Voice_Carrier.objects.all()
-    service_type = Service_Type.objects.all()
     sms_carrier = SMS_Carrier.objects.all()
     sms_type = SMS_Type.objects.all()
     term_location = Term_Location.objects.all()
@@ -529,7 +512,7 @@ def did_edit(request, id):
     for item in customers_data:
             customers.append({'id': item[0], 'full_name': item[1]})
 
-    return render(request, 'did_edit.html', {'did': didData, 'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'service_type': service_type, 'sms_carrier': sms_carrier, 'sms_type': sms_type, 'term_location': term_location})
+    return render(request, 'did_edit.html', {'did': didData, 'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'sms_carrier': sms_carrier, 'sms_type': sms_type, 'term_location': term_location})
 
 
 @login_required
@@ -544,7 +527,6 @@ def did_update(request, id):
             did.status = Status.objects.get(id = int(request.POST['status'])) if request.POST['status'] else None
             did.change_date = parse_date(request.POST['change_date'])
             did.voice_carrier = Voice_Carrier.objects.get(id = int(request.POST['voice_carrier'])) if request.POST['voice_carrier'] else None
-            did.type = Service_Type.objects.get(id = int(request.POST['type'])) if request.POST['type'] else None
             did.sms_enabled = request.POST['sms_enabled']
             did.sms_carrier = SMS_Carrier.objects.get(id = int(request.POST['sms_carrier'])) if request.POST['sms_carrier'] else None
             did.sms_type = SMS_Type.objects.get(id = int(request.POST['sms_type'])) if request.POST['sms_type'] else None
@@ -595,7 +577,6 @@ def export_csv(request):
                 data[0]['change_date'],
                 Voice_Carrier.objects.get(id = data[0]['voice_carrier_id']).name if data[0]['voice_carrier_id'] else "",
                 data[0]['sms_enabled'],
-                Service_Type.objects.get(id = data[0]['type_id']).name if data[0]['type_id'] else "",
                 SMS_Carrier.objects.get(id = data[0]['sms_carrier_id']).name if data[0]['sms_carrier_id'] else "",
                 SMS_Type.objects.get(id = data[0]['sms_type_id']).name if data[0]['sms_type_id'] else "",
                 data[0]['sms_campaign'],
@@ -644,7 +625,6 @@ def export_error_csv(request):
             item['change_date'],
             item['voice_carrier'],
             item['sms_enabled'],
-            item['type'],
             item['sms_carrier'],
             item['sms_type'],
             item['sms_campaign'],

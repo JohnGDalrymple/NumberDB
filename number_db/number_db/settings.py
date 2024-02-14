@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'dids',
     'customers',
     'assist_dids',
+    'service_orders',
 ]
 
 MIDDLEWARE = [

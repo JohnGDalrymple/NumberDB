@@ -18,11 +18,9 @@ import uuid
 # Create your views here.
 
 @login_required
-def did_status_type(request):
+def did_status(request):
     status = Status.objects.all().values()
-    types = Service_Type.objects.all().values()
-
-    return render(request, 'status_type.html', { 'status': status, 'types': types })
+    return render(request, 'status.html', { 'status': status })
 
 
 @login_required
