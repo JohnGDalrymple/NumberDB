@@ -128,22 +128,6 @@ document.getElementById("edit_status_form")?.addEventListener('submit', ()=>[
     document.getElementById("edit_status_form").action = `${window.location.origin}/assist_did/service_status_update/${document.getElementById("edit_status_button").name}`
 ])
 
-function editType(id) {
-    $.ajax({
-        url: `${window.location.origin}/assist_did/service_type_read/${id}`,
-        method: 'GET',
-        success: function(response) {
-            document.getElementById("edit_type_name").value = response.name
-            document.getElementById("edit_type_description").value = response.description
-            document.getElementById("edit_type_button").name = response.id
-        }
-    });
-}
-
-document.getElementById("edit_type_form")?.addEventListener('submit', ()=>[
-    document.getElementById("edit_type_form").action = `${window.location.origin}/assist_did/service_type_update/${document.getElementById("edit_type_button").name}`
-])
-
 function editVoiceCarrier(id) {
     $.ajax({
         url: `${window.location.origin}/assist_did/voice_carrier_read/${id}`,

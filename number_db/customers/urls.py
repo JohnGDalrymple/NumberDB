@@ -8,4 +8,5 @@ urlpatterns = [
     path('edit/<int:id>', views.customer_edit, name='customer_edit'),
     path('update/<int:id>', views.customer_update, name='customer_update'),
     path('export-csv/', views.export_csv, name='customer_export_csv'),
+    path('sync_method/', views.sync_method, name='sync_method'),
 ]

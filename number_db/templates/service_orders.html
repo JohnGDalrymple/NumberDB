@@ -1,46 +1,45 @@
 {% extends 'layout/app.html' %} {% load static %} {% block body %}
 <div class="container-fluid px-4">
-  <h1 class="mt-4">Customer CRUD</h1>
+  <h1 class="mt-4">Service Orders</h1>
   <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-    <li class="breadcrumb-item active">Customer CRUD</li>
+    <li class="breadcrumb-item active">Service Orders</li>
   </ol>
 
   <div class="card mb-4">
     <div class="card-header">
       <i class="fas fa-table me-1"></i>
-      Customer CRUD
-        <a class="btn-sm btn btn-success" href="{% static 'sample_contact.csv' %}" download style="float: right"><span class="fa fa-download"></span> &nbsp;Download Sample CSV</a>
+      Service Orders
+        <!-- <a class="btn-sm btn btn-success" href="{% static 'sample_contact.csv' %}" download style="float: right"><span class="fa fa-download"></span> &nbsp;Download Sample CSV</a>
         <a id="selectCustomerDownloadButton" class="btn-sm btn btn-success" style="float: right; margin-right: 10px;">
           <span class="fa fa-download" ></span> 
             &nbsp;Download Select CSV
-        </a>
+        </a> -->
     </div>
     <div class="card-body">
       <form class="form-horizontal mb-3" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="d-flex align-items-sm-start align-items-stretch  flex-column flex-sm-row gap-2">
               <div class="flex-grow-1">
-                  <div class="input-group">
+                  <!-- <div class="input-group">
                       <input type="file" class="form-control custom-file-input file" name="csv_file">
-                  </div>
+                  </div> -->
               </div>
               <div class="d-flex">
-                  <button class="btn btn-primary btn-block" type="submit">Submit</button>
-                  <a class="btn btn-info ms-2" href="sync_method/"><span class="fa fa-sync"></span> Sync With Method</a>
+                  <!-- <button class="btn btn-primary btn-block" type="submit">Submit</button> -->
                   <a class="btn btn-success ms-2" href="add/"><span class="fa fa-add"></span> Add</a>
               </div>
           </div>
       </form>
       <hr>
-      <div class="d-flex mb-3">
+      <!-- <div class="d-flex mb-3">
           <form class="form-inline ms-auto w-100">
             <div class="input-group">
                 <input class="form-control" type="text" name="search" value="{{ search }}" placeholder="Search for customer..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
                 <button class="btn btn-secondary" type="submit"><i class="fas fa-search"></i></button>
             </div>
           </form>
-      </div>
+      </div> -->
       {% for message in messages %}
       <div
         class="alert alert-{{ message.tags }} alert-dismissible"
@@ -63,52 +62,36 @@
                   <input class="form-check-input" type="checkbox" value="" id="fullCheckAction" onclick="fullCheck()"/>
                 </div>
               </th>
-              <th>Full Name</th>
-              <th>phone</th>
-              <th>Fax</th>
-              <th>Mobile</th>
+              <th>Username</th>
               <th>Email</th>
-              <th>Billing Address</th>
-              <th>Billing City</th>
-              <th>Billing State</th>
-              <th>Billing Zipcode</th>
-              <th>Billing Country</th>
-              <th>E911 Address</th>
-              <th>E911 City</th>
-              <th>E911 State</th>
-              <th>E911 Zipcode</th>
-              <th>E911 Country</th>
+              <th>Number</th>
+              <th>Texting</th>
+              <th>Request Port Date</th>
+              <th>E911 Number</th>
+              <th>Created At</th>
+              <th>Updated At</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {% for customer in customers %}
-            <tr class="table-row" id="tr_{{customer.id}}">
+            {% for item in service_orders %}
+            <tr class="table-row" id="tr_{{item.id}}">
               <th scope="row">
                 <div class="form-check">
-                  <input class="form-check-input item" type="checkbox" value="" id="select_{{customer.id}}"/>
+                  <input class="form-check-input item" type="checkbox" value="" id="select_{{item.id}}"/>
                 </div>
               </th>
-              <td>{{ customer.full_name }}</td>
-              <td>{{ customer.phone }}</td>
-              <td>{{ customer.fax }}</td>
-              <td>{{ customer.mobile }}</td>
-              <td>{{ customer.email }}</td>
-              <td>{{ customer.billing_address }}</td>
-              <td>{{ customer.billing_city }}</td>
-              <td>{{ customer.billing_state }}</td>
-              <td>{{ customer.billing_zipcode }}</td>
-              <td>{{ customer.billing_country }}</td>
-              <td>{{ customer.e911_address }}</td>
-              <td>{{ customer.e911_city }}</td>
-              <td>{{ customer.e911_state }}</td>
-              <td>{{ customer.e911_zipcode }}</td>
-              <td>{{ customer.e911_country }}</td>
+              <td>{{ item.username }}</td>
+              <td>{{ item.email }}</td>
+              <td>{{ item.number }}</td>
+              <td>{{ item.texting }}</td>
+              <td>{{ item.requested_port_date }}</td>
+              <td>{{ item.e911_number }}</td>
+              <td>{{ item.created_at }}</td>
+              <td>{{ item.updated_at }}</td>
               <td style="display: flex; justify-content: space-between;">
-                {% if customer.is_active %}
-                  <a class="btn btn-sm btn-danger" href="delete/{{ customer.id }}"><span class="fa fa-trash"></span> Delete</a>
-                  <a class="btn btn-sm btn-warning" href="edit/{{ customer.id }}"><span class="fa fa-edit"></span> Edit</a>
-                {% endif %}
+                <a class="btn btn-sm btn-warning" href="edit/{{ item.id }}"><span class="fa fa-edit"></span> Edit</a>
+                <a class="btn btn-sm btn-danger" href="delete/{{ item.id }}"><span class="fa fa-trash"></span> Delete</a>
               </td>
             </tr>
             {% endfor %}

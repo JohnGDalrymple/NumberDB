@@ -1,37 +1,41 @@
 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
-  <div class="sb-sidenav-menu">
-      <div class="nav">
-          <div class="sb-sidenav-menu-heading">Core</div>
-          <a class="nav-link" href="{% url 'home' %}">
-              <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-              Dashboard
-          </a>
-          <a class="nav-link" href="{% url 'did' %}">
-              <div class="sb-nav-link-icon"><i class="fas fa-fw fa-database"></i></div>
-              DID CRUD
-          </a>
-          <a class="nav-link" href="{% url 'customer' %}">
-            <div class="sb-nav-link-icon"><i class="fas fa-fw fa-user"></i></div>
-            Customer CRUD
-          </a>
-          <div class="sb-sidenav-menu-heading">Interface</div>
-          <a class="nav-link" href="{% url 'user' %}">
-            <div class="sb-nav-link-icon"><i class="fas fa-fw fa-database"></i></div>
-            Admin List
-        </a>
-        <div class="sb-sidenav-menu-heading">Did Assist</div>
-          <a class="nav-link" href="{% url 'did_status_type' %}">
-            <div class="sb-nav-link-icon"><i class="fas fa-fw fa-database"></i></div>
-            Service Status & Type
-          </a>
-          <a class="nav-link" href="{% url 'did_voice_sms_carrier' %}">
-            <div class="sb-nav-link-icon"><i class="fas fa-fw fa-database"></i></div>
-            Voice & SMS Carrier
-          </a>
-          <a class="nav-link" href="{% url 'did_sms_type_term_location' %}">
-            <div class="sb-nav-link-icon"><i class="fas fa-fw fa-database"></i></div>
-            SMS Type <br/>   Term Location
-          </a>
-      </div>
-  </div>
+    <div class="sb-sidenav-menu">
+        <div class="nav">
+            <div class="sb-sidenav-menu-heading">Core</div>
+              <a class="nav-link" href="{% url 'home' %}">
+                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                Dashboard
+              </a>
+              <a class="nav-link" href="{% url 'did' %}">
+                <div class="sb-nav-link-icon"><i class="fas fa-fw fa-database"></i></div>
+                DID CRUD
+              </a>
+              <a class="nav-link" href="{% url 'customer' %}">
+                <div class="sb-nav-link-icon"><i class="fas fa-fw fa-user"></i></div>
+                Customer CRUD
+              </a>
+              <a class="nav-link" href="{% url 'service_order' %}">
+                <div class="sb-nav-link-icon"><i class="fas fa-fw fa-server"></i></div>
+                Service Orders
+              </a>
+            <div class="sb-sidenav-menu-heading">Interface</div>
+              <a class="nav-link" href="{% url 'user' %}">
+                <div class="sb-nav-link-icon"><i class="fas fa-fw fa-database"></i></div>
+                Admin List
+              </a>
+            <div class="sb-sidenav-menu-heading">Did Assist</div>
+              <a class="nav-link" href="{% url 'did_status' %}">
+                <div class="sb-nav-link-icon"><i class="fas fa-fw fa-database"></i></div>
+                Service Status
+              </a>
+              <a class="nav-link" href="{% url 'did_voice_sms_carrier' %}">
+                <div class="sb-nav-link-icon"><i class="fas fa-fw fa-database"></i></div>
+                Voice & SMS Carrier
+              </a>
+              <a class="nav-link" href="{% url 'did_sms_type_term_location' %}">
+                <div class="sb-nav-link-icon"><i class="fas fa-fw fa-database"></i></div>
+                SMS Type <br/>   Term Location
+              </a>
+        </div>
+    </div>
 </nav>

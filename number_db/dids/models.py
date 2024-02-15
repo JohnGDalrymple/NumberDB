@@ -28,7 +28,6 @@ class Did(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True, related_name='customer_dids')
     reseller = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True, related_name='reseller_dids')
     status = models.ForeignKey(Status, on_delete=models.CASCADE, null=True, blank=True)
-    type = models.ForeignKey(Service_Type, on_delete=models.CASCADE, null=True, blank=True)
     voice_carrier = models.ForeignKey(Voice_Carrier, on_delete=models.CASCADE, null=True, blank=True)
     sms_carrier = models.ForeignKey(SMS_Carrier, on_delete=models.CASCADE, null=True, blank=True)
     sms_type = models.ForeignKey(SMS_Type, on_delete=models.CASCADE, null=True, blank=True)
@@ -54,27 +53,6 @@ class Did(models.Model):
     updated_date_time = models.DateField('%m/%d/%Y %H:%M:%S', default=datetime.datetime.now, null=True, blank=True)
     updated_by = models.CharField(max_length=50, null=True, blank=True)
 
-    def search(self, query):
-        qs = self.objects.filter(
-            Q(did__icontains=query)|
-            Q(customer__full_name__icontains=query)|
-            Q(reseller__full_name__icontains=query)|
-            Q(in_method__iexact=query)|
-            Q(status__name__icontains=query)|
-            Q(service_type__name__icontains=query)|
-            Q(voice_carrier__name__icontains=query)|
-            Q(sms_carrier__name__icontains=query)|
-            Q(sms_type__name__icontains=query)|
-            Q(sms_campaign__icontains=query)|
-            Q(term_location__name__icontains=query)|
-            Q(user_first_name__icontains=query)|
-            Q(user_last_name__icontains=query)|
-            Q(extension__icontains=query)|
-            Q(email__icontains=query)|
-            Q(note__icontains=query)
-        )
-        return qs
-
 
 class Did_Error(models.Model):
     did = models.CharField(max_length=50, null=True, blank=True)
@@ -84,7 +62,6 @@ class Did_Error(models.Model):
     status = models.CharField(max_length=10, null=True, blank=True)
     change_date = models.CharField(max_length=10, null=True, blank=True)
     voice_carrier = models.CharField(max_length=30, null=True, blank=True)
-    type = models.CharField(max_length=30, null=True, blank=True)
     sms_enabled = models.CharField(max_length=10, null=True, blank=True)
     sms_carrier = models.CharField(max_length=10, null=True, blank=True)
     sms_type = models.CharField(max_length=30, null=True, blank=True)
