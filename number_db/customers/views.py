@@ -8,7 +8,6 @@ from dids.forms import *
 from django.views.decorators.csrf import csrf_protect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.exceptions import ValidationError
-import unicodedata
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.hashers import make_password
 import re
@@ -17,10 +16,14 @@ import pandas as pd
 import math
 import numpy as np
 from django.db.models import Q
+import os
+import requests
 
 # Create your views here.
 
-default_header = ['Customer full name', 'Phone', 'Fax', 'Mobile', 'Email', 'Billing address', 'Billing city', 'Billing state', 'Billing ZIP code', 'Billing country', 'E911 address', 'E911 city', 'E911 state', 'E911 ZIP code', 'E911 country']
+init_header = ['Customer full name', 'Phone', 'Fax', 'Mobile', 'Email', 'Billing address', 'Billing city', 'Billing state', 'Billing ZIP code', 'Billing country', 'E911 address', 'E911 city', 'E911 state', 'E911 ZIP code', 'E911 country']
+
+check_header = ['AltPhone', 'AssignedTo', 'AssignedTo_RecordID', 'Balance', 'BillAddressAddr1', 'BillAddressAddr2', 'BillAddressAddr3', 'BillAddressAddr4', 'BillAddressAddr5', 'BillAddressAttentionTo', 'BillAddressCity', 'BillAddressCountry', 'BillAddressPostalCode', 'BillAddressState', 'Campaign', 'Campaign_RecordID', 'Class', 'Class_RecordID', 'CompanyName', 'CreatedDate', 'Currency', 'Currency_RecordID', 'CustomerType', 'CustomerType_RecordID', 'DeliveryMethod', 'DeliveryMethod_RecordID', 'DirectDial', 'Email', 'EntityType', 'Fax', 'FirstName', 'FullName', 'IsActive', 'IsLeadStatusOnly', 'IsStatementWithParent', 'IsTaxable', 'JobComments', 'LastActivityCompletedDate', 'LastCompletedActivity', 'LastCompletedActivity_RecordID', 'LastInvoiceRecordID', 'LastInvoiceRecordID_RecordID', 'LastInvoiceRecordIDAmount', 'LastInvoiceRecordIDTxnDate', 'LastModifiedDate', 'LastName', 'LastSalesReceiptRecordID', 'LastSalesReceiptRecordID_RecordID', 'LastSalesReceiptRecordIDTotalAmount', 'LastSalesReceiptRecordIDTxnDate', 'Latitude', 'LeadConvertedDate', 'LeadRating', 'LeadRating_RecordID', 'LeadSource', 'LeadSource_RecordID', 'LeadStatus', 'LeadStatus_RecordID', 'LifetimeValue', 'ListID', 'Longitude', 'MergeOnNextSyncTo', 'MergeOnNextSyncTo_RecordID', 'MIActiveTypeNumberCount', 'MiddleName', 'MIDiscoTypeNumberCount', 'MIDiscreteNumbers', 'MIParkedTypeNumberCount', 'Mobile', 'Name', 'NextActivityDueDate', 'NextPendingActivity', 'NextPendingActivity_RecordID', 'Notes', 'Pager', 'ParentFullName', 'ParentFullName_RecordID', 'Phone', 'PortalPassword', 'PortalUserName', 'PrintAs', 'RecordID', 'ResaleNumber', 'SalesRepName', 'SalesRepRecordID', 'SalesTaxCode', 'SalesTaxCode_RecordID', 'SalesTaxCountry', 'Salutation', 'ShipAddressAddr1', 'ShipAddressAddr2', 'ShipAddressAddr3', 'ShipAddressAddr4', 'ShipAddressAddr5', 'ShipAddressAttentionTo', 'ShipAddressCity', 'ShipAddressCountry', 'ShipAddressPostalCode', 'ShipAddressState', 'Sublevel', 'Suffix', 'TaxExemptionReason', 'TaxExemptionReason_RecordID', 'Terms', 'Terms_RecordID', 'TimeModifiedAccounting', 'TotalBalance']
 
 default_data_header = ['full_name', 'phone', 'fax', 'mobile', 'email', 'billing_address', 'billing_city', 'billing_state', 'billing_zipcode', 'billing_country', 'e911_address', 'e911_city', 'e911_state', 'e911_zipcode', 'e911_country']
 
@@ -37,7 +40,7 @@ def export_csv(request):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="CurrentCustomers.csv"'
         writer = csv.writer(response)
-        writer.writerow(default_header)
+        writer.writerow(init_header)
 
         for id in id_array:
             data = Customer.objects.filter(id = int(id)).values()
@@ -135,26 +138,28 @@ def customer_list(request):
                 data_dict = data_df.to_dict('records')
                 
                 if data_dict != []:
-                    if set(data_dict[0].keys()) == set(default_header):
+                    if set(data_dict[0].keys()) == set(check_header):
                         filter_data = data_df.fillna('')
                         filter_data = filter_data.to_dict('records')
                         for item in filter_data:
                             save_data = Customer(
-                            full_name = item['Customer full name'],
+                            full_name = item['FullName'],
                             phone = item['Phone'],
                             fax = item['Fax'],
                             mobile = item['Mobile'],
                             email = item['Email'],
-                            billing_address = item['Billing address'],
-                            billing_city = item['Billing city'],
-                            billing_state = item['Billing state'],
-                            billing_zipcode = item['Billing ZIP code'],
-                            billing_country = item['Billing country'],
-                            e911_address = item['E911 address'],
-                            e911_city = item['E911 city'],
-                            e911_state = item['E911 state'],
-                            e911_zipcode = item['E911 ZIP code'],
-                            e911_country = item['E911 country'],
+                            billing_address = item['BillAddressAddr1'],
+                            billing_city = item['BillAddressCity'],
+                            billing_state = item['BillAddressState'],
+                            billing_zipcode = item['BillAddressPostalCode'],
+                            billing_country = item['BillAddressCountry'],
+                            e911_address = item['ShipAddressAddr1'],
+                            e911_city = item['ShipAddressCity'],
+                            e911_state = item['ShipAddressState'],
+                            e911_zipcode = item['ShipAddressPostalCode'],
+                            e911_country = item['ShipAddressCountry'],
+                            record_id = item['RecordID'],
+                            is_active = item['IsActive'],
                             )
                             try:
                                 save_data.save()
@@ -176,8 +181,13 @@ def customer_list(request):
 @login_required
 def customer_delete(request, id):
     customer = Customer.objects.get(id=id)
-    customer.delete()
-    messages.warning(request, 'Customer was deleted successfully!')
+    customer.full_name = customer.full_name + " (deleted)"
+    customer.is_active = False
+    try:
+        customer.save()
+        messages.warning(request, 'Customer was deleted successfully!')
+    except Exception as e:
+        messages.warning(request, e)
     return redirect('/customer')
 
 @login_required
@@ -198,6 +208,7 @@ def customer_add(request):
             e911_state = request.POST['e911_state'],
             e911_zipcode = request.POST['e911_zipcode'],
             e911_country = request.POST['billing_address'],
+            is_active = True,
             created_at = datetime.datetime.now(),
             updated_at = datetime.datetime.now(), )
         try:
@@ -243,3 +254,54 @@ def customer_update(request, id):
         except Exception as e:
             messages.warning(request, e)
         return redirect('/customer')
+
+@login_required
+def sync_method(request):
+    skip = 0
+    top = 100
+    headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
+    while True:
+        params = {'skip': skip, 'top': top, 'select':'RecordID,FullName,Phone,Fax,Mobile,Email,BillAddressAddr1,BillAddressCity,BillAddressState,BillAddressPostalCode,BillAddressCountry,ShipAddressAddr1,ShipAddressCity,ShipAddressCountry,ShipAddressPostalCode,ShipAddressState,IsActive'}
+
+        response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}Customer", headers=headers, params=params)
+
+        if response.status_code != 200:
+            messages.warning(request, f"Error {response.status_code} when getting data from API.")
+            break
+
+        response_json = response.json()
+
+        if 'value' not in response_json:
+            messages.warning(request, "Unexpected response structure from API.")
+            break
+
+        if(len(response_json['value']) == 0):
+            break
+        for item in response_json['value']:
+            save_data = Customer(
+            full_name = item['FullName'],
+            phone = item['Phone'],
+            fax = item['Fax'],
+            mobile = item['Mobile'],
+            email = item['Email'],
+            billing_address = item['BillAddressAddr1'],
+            billing_city = item['BillAddressCity'],
+            billing_state = item['BillAddressState'],
+            billing_zipcode = item['BillAddressPostalCode'],
+            billing_country = item['BillAddressCountry'],
+            e911_address = item['ShipAddressAddr1'],
+            e911_city = item['ShipAddressCity'],
+            e911_state = item['ShipAddressState'],
+            e911_zipcode = item['ShipAddressPostalCode'],
+            e911_country = item['ShipAddressCountry'],
+            record_id = item['RecordID'],
+            is_active = item['IsActive'],
+            )
+            try:
+                save_data.save()
+            except Exception as e:
+                messages.warning(request, e)
+
+        skip += 100
+    
+    return redirect('/customer')

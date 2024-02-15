@@ -40,58 +40,6 @@ def did_sms_type_term_location(request):
 
 
 @login_required
-def did_serivce_type_add(request):
-    if request.method == 'POST':
-        try:
-            service_type = Service_Type(
-                name = request.POST['name'],
-                description = request.POST['description'],
-                )
-            service_type.full_clean()
-        except Exception as e:
-            messages.warning(request, e)
-
-        service_type.save()
-        messages.success(request, 'Service type was created successfully!')
-        return redirect('/assist_did/did_status_type')
-    
-
-@login_required
-def did_service_type_read(request, id):
-    try:
-        service_type = Service_Type.objects.get(id = id)
-    except Exception as e:
-        messages.warning(request, e)
-
-    return JsonResponse({'id':service_type.id, 'name': service_type.name, 'description': service_type.description})
-
-
-@login_required
-def did_service_type_update(request, id):
-    if request.method == "POST":
-        service_type = Service_Type.objects.get(id=id)
-        service_type.name = request.POST['name']
-        service_type.description = request.POST['description']
-        try:
-            service_type.save()
-            messages.success(request, 'The service type was updated successfully!')
-        except Exception as e:
-            messages.warning(request, e)
-        return redirect('/assist_did/did_status_type')
-    
-
-@login_required
-def did_service_type_delete(request, id):
-    service_type = Service_Type.objects.get(id=id)
-    service_type.delete()
-    try:
-        messages.success(request, 'The service type was deleted successfully!')
-    except Exception as e:
-        messages.warning(request, e)
-    return redirect('/assist_did/did_status_type')
-    
-
-@login_required
 def did_service_status_add(request):
     if request.method == 'POST':
         try:
@@ -105,7 +53,7 @@ def did_service_status_add(request):
         except Exception as e:
             messages.warning(request, e)
 
-        return redirect('/assist_did/did_status_type')
+        return redirect('/assist_did/did_status')
 
 
 @login_required
@@ -129,7 +77,7 @@ def did_service_status_update(request, id):
             messages.success(request, 'The service status was updated successfully!')
         except Exception as e:
             messages.warning(request, e)
-        return redirect('/assist_did/did_status_type')
+        return redirect('/assist_did/did_status')
     
 
 @login_required
@@ -140,7 +88,7 @@ def did_service_status_delete(request, id):
         messages.success(request, 'The service status was deleted successfully!')
     except Exception as e:
         messages.warning(request, e)
-    return redirect('/assist_did/did_status_type')
+    return redirect('/assist_did/did_status')
 
 
 @login_required

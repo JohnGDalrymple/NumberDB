@@ -27,6 +27,7 @@
               </div>
               <div class="d-flex">
                   <button class="btn btn-primary btn-block" type="submit">Submit</button>
+                  <a class="btn btn-info ms-2" href="sync_method/"><span class="fa fa-sync"></span> Sync With Method</a>
                   <a class="btn btn-success ms-2" href="add/"><span class="fa fa-add"></span> Add</a>
               </div>
           </div>
@@ -104,8 +105,10 @@
               <td>{{ customer.e911_zipcode }}</td>
               <td>{{ customer.e911_country }}</td>
               <td style="display: flex; justify-content: space-between;">
-                <a class="btn btn-sm btn-warning" href="edit/{{ customer.id }}"><span class="fa fa-edit"></span> Edit</a>
-                <a class="btn btn-sm btn-danger" href="delete/{{ customer.id }}"><span class="fa fa-trash"></span> Delete</a>
+                {% if customer.is_active %}
+                  <a class="btn btn-sm btn-danger" href="delete/{{ customer.id }}"><span class="fa fa-trash"></span> Delete</a>
+                  <a class="btn btn-sm btn-warning" href="edit/{{ customer.id }}"><span class="fa fa-edit"></span> Edit</a>
+                {% endif %}
               </td>
             </tr>
             {% endfor %}
