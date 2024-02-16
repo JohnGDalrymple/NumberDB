@@ -1,9 +1,9 @@
 {% extends 'layout/app.html' %} {% load static %} {% block body %}
 <div class="container-fluid px-4">
-  <h1 class="mt-4">Voice & SMS carrier</h1>
+  <h1 class="mt-4">Voice & SMS Carrier</h1>
   <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-    <li class="breadcrumb-item active">Voice & SMS carrier</li>
+    <li class="breadcrumb-item active">Voice & SMS Carrier</li>
   </ol>
 
   <div class="card mb-4">
@@ -31,10 +31,11 @@
       <div class="d-flex flex-row gap-3">
         <div class="w-50">
           <div class="d-flex align-items-sm-start align-items-stretch flex-column flex-sm-row mb-3">
-            <div class="d-flex">
+            <div class="w-100 d-flex justify-content-between">
               <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#create_voice_carrier">
                 <span class="fa fa-add"></span> Add
               </button>
+              <a class="btn btn-info ms-2" href="sync_method/"><span class="fa fa-sync"></span> Sync With Method</a>
             </div>
           </div>
           <div class="table-container">
@@ -47,7 +48,6 @@
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>Description</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -55,10 +55,11 @@
                 {% for item in voice_carrier %}
                 <tr class="table-row">
                   <td>{{ item.name }}</td>
-                  <td>{{ item.description }}</td>
                   <td style="display: flex; justify-content: space-between;">
-                    <button type="button" class="btn btn-sm btn-warning" onclick="editVoiceCarrier('{{item.id}}')" data-bs-toggle="modal" data-bs-target="#edit_voice_carrier"><span class="fa fa-edit"></span> Edit</button>
-                    <a class="btn btn-sm btn-danger" href="/assist_did/voice_carrier_delete/{{ item.id }}"><span class="fa fa-trash"></span> Delete</a>
+                    {% if item.is_active %}
+                      <button type="button" class="btn btn-sm btn-warning" onclick="editVoiceCarrier('{{item.id}}')" data-bs-toggle="modal" data-bs-target="#edit_voice_carrier"><span class="fa fa-edit"></span> Edit</button>
+                      <a class="btn btn-sm btn-danger" href="/assist_did/voice_carrier_delete/{{ item.id }}"><span class="fa fa-trash"></span> Delete</a>
+                    {% endif %}
                   </td>
                 </tr>
                 </tr>
@@ -69,11 +70,12 @@
         </div>
         <div class="w-50">
           <div class="d-flex align-items-sm-start align-items-stretch flex-column flex-sm-row mb-3">
-            <div class="d-flex">
+            <div class="w-100 d-flex justify-content-between">
               <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#create_sms_carrier">
                 <span class="fa fa-add"></span> Add
               </button>
-            </div>
+              <a class="btn btn-info ms-2" href="sync_method/"><span class="fa fa-sync"></span> Sync With Method</a>
+          </div>
           </div>
           <div class="table-container">
             <table
@@ -85,7 +87,6 @@
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>Description</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -93,10 +94,11 @@
                 {% for item in sms_carrier %}
                 <tr class="table-row" id="tr_{{item.id}}">
                   <td>{{ item.name }}</td>
-                  <td>{{ item.description }}</td>
                   <td style="display: flex; justify-content: space-between;">
-                    <button type="button" class="btn btn-sm btn-warning" onclick="editSMSCarrier('{{item.id}}')" data-bs-toggle="modal" data-bs-target="#edit_sms_carrier"><span class="fa fa-edit"></span> Edit</button>
-                    <a class="btn btn-sm btn-danger" href="/assist_did/sms_carrier_delete/{{ item.id }}"><span class="fa fa-trash"></span> Delete</a>
+                    {% if item.is_active %}
+                      <button type="button" class="btn btn-sm btn-warning" onclick="editSMSCarrier('{{item.id}}')" data-bs-toggle="modal" data-bs-target="#edit_sms_carrier"><span class="fa fa-edit"></span> Edit</button>
+                      <a class="btn btn-sm btn-danger" href="/assist_did/sms_carrier_delete/{{ item.id }}"><span class="fa fa-trash"></span> Delete</a>
+                    {% endif %}
                   </td>
                 </tr>
                 </tr>
@@ -125,10 +127,6 @@
                     <div class="form-floating mb-md-0">
                         <input class="form-control" id="name" type="text" name="name" placeholder="Enter voice carrier name" required/>
                         <label for="name">Enter voice carrier name</label>
-                    </div>
-                    <div class="form-floating">
-                        <input class="form-control" id="description" type="text" name="description" placeholder="Enter voice carrier description"/>
-                        <label for="description">Enter voice carrier description</label>
                     </div>
                 </div>
             </div>
@@ -159,10 +157,6 @@
                         <input class="form-control" id="edit_voice_carrier_name" type="text" name="name" placeholder="Enter voice carrier name" required/>
                         <label for="name">Enter voice carrier name</label>
                     </div>
-                    <div class="form-floating">
-                        <input class="form-control" id="edit_voice_carrier_description" type="text" name="description" placeholder="Enter voice carrier description"/>
-                        <label for="description">Enter voice carrier description</label>
-                    </div>
                 </div>
             </div>
             <div class="d-flex gap-3 justify-content-end">
@@ -192,10 +186,6 @@
                           <input class="form-control" id="name" type="text" name="name" placeholder="Enter sms carrier name" required/>
                           <label for="name">Enter sms carrier name</label>
                       </div>
-                      <div class="form-floating">
-                          <input class="form-control" id="description" type="text" name="description" placeholder="Enter sms carrier description"/>
-                          <label for="description">Enter sms carrier description</label>
-                      </div>
                   </div>
               </div>
               <div class="d-flex gap-3 justify-content-end">
@@ -224,10 +214,6 @@
                       <div class="form-floating mb-md-0">
                           <input class="form-control" id="edit_sms_carrier_name" type="text" name="name" placeholder="Enter sms carrier name" required/>
                           <label for="name">Enter sms carrier name</label>
-                      </div>
-                      <div class="form-floating">
-                          <input class="form-control" id="edit_sms_carrier_description" type="text" name="description" placeholder="Enter sms carrier description"/>
-                          <label for="description">Enter sms carrier description</label>
                       </div>
                   </div>
               </div>

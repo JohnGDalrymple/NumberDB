@@ -2,13 +2,17 @@ from . import views
 from django.urls import path
 
 urlpatterns = [
-    path('did_status/', views.did_status, name='did_status'),
+    path('did_status_service/', views.did_status_service, name='did_status_service'),
     path('did_voice_sms_carrier/', views.did_voice_sms_carrier, name='did_voice_sms_carrier'),
     path('did_sms_type_term_location/', views.did_sms_type_term_location, name='did_sms_type_term_location'),
     path('service_status_add/', views.did_service_status_add, name='did_service_status_add'),
     path('service_status_read/<int:id>', views.did_service_status_read, name='did_service_status_read'),
     path('service_status_update/<int:id>', views.did_service_status_update, name='did_service_status_update'),
     path('service_status_delete/<int:id>', views.did_service_status_delete, name='did_service_status_delete'),
+    path('service_item_add/', views.did_service_item_add, name='did_service_item_add'),
+    path('service_item_read/<int:id>', views.did_service_item_read, name='did_service_item_read'),
+    path('service_item_update/<int:id>', views.did_service_item_update, name='did_service_item_update'),
+    path('service_item_delete/<int:id>', views.did_service_item_delete, name='did_service_item_delete'),
     path('voice_carrier_add/', views.did_voice_carrier_add, name='did_voice_carrier_add'),
     path('voice_carrier_read/<int:id>', views.did_voice_carrier_read, name='did_voice_carrier_read'),
     path('voice_carrier_update/<int:id>', views.did_voice_carrier_update, name='did_voice_carrier_update'),

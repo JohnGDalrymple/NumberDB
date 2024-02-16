@@ -1,0 +1,241 @@
+{% extends 'layout/app.html' %} {% load static %} {% block body %}
+<div class="container-fluid px-4">
+  <h1 class="mt-4">Service Status and Items</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+    <li class="breadcrumb-item active">Service Status and Items</li>
+  </ol>
+
+  <div class="card mb-4">
+      <div class="card-header">
+        <div class="d-flex flex-row justify-content-around">
+          <div>
+            <i class="fas fa-table me-1"></i>
+            Service Status
+          </div>
+          <div>
+            <i class="fas fa-table me-1"></i>
+            Service Items
+          </div>
+      </div>
+    </div>
+    <div class="card-body">
+      {% for message in messages %}
+      <div
+        class="alert alert-{{ message.tags }} alert-dismissible"
+        role="alert"
+      >
+        {{ message }}
+      </div>
+      {% endfor %}
+      <div class="d-flex flex-row gap-3">
+        <div class="w-50">
+          <div class="d-flex align-items-sm-start align-items-stretch flex-column flex-sm-row mb-3">
+            <div class="w-100 d-flex flex-row justify-content-between">
+              <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#create_status">
+                <span class="fa fa-add"></span> Add
+              </button>
+              <a class="btn btn-info ms-2" href="sync_method/"><span class="fa fa-sync"></span> Sync With Method</a>
+              </div>
+          </div>
+          <div class="table-container">
+            <table
+              class="table table-bordered"
+              id="dataTable"
+              width="100%"
+              cellspacing="0"
+            >
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in status %}
+                <tr class="table-row">
+                  <td>{{ item.name }}</td>
+                  <td style="display: flex; justify-content: space-between;">
+                    {% if item.is_active %}
+                      <button type="button" class="btn btn-sm btn-warning" onclick="editStatus('{{item.id}}')" data-bs-toggle="modal" data-bs-target="#edit_status"><span class="fa fa-edit"></span> Edit</button>
+                      <a class="btn btn-sm btn-danger" href="/assist_did/service_status_delete/{{ item.id }}"><span class="fa fa-trash"></span> Delete</a>
+                    {% endif %}
+                  </td>
+                </tr>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="w-50">
+          <div class="d-flex align-items-sm-start align-items-stretch flex-column flex-sm-row mb-3">
+            <div class="w-100 d-flex justify-content-between">
+              <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#create_service_item">
+                <span class="fa fa-add"></span> Add
+            </button>
+            <a class="btn btn-info ms-2" href="sync_method/"><span class="fa fa-sync"></span> Sync With Method</a>
+            </div>
+          </div>
+          <div class="table-container">
+            <table
+              class="table table-bordered"
+              id="dataTable"
+              width="100%"
+              cellspacing="0"
+            >
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in services %}
+                <tr class="table-row">
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.description }}</td>
+                  <td style="display: flex; justify-content: space-between;">
+                    {% if item.is_active %}
+                      <button type="button" class="btn btn-sm btn-warning" onclick="editService('{{item.id}}')" data-bs-toggle="modal" data-bs-target="#edit_service_item"><span class="fa fa-edit"></span> Edit</button>
+                      <a class="btn btn-sm btn-danger" href="/assist_did/service_item_delete/{{ item.id }}"><span class="fa fa-trash"></span> Delete</a>
+                    {% endif %}
+                  </td>
+                </tr>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>  
+  </div>
+
+  <!-- Add Service Status Modal -->
+  <div class="modal fade" id="create_status" tabindex="-1" aria-labelledby="add_service_status_modal_label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="add_service_status_modal_label">Add Service Status</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="/assist_did/service_status_add/" method="POST">
+            {% csrf_token %}
+            <div class="row mb-3">
+                <div class="d-flex flex-column gap-3">
+                    <div class="form-floating mb-md-0">
+                        <input class="form-control" id="name" type="text" name="name" placeholder="Enter service status name" required/>
+                        <label for="name">Enter service status name</label>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex gap-3 justify-content-end">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-primary btn-block" type="submit">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Service Status Modal -->
+  <div class="modal fade" id="edit_status" tabindex="-1" aria-labelledby="edit_service_status_modal_label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="edit_service_status_modal_label">Edit Service Status</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="edit_status_form" action="/assist_did/service_status_update/" method="POST">
+            {% csrf_token %}
+            <div class="row mb-3">
+                <div class="d-flex flex-column gap-3">
+                    <div class="form-floating mb-md-0">
+                        <input class="form-control" id="edit_status_name" type="text" name="name" placeholder="Enter service status name" required/>
+                        <label for="name">Enter service status name</label>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex gap-3 justify-content-end">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="edit_status_button" class="btn btn-primary btn-block" type="submit">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Service Item Modal -->
+  <div class="modal fade" id="create_service_item" tabindex="-1" aria-labelledby="add_service_item_modal_label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="add_service_item_modal_label">Add Service Item</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="/assist_did/service_item_add/" method="POST">
+            {% csrf_token %}
+            <div class="row mb-3">
+                <div class="d-flex flex-column gap-3">
+                    <div class="form-floating mb-md-0">
+                        <input class="form-control" id="name" type="text" name="name" placeholder="Enter service item name" required/>
+                        <label for="name">Enter service item name</label>
+                    </div>
+                    <div class="form-floating">
+                        <input class="form-control" id="description" type="text" name="description" placeholder="Enter service item description"/>
+                        <label for="description">Enter service item description</label>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex gap-3 justify-content-end">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-primary btn-block" type="submit">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Service Item Modal -->
+  <div class="modal fade" id="edit_service_item" tabindex="-1" aria-labelledby="edit_service_item_modal_label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="edit_service_item_modal_label">Edit Service Item</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="edit_service_item_form" action="/assist_did/service_item_update/" method="POST">
+            {% csrf_token %}
+            <div class="row mb-3">
+                <div class="d-flex flex-column gap-3">
+                    <div class="form-floating mb-md-0">
+                        <input class="form-control" id="edit_service_item_name" type="text" name="name" placeholder="Enter service item name" required/>
+                        <label for="name">Enter service item name</label>
+                    </div>
+                    <div class="form-floating">
+                        <input class="form-control" id="edit_service_item_description" type="text" name="description" placeholder="Enter service item description"/>
+                        <label for="description">Enter service item description</label>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex gap-3 justify-content-end">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="edit_service_item_button" class="btn btn-primary btn-block" type="submit">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %} {% block javascript %} {% endblock %}
