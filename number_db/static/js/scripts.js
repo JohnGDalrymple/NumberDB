@@ -118,7 +118,6 @@ function editStatus(id) {
         method: 'GET',
         success: function(response) {
             document.getElementById("edit_status_name").value = response.name
-            document.getElementById("edit_status_description").value = response.description
             document.getElementById("edit_status_button").name = response.id
         }
     });
@@ -128,13 +127,28 @@ document.getElementById("edit_status_form")?.addEventListener('submit', ()=>[
     document.getElementById("edit_status_form").action = `${window.location.origin}/assist_did/service_status_update/${document.getElementById("edit_status_button").name}`
 ])
 
+function editService(id) {
+    $.ajax({
+        url: `${window.location.origin}/assist_did/service_item_read/${id}`,
+        method: 'GET',
+        success: function(response) {
+            document.getElementById("edit_service_item_name").value = response.name
+            document.getElementById("edit_service_item_description").value = response.description
+            document.getElementById("edit_service_item_button").name = response.id
+        }
+    });
+}
+
+document.getElementById("edit_service_item_form")?.addEventListener('submit', ()=>[
+    document.getElementById("edit_service_item_form").action = `${window.location.origin}/assist_did/service_item_update/${document.getElementById("edit_service_item_button").name}`
+])
+
 function editVoiceCarrier(id) {
     $.ajax({
         url: `${window.location.origin}/assist_did/voice_carrier_read/${id}`,
         method: 'GET',
         success: function(response) {
             document.getElementById("edit_voice_carrier_name").value = response.name
-            document.getElementById("edit_voice_carrier_description").value = response.description
             document.getElementById("edit_voice_carrier_button").name = response.id
         }
     });
@@ -150,7 +164,6 @@ function editSMSCarrier(id) {
         method: 'GET',
         success: function(response) {
             document.getElementById("edit_sms_carrier_name").value = response.name
-            document.getElementById("edit_sms_carrier_description").value = response.description
             document.getElementById("edit_sms_carrier_button").name = response.id
         }
     });
@@ -166,7 +179,6 @@ function editSMSType(id) {
         method: 'GET',
         success: function(response) {
             document.getElementById("edit_sms_type_name").value = response.name
-            document.getElementById("edit_sms_type_description").value = response.description
             document.getElementById("edit_sms_type_button").name = response.id
         }
     });
@@ -182,7 +194,6 @@ function editTermLocation(id) {
         method: 'GET',
         success: function(response) {
             document.getElementById("edit_term_location_name").value = response.name
-            document.getElementById("edit_term_location_description").value = response.description
             document.getElementById("edit_term_location_button").name = response.id
         }
     });

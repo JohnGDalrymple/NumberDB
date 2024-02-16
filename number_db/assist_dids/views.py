@@ -18,9 +18,11 @@ import uuid
 # Create your views here.
 
 @login_required
-def did_status(request):
+def did_status_service(request):
     status = Status.objects.all().values()
-    return render(request, 'status.html', { 'status': status })
+    services = Service.objects.all().values()
+
+    return render(request, 'status_service.html', { 'status': status, 'services': services })
 
 
 @login_required
@@ -45,7 +47,7 @@ def did_service_status_add(request):
         try:
             service_status = Status(
                 name = request.POST['name'],
-                description = request.POST['description'],
+                is_active = True
             )
             service_status.full_clean()
             service_status.save()
@@ -53,7 +55,7 @@ def did_service_status_add(request):
         except Exception as e:
             messages.warning(request, e)
 
-        return redirect('/assist_did/did_status')
+        return redirect('/assist_did/did_status_service')
 
 
 @login_required
@@ -63,7 +65,7 @@ def did_service_status_read(request, id):
     except Exception as e:
         messages.warning(request, e)
 
-    return JsonResponse({'id':status.id, 'name': status.name, 'description': status.description})
+    return JsonResponse({'id':status.id, 'name': status.name})
 
 
 @login_required
@@ -71,24 +73,80 @@ def did_service_status_update(request, id):
     if request.method == "POST":
         status = Status.objects.get(id=id)
         status.name = request.POST['name']
-        status.description = request.POST['description']
         try:
             status.save()
             messages.success(request, 'The service status was updated successfully!')
         except Exception as e:
             messages.warning(request, e)
-        return redirect('/assist_did/did_status')
+        return redirect('/assist_did/did_status_service')
     
 
 @login_required
 def did_service_status_delete(request, id):
     status = Status.objects.get(id=id)
-    status.delete()
+    status.name = status.name + " (deleted)"
+    status.is_active = False
     try:
+        status.save()
         messages.success(request, 'The service status was deleted successfully!')
     except Exception as e:
         messages.warning(request, e)
-    return redirect('/assist_did/did_status')
+    return redirect('/assist_did/did_status_service')
+
+
+@login_required
+def did_service_item_add(request):
+    if request.method == 'POST':
+        try:
+            service_item = Service(
+                name = request.POST['name'],
+                description = request.POST['description'],
+                is_active = True
+            )
+            service_item.full_clean()
+            service_item.save()
+            messages.success(request, 'Service item was created successfully!')
+        except Exception as e:
+            messages.warning(request, e)
+
+        return redirect('/assist_did/did_status_service')
+
+
+@login_required
+def did_service_item_read(request, id):
+    try:
+        service_item = Service.objects.get(id = id)
+    except Exception as e:
+        messages.warning(request, e)
+
+    return JsonResponse({'id':service_item.id, 'name': service_item.name, 'description': service_item.description})
+
+
+@login_required
+def did_service_item_update(request, id):
+    if request.method == "POST":
+        service_item = Service.objects.get(id=id)
+        service_item.name = request.POST['name']
+        service_item.description = request.POST['description']
+        try:
+            service_item.save()
+            messages.success(request, 'The service item was updated successfully!')
+        except Exception as e:
+            messages.warning(request, e)
+        return redirect('/assist_did/did_status_service')
+    
+
+@login_required
+def did_service_item_delete(request, id):
+    service_item = Service.objects.get(id=id)
+    service_item.name = service_item.name + " (deleted)"
+    service_item.is_active = False
+    try:
+        service_item.save()
+        messages.success(request, 'The service item was deleted successfully!')
+    except Exception as e:
+        messages.warning(request, e)
+    return redirect('/assist_did/did_status_service')
 
 
 @login_required
@@ -97,7 +155,7 @@ def did_voice_carrier_add(request):
         try:
             voice_carrier = Voice_Carrier(
                 name = request.POST['name'],
-                description = request.POST['description'],
+                is_active = True
             )
             voice_carrier.full_clean()
             voice_carrier.save()
@@ -115,7 +173,7 @@ def did_voice_carrier_read(request, id):
     except Exception as e:
         messages.warning(request, e)
 
-    return JsonResponse({'id':voice_carrier.id, 'name': voice_carrier.name, 'description': voice_carrier.description})
+    return JsonResponse({'id':voice_carrier.id, 'name': voice_carrier.name})
 
 
 @login_required
@@ -123,7 +181,6 @@ def did_voice_carrier_update(request, id):
     if request.method == "POST":
         voice_carrier = Voice_Carrier.objects.get(id=id)
         voice_carrier.name = request.POST['name']
-        voice_carrier.description = request.POST['description']
         try:
             voice_carrier.save()
             messages.success(request, 'The voice carrier was updated successfully!')
@@ -135,8 +192,10 @@ def did_voice_carrier_update(request, id):
 @login_required
 def did_voice_carrier_delete(request, id):
     voice_carrier = Voice_Carrier.objects.get(id=id)
-    voice_carrier.delete()
+    voice_carrier.name = voice_carrier.name + " (deleted)"
+    voice_carrier.is_active = False
     try:
+        voice_carrier.save()
         messages.success(request, 'The voice carrier was deleted successfully!')
     except Exception as e:
         messages.warning(request, e)
@@ -149,7 +208,7 @@ def did_sms_carrier_add(request):
         try:
             sms_carrier = SMS_Carrier(
                 name = request.POST['name'],
-                description = request.POST['description'],
+                is_active = True
             )
             sms_carrier.full_clean()
             sms_carrier.save()
@@ -167,7 +226,7 @@ def did_sms_carrier_read(request, id):
     except Exception as e:
         messages.warning(request, e)
 
-    return JsonResponse({'id':sms_carrier.id, 'name': sms_carrier.name, 'description': sms_carrier.description})
+    return JsonResponse({'id':sms_carrier.id, 'name': sms_carrier.name})
 
 
 @login_required
@@ -175,7 +234,6 @@ def did_sms_carrier_update(request, id):
     if request.method == "POST":
         sms_carrier = SMS_Carrier.objects.get(id=id)
         sms_carrier.name = request.POST['name']
-        sms_carrier.description = request.POST['description']
         try:
             sms_carrier.save()
             messages.success(request, 'The SMS carrier was updated successfully!')
@@ -187,8 +245,10 @@ def did_sms_carrier_update(request, id):
 @login_required
 def did_sms_carrier_delete(request, id):
     sms_carrier = SMS_Carrier.objects.get(id=id)
-    sms_carrier.delete()
+    sms_carrier.name = sms_carrier.name + " (deleted)"
+    sms_carrier.is_active = False
     try:
+        sms_carrier.save()
         messages.success(request, 'The SMS carrier was deleted successfully!')
     except Exception as e:
         messages.warning(request, e)
@@ -201,7 +261,7 @@ def did_sms_type_add(request):
         try:
             sms_type = SMS_Type(
                 name = request.POST['name'],
-                description = request.POST['description'],
+                is_active = True
             )
             sms_type.full_clean()
             sms_type.save()
@@ -219,7 +279,7 @@ def did_sms_type_read(request, id):
     except Exception as e:
         messages.warning(request, e)
 
-    return JsonResponse({'id':sms_type.id, 'name': sms_type.name, 'description': sms_type.description})
+    return JsonResponse({'id':sms_type.id, 'name': sms_type.name})
 
 
 @login_required
@@ -227,7 +287,6 @@ def did_sms_type_update(request, id):
     if request.method == "POST":
         sms_type = SMS_Type.objects.get(id=id)
         sms_type.name = request.POST['name']
-        sms_type.description = request.POST['description']
         try:
             sms_type.save()
             messages.success(request, 'The SMS type was updated successfully!')
@@ -239,8 +298,10 @@ def did_sms_type_update(request, id):
 @login_required
 def did_sms_type_delete(request, id):
     sms_type = SMS_Type.objects.get(id=id)
-    sms_type.delete()
+    sms_type.name = sms_type.name + " (deleted)"
+    sms_type.is_active = False
     try:
+        sms_type.save()
         messages.success(request, 'The SMS type was deleted successfully!')
     except Exception as e:
         messages.warning(request, e)
@@ -253,7 +314,6 @@ def did_term_location_add(request):
         try:
             term_location = Term_Location(
                 name = request.POST['name'],
-                description = request.POST['description'],
             )
             term_location.full_clean()
             term_location.save()
@@ -271,7 +331,7 @@ def did_term_location_read(request, id):
     except Exception as e:
         messages.warning(request, e)
 
-    return JsonResponse({'id':term_location.id, 'name': term_location.name, 'description': term_location.description})
+    return JsonResponse({'id':term_location.id, 'name': term_location.name})
 
 
 @login_required
@@ -279,7 +339,6 @@ def did_term_location_update(request, id):
     if request.method == "POST":
         term_location = Term_Location.objects.get(id=id)
         term_location.name = request.POST['name']
-        term_location.description = request.POST['description']
         try:
             term_location.save()
             messages.success(request, 'The term location was updated successfully!')
@@ -291,8 +350,8 @@ def did_term_location_update(request, id):
 @login_required
 def did_term_location_delete(request, id):
     term_location = Term_Location.objects.get(id=id)
-    term_location.delete()
     try:
+        term_location.delete()
         messages.success(request, 'The term location was deleted successfully!')
     except Exception as e:
         messages.warning(request, e)
