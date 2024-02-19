@@ -29,4 +29,10 @@ urlpatterns = [
     path('term_location_read/<int:id>', views.did_term_location_read, name='did_term_location_read'),
     path('term_location_update/<int:id>', views.did_term_location_update, name='did_term_location_update'),
     path('term_location_delete/<int:id>', views.did_term_location_delete, name='did_term_location_delete'),
+    path('did_status_service/sync_status_method/', views.did_sync_status_method, name='did_sync_status_method'),
+    path('did_status_service/sync_service_item_method/', views.did_sync_service_item_method, name='did_sync_service_item_method'),
+    path('did_sms_type_term_location/sync_sms_type_method/', views.did_sync_sms_type_method, name='did_sync_sms_type_method'),
+    path('did_sms_type_term_location/sync_term_location_method/', views.did_sync_term_location_method, name='did_sync_term_location_method'),
+    path('did_voice_sms_carrier/sync_voice_carrier_method/', views.did_sync_voice_carrier_method, name='did_sync_voice_carrier_method'),
+    path('did_voice_sms_carrier/sync_sms_carrier_method/', views.did_sync_sms_carrier_method, name='did_sync_sms_carrier_method'),
 ]

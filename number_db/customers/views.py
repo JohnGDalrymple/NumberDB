@@ -299,6 +299,7 @@ def sync_method(request):
             )
             try:
                 save_data.save()
+                messages.success(request, "Customer data has been synchronized with Method.")
             except Exception as e:
                 messages.warning(request, e)
 
