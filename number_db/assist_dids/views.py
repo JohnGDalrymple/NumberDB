@@ -13,7 +13,8 @@ import unicodedata
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.hashers import make_password
 import pandas as pd
-import uuid
+import requests
+import os
 
 # Create your views here.
 
@@ -356,3 +357,237 @@ def did_term_location_delete(request, id):
     except Exception as e:
         messages.warning(request, e)
     return redirect('/assist_did/did_sms_type_term_location')
+
+
+@login_required
+def did_sync_status_method(request):
+    skip = 0
+    top = 100
+    headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
+    while True:
+        params = {'skip': skip, 'top': top, 'select':'MITypeName,RecordID,MIIsActive'}
+
+        response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MIType", headers=headers, params=params)
+
+        if response.status_code != 200:
+            messages.warning(request, f"Error {response.status_code} when getting data from API.")
+            break
+
+        response_json = response.json()
+
+        if 'value' not in response_json:
+            messages.warning(request, "Unexpected response structure from API.")
+            break
+
+        if(len(response_json['value']) == 0):
+            break
+        for item in response_json['value']:
+            save_data = Status(
+            name = item['MITypeName'],
+            record_id = item['RecordID'],
+            is_active = item['MIIsActive'],
+            )
+            try:
+                save_data.save()
+                messages.success(request, "Service Status has been synchronized with Method.")
+            except Exception as e:
+                messages.warning(request, e)
+
+        skip += 100
+    
+    return redirect('/assist_did/did_status_service')
+
+
+@login_required
+def did_sync_service_item_method(request):
+    skip = 0
+    top = 100
+    headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
+    while True:
+        params = {'skip': skip, 'top': top, 'select':'FullName,RecordID,SalesDesc,IsActive'}
+
+        response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}Item", headers=headers, params=params)
+
+        if response.status_code != 200:
+            messages.warning(request, f"Error {response.status_code} when getting data from API.")
+            break
+
+        response_json = response.json()
+
+        if 'value' not in response_json:
+            messages.warning(request, "Unexpected response structure from API.")
+            break
+
+        if(len(response_json['value']) == 0):
+            break
+        for item in response_json['value']:
+            save_data = Service(
+            name = item['FullName'],
+            description = item['SalesDesc'],
+            record_id = item['RecordID'],
+            is_active = item['IsActive'],
+            )
+            try:
+                save_data.save()
+                messages.success(request, "Service Item data has been synchronized with Method.")
+            except Exception as e:
+                messages.warning(request, e)
+
+        skip += 100
+    
+    return redirect('/assist_did/did_status_service')
+
+
+@login_required
+def did_sync_sms_type_method(request):
+    skip = 0
+    top = 100
+    headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
+    while True:
+        params = {'skip': skip, 'top': top, 'select':'RecordID,MISMSType,MIIsActive'}
+
+        response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MISMSType", headers=headers, params=params)
+
+        if response.status_code != 200:
+            messages.warning(request, f"Error {response.status_code} when getting data from API.")
+            break
+
+        response_json = response.json()
+
+        if 'value' not in response_json:
+            messages.warning(request, "Unexpected response structure from API.")
+            break
+
+        if(len(response_json['value']) == 0):
+            break
+        for item in response_json['value']:
+            save_data = SMS_Type(
+            name = item['MISMSType'],
+            record_id = item['RecordID'],
+            is_active = item['MIIsActive'],
+            )
+            try:
+                save_data.save()
+                messages.success(request, "SMS Type data has been synchronized with Method.")
+            except Exception as e:
+                messages.warning(request, e)
+
+        skip += 100
+    
+    return redirect('/assist_did/did_sms_type_term_location')
+
+
+@login_required
+def did_sync_term_location_method(request):
+    skip = 0
+    top = 100
+    headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
+    while True:
+        params = {'skip': skip, 'top': top, 'select':'RecordID,MITermLocation'}
+
+        response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MITermLocation", headers=headers, params=params)
+
+        if response.status_code != 200:
+            messages.warning(request, f"Error {response.status_code} when getting data from API.")
+            break
+
+        response_json = response.json()
+
+        if 'value' not in response_json:
+            messages.warning(request, "Unexpected response structure from API.")
+            break
+
+        if(len(response_json['value']) == 0):
+            break
+        for item in response_json['value']:
+            save_data = Term_Location(
+            name = item['MITermLocation'],
+            record_id = item['RecordID'],
+            )
+            try:
+                save_data.save()
+                messages.success(request, "Term location data has been synchronized with Method.")
+            except Exception as e:
+                messages.warning(request, e)
+
+        skip += 100
+    
+    return redirect('/assist_did/did_sms_type_term_location')
+
+
+@login_required
+def did_sync_voice_carrier_method(request):
+    skip = 0
+    top = 100
+    headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
+    while True:
+        params = {'skip': skip, 'top': top, 'select':'MIVoiceCarrierName,MIIsActive,RecordID'}
+
+        response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MIVoiceCarrier", headers=headers, params=params)
+
+        if response.status_code != 200:
+            messages.warning(request, f"Error {response.status_code} when getting data from API.")
+            break
+
+        response_json = response.json()
+
+        if 'value' not in response_json:
+            messages.warning(request, "Unexpected response structure from API.")
+            break
+
+        if(len(response_json['value']) == 0):
+            break
+        for item in response_json['value']:
+            save_data = Voice_Carrier(
+            name = item['MIVoiceCarrierName'],
+            is_active = item['MIIsActive'],
+            record_id = item['RecordID'],
+            )
+            try:
+                save_data.save()
+                messages.success(request, "Voice carrier data has been synchronized with Method.")
+            except Exception as e:
+                messages.warning(request, e)
+
+        skip += 100
+    
+    return redirect('/assist_did/did_voice_sms_carrier')
+
+
+@login_required
+def did_sync_sms_carrier_method(request):
+    skip = 0
+    top = 100
+    headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
+    while True:
+        params = {'skip': skip, 'top': top, 'select':'MIVoiceCarrierName,MIIsActive,RecordID'}
+
+        response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MIVoiceCarrier", headers=headers, params=params)
+
+        if response.status_code != 200:
+            messages.warning(request, f"Error {response.status_code} when getting data from API.")
+            break
+
+        response_json = response.json()
+
+        if 'value' not in response_json:
+            messages.warning(request, "Unexpected response structure from API.")
+            break
+
+        if(len(response_json['value']) == 0):
+            break
+        for item in response_json['value']:
+            save_data = SMS_Carrier(
+            name = item['MIVoiceCarrierName'],
+            is_active = item['MIIsActive'],
+            record_id = item['RecordID'],
+            )
+            try:
+                save_data.save()
+                messages.success(request, "SMS carrier data has been synchronized with Method.")
+            except Exception as e:
+                messages.warning(request, e)
+
+        skip += 100
+    
+    return redirect('/assist_did/did_voice_sms_carrier')

@@ -4,6 +4,7 @@ from django.urls import path
 urlpatterns = [
     path('', views.index, name='index'),
     path('did/', views.did, name='did'),
+    path('did/sync_method/', views.did_sync_method, name='did_sync_method'),
     path('did/add/', views.did_add, name='did_add'),
     path('did/delete/<int:id>', views.did_delete, name='did_delete'),
     path('did/edit/<int:id>', views.did_edit, name='did_edit'),

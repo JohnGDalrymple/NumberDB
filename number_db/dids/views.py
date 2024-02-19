@@ -16,6 +16,8 @@ from django.contrib.auth.hashers import make_password
 import pandas as pd
 import uuid
 from operator import or_
+import requests
+import os
 
 # Create your views here.
 
@@ -37,6 +39,29 @@ def parse_datetime(datetime_string):
     except ValueError:
         return datetime.datetime.strptime(datetime_string, '%m/%d/%Y %H:%M:%S').date() if datetime_string else None
    
+
+def parse_date_sync(date_string):
+    if date_string:
+        if '.' in date_string:
+            date_format = "%Y-%m-%dT%H:%M:%S.%f"
+        else:
+            date_format = "%Y-%m-%dT%H:%M:%S"
+
+        return datetime.datetime.strptime(date_string, date_format).date()
+    else:
+        return None
+
+def parse_datetime_sync(date_string):
+    if date_string:
+        if '.' in date_string:
+            date_format = "%Y-%m-%dT%H:%M:%S.%f"
+        else:
+            date_format = "%Y-%m-%dT%H:%M:%S"
+
+        return datetime.datetime.strptime(date_string, date_format).date()
+    else:
+        return None
+
 
 def switch(value):
     if value.lower() == "yes":
@@ -110,6 +135,7 @@ def did(request):
             # dids_list = Did.objects.filter(q_objects).distinct().values()
             q_objects = []
             q_objects.append((Q(did__icontains = query)))
+            q_objects.append((Q(reseller__icontains = query)))
             q_objects.append((Q(user_first_name__icontains = query)))
             q_objects.append((Q(user_last_name__icontains = query)))
             q_objects.append((Q(email__icontains = query)))
@@ -122,10 +148,6 @@ def did(request):
             q_objects.append((Q(e911_enabled_billed__icontains = query)))
             q_objects.append((Q(e911_cid__icontains = query)))
             q_objects.append((Q(e911_address__icontains = query)))
-            q_objects.append((Q(service_1__icontains = query)))
-            q_objects.append((Q(service_2__icontains = query)))
-            q_objects.append((Q(service_3__icontains = query)))
-            q_objects.append((Q(service_4__icontains = query)))
             q_objects.append((Q(updated_by__icontains = query)))
             
             # Add Q objects for foreign key fields
@@ -135,12 +157,19 @@ def did(request):
             q_objects.append((Q(sms_type__name__icontains = query)))
             q_objects.append((Q(term_location__name__icontains = query)))
             q_objects.append((Q(customer__full_name__icontains = query)))
-            q_objects.append((Q(reseller__full_name__icontains = query)))
+            q_objects.append((Q(service_1__name__icontains = query)))
+            q_objects.append((Q(service_2__name__icontains = query)))
+            q_objects.append((Q(service_3__name__icontains = query)))
+            q_objects.append((Q(service_4__name__icontains = query)))
             
             # Use Q object to query the database with OR condition
             dids_list = Did.objects.filter(reduce(or_, q_objects))
 
             for item in dids_list:
+                item.note =  "" if(item.note == None) else item.note
+                item.e911_enabled_billed =  "" if(item.e911_enabled_billed == None) else item.e911_enabled_billed
+                item.e911_address =  "" if(item.e911_address == None) else item.e911_address
+                item.updated_by =  "" if(item.updated_by == None) else item.updated_by
                 item.change_date =  "" if(item.change_date == None) else item.change_date
                 item.extension =  "" if(item.extension == None) else item.extension
                 item.onboard_date =  "" if(item.onboard_date == None) else item.onboard_date
@@ -150,9 +179,12 @@ def did(request):
             return render(request, 'dids.html', {'dids': dids_list, 'search': query, 'error': did_error})
 
         else:
-            # dids_list = Did.objects.all().values()
-            dids_list = Did.objects.all().select_related('customer', 'reseller', 'status', 'voice_carrier', 'sms_carrier', 'sms_type', 'term_location')
+            dids_list = Did.objects.all().select_related('customer', 'status', 'voice_carrier', 'sms_carrier', 'sms_type', 'term_location', 'service_1', 'service_2', 'service_3', 'service_4')
             for item in dids_list:
+                item.note =  "" if(item.note == None) else item.note
+                item.e911_enabled_billed =  "" if(item.e911_enabled_billed == None) else item.e911_enabled_billed
+                item.e911_address =  "" if(item.e911_address == None) else item.e911_address
+                item.updated_by =  "" if(item.updated_by == None) else item.updated_by
                 item.change_date =  "" if(item.change_date == None) else item.change_date
                 item.extension =  "" if(item.extension == None) else item.extension
                 item.onboard_date =  "" if(item.onboard_date == None) else item.onboard_date
@@ -193,16 +225,6 @@ def did(request):
                                 sms_carrier_value = check_sms_carrier(item['SMS Carrier'])
                                 sms_type_value = check_sms_type(item['SMS Type'])
                                 term_location_value = check_term_location(item['Term Location'])
-
-                                # print(item)
-                                # print("voice_carrier_value", voice_carrier_value)
-                                # print("customer_value", customer_value)
-                                # print("resller_value", resller_value)
-                                # print("service_status_value", service_status_value)
-                                # print("service_type_value", service_type_value)
-                                # print("sms_carrier_value", sms_carrier_value)
-                                # print("sms_type_value", sms_type_value)
-                                # print("term_location_value", term_location_value)
 
                                 if not item['DID'] or switch(item['In Method']) == True or voice_carrier_value == True or service_status_value == True or switch(item['SMS Enabled']) == True or sms_carrier_value == True or sms_type_value == True or term_location_value == True or switch(item['E911 Enabled Billed']) == True or customer_value == True or resller_value == True:
                                     error_flag = True
@@ -649,3 +671,65 @@ def export_error_csv(request):
         
     Did_Error.objects.all().delete()
     return response
+
+
+@login_required
+def did_sync_method(request):
+    skip = 0
+    top = 100
+    headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
+    while True:
+        params = {'skip': skip, 'top': top, 'select':'Number,MIEntityFullName_RecordID,MIResellerMSP,MISMSType_RecordID,MISMSCarrier_RecordID,MISMSCarrier_RecordID,MISMSType_RecordID,MITermLocation_RecordID,IsDuplicated,LastModifiedDate,MISMSEnabled,MISMSCampaign,MIUserFirstName,MIUserLastName,MIExtension,MIEmail,MIStartDate,MIItemFullName_RecordID,MIItemFullName2_RecordID,MIItemFullName3_RecordID,MIItemFullName4_RecordID,LastModifiedDate,ImportBy,RecordID'}
+
+        response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MICustomerNumberRelationshipTable", headers=headers, params=params)
+
+        if response.status_code != 200:
+            messages.warning(request, f"Error {response.status_code} when getting data from API.")
+            break
+
+        response_json = response.json()
+
+        if 'value' not in response_json:
+            messages.warning(request, "Unexpected response structure from API.")
+            break
+
+        if(len(response_json['value']) == 0):
+            break
+
+        for item in response_json['value']:
+            save_data = Did(
+                did = item["Number"],
+                customer_id = item["MIEntityFullName_RecordID"],
+                reseller = item["MIResellerMSP"],
+                status_id = item["MISMSType_RecordID"],
+                voice_carrier_id = item["MISMSCarrier_RecordID"],
+                sms_carrier_id = item["MISMSCarrier_RecordID"],
+                sms_type_id = item["MISMSType_RecordID"],
+                term_location_id = item["MITermLocation_RecordID"],
+                in_method = "Yes" if item["IsDuplicated"] else "No",
+                change_date = parse_date_sync(item["LastModifiedDate"]),
+                sms_enabled = "Yes" if item["MISMSEnabled"] else "No",
+                sms_campaign = item["MISMSCampaign"],
+                user_first_name = item["MIUserFirstName"],
+                user_last_name = item["MIUserLastName"],
+                extension = item["MIExtension"],
+                email = item["MIEmail"],
+                onboard_date = parse_date_sync(item["MIStartDate"]),
+                service_1_id = item["MIItemFullName_RecordID"],
+                service_2_id = item["MIItemFullName2_RecordID"],
+                service_3_id = item["MIItemFullName3_RecordID"],
+                service_4_id = item["MIItemFullName4_RecordID"],
+                updated_date_time = parse_date_sync(item["LastModifiedDate"]),
+                updated_by = item["ImportBy"],
+                record_id = item["RecordID"],
+                did_uuid = uuid.uuid4(),
+            )
+            try:
+                save_data.save()
+            except Exception as e:
+                messages.warning(request, e)
+
+        skip += 100
+    
+    messages.success(request, "DID data has been synchronized with Method.")
+    return redirect('/did')

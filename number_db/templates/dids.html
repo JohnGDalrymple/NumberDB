@@ -30,6 +30,7 @@
           </div>
               <div class="d-flex">
                 <button class="btn btn-primary btn-block" type="submit">Submit</button>
+                <a class="btn btn-info ms-2" href="sync_method/"><span class="fa fa-sync"></span> Sync With Method</a>
                 <a class="btn btn-success ms-2" href="add/"><span class="fa fa-add"></span> Add</a>
             </div>
           </div>
@@ -86,6 +87,10 @@
               <th>E911 Enabled_Billed</th>
               <th>E911 CID</th>
               <th>E911 Address</th>
+              <th>Service 1</th>
+              <th>Service 2</th>
+              <th>Service 3</th>
+              <th>Service 4</th>
               <th>Update Date Time</th>
               <th>Update By</th>
               <th>Action</th>
@@ -120,6 +125,10 @@
               <td>{{ did.e911_enabled_billed }}</td>
               <td>{{ did.e911_cid }}</td>
               <td>{{ did.e911_address }}</td>
+              <td>{{ did.service_1.name }}</td>
+              <td>{{ did.service_2.name }}</td>
+              <td>{{ did.service_3.name }}</td>
+              <td>{{ did.service_4.name }}</td>
               <td>{{ did.updated_date_time | date:"d-m-Y" }}</td>
               <td>{{ did.updated_by }}</td>
               <td style="display: flex; justify-content: space-between;">
