@@ -18,6 +18,19 @@ import numpy as np
 from django.db.models import Q
 import os
 import requests
+import re
+
+email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+
+def is_valid_email(email):
+    if email == None:
+        return None
+    elif ',' in email:
+        return email
+    elif(re.search(email_regex,email)):  
+        return email  
+    else:  
+        return email + '@outlook.com'
 
 # Create your views here.
 
@@ -283,7 +296,7 @@ def sync_method(request):
             phone = item['Phone'],
             fax = item['Fax'],
             mobile = item['Mobile'],
-            email = item['Email'],
+            email = is_valid_email(item['Email']),
             billing_address = item['BillAddressAddr1'],
             billing_city = item['BillAddressCity'],
             billing_state = item['BillAddressState'],
@@ -299,10 +312,11 @@ def sync_method(request):
             )
             try:
                 save_data.save()
-                messages.success(request, "Customer data has been synchronized with Method.")
             except Exception as e:
                 messages.warning(request, e)
 
         skip += 100
     
+    messages.success(request, "Customer data has been synchronized with Method.")
+        
     return redirect('/customer')

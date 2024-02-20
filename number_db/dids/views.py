@@ -18,6 +18,21 @@ import uuid
 from operator import or_
 import requests
 import os
+import re
+
+# email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+# email_regex = r"(^[a-zA-Z0-9_.+-']+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+email_regex = r"(^[a-zA-Z0-9_.+\-']+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+
+def is_valid_email(email):
+    if email == None or email == '':
+        return ''
+    elif ',' in email:
+        return email
+    elif(re.search(email_regex, email.strip())):  
+        return email  
+    else:  
+        return email + '@outlook.com'
 
 # Create your views here.
 
@@ -713,7 +728,7 @@ def did_sync_method(request):
                 user_first_name = item["MIUserFirstName"],
                 user_last_name = item["MIUserLastName"],
                 extension = item["MIExtension"],
-                email = item["MIEmail"],
+                email = is_valid_email(item["MIEmail"]),
                 onboard_date = parse_date_sync(item["MIStartDate"]),
                 service_1_id = item["MIItemFullName_RecordID"],
                 service_2_id = item["MIItemFullName2_RecordID"],

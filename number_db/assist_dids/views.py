@@ -27,11 +27,12 @@ def did_status_service(request):
 
 
 @login_required
-def did_voice_sms_carrier(request):
+def did_voice_sms_carrier_customer_type(request):
     sms_carrier = SMS_Carrier.objects.all().values()
     voice_carrier = Voice_Carrier.objects.all().values()
+    customer_type = Customer_Type.objects.all().values()
 
-    return render(request, 'voice_sms_carrier.html', { 'sms_carrier': sms_carrier, 'voice_carrier': voice_carrier })
+    return render(request, 'voice_sms_carrier_customer_type.html', { 'sms_carrier': sms_carrier, 'voice_carrier': voice_carrier, 'customer_type': customer_type })
 
 
 @login_required
@@ -164,7 +165,7 @@ def did_voice_carrier_add(request):
         except Exception as e:
             messages.warning(request, e)
 
-        return redirect('/assist_did/did_voice_sms_carrier')
+        return redirect('/assist_did/did_voice_sms_carrier_customer_type')
 
 
 @login_required
@@ -187,7 +188,7 @@ def did_voice_carrier_update(request, id):
             messages.success(request, 'The voice carrier was updated successfully!')
         except Exception as e:
             messages.warning(request, e)
-        return redirect('/assist_did/did_voice_sms_carrier')
+        return redirect('/assist_did/did_voice_sms_carrier_customer_type')
     
 
 @login_required
@@ -200,7 +201,7 @@ def did_voice_carrier_delete(request, id):
         messages.success(request, 'The voice carrier was deleted successfully!')
     except Exception as e:
         messages.warning(request, e)
-    return redirect('/assist_did/did_voice_sms_carrier')
+    return redirect('/assist_did/did_voice_sms_carrier_customer_type')
 
 
 @login_required
@@ -217,7 +218,7 @@ def did_sms_carrier_add(request):
         except Exception as e:
             messages.warning(request, e)
 
-        return redirect('/assist_did/did_voice_sms_carrier')
+        return redirect('/assist_did/did_voice_sms_carrier_customer_type')
 
 
 @login_required
@@ -240,7 +241,7 @@ def did_sms_carrier_update(request, id):
             messages.success(request, 'The SMS carrier was updated successfully!')
         except Exception as e:
             messages.warning(request, e)
-        return redirect('/assist_did/did_voice_sms_carrier')
+        return redirect('/assist_did/did_voice_sms_carrier_customer_type')
     
 
 @login_required
@@ -253,7 +254,60 @@ def did_sms_carrier_delete(request, id):
         messages.success(request, 'The SMS carrier was deleted successfully!')
     except Exception as e:
         messages.warning(request, e)
-    return redirect('/assist_did/did_voice_sms_carrier')
+    return redirect('/assist_did/did_voice_sms_carrier_customer_type')
+
+
+@login_required
+def did_customer_type_add(request):
+    if request.method == 'POST':
+        try:
+            customer_type = Customer_Type(
+                name = request.POST['name'],
+                is_active = True
+            )
+            customer_type.full_clean()
+            customer_type.save()
+            messages.success(request, 'Customer type was created successfully!')
+        except Exception as e:
+            messages.warning(request, e)
+
+        return redirect('/assist_did/did_voice_sms_carrier_customer_type')
+
+
+@login_required
+def did_customer_type_read(request, id):
+    try:
+        customer_type = Customer_Type.objects.get(id = id)
+    except Exception as e:
+        messages.warning(request, e)
+
+    return JsonResponse({'id':customer_type.id, 'name': customer_type.name})
+
+
+@login_required
+def did_customer_type_update(request, id):
+    if request.method == "POST":
+        customer_type = Customer_Type.objects.get(id=id)
+        customer_type.name = request.POST['name']
+        try:
+            customer_type.save()
+            messages.success(request, 'The Customer was updated successfully!')
+        except Exception as e:
+            messages.warning(request, e)
+        return redirect('/assist_did/did_voice_sms_carrier_customer_type')
+    
+
+@login_required
+def did_customer_type_delete(request, id):
+    customer_type = Customer_Type.objects.get(id=id)
+    customer_type.name = customer_type.name + " (deleted)"
+    customer_type.is_active = False
+    try:
+        customer_type.save()
+        messages.success(request, 'The Customer type was deleted successfully!')
+    except Exception as e:
+        messages.warning(request, e)
+    return redirect('/assist_did/did_voice_sms_carrier_customer_type')
 
 
 @login_required
@@ -386,15 +440,17 @@ def did_sync_status_method(request):
             name = item['MITypeName'],
             record_id = item['RecordID'],
             is_active = item['MIIsActive'],
+            is_synced = True,
             )
             try:
                 save_data.save()
-                messages.success(request, "Service Status has been synchronized with Method.")
             except Exception as e:
                 messages.warning(request, e)
 
         skip += 100
     
+    messages.success(request, "Service Status has been synchronized with Method.")
+        
     return redirect('/assist_did/did_status_service')
 
 
@@ -426,15 +482,17 @@ def did_sync_service_item_method(request):
             description = item['SalesDesc'],
             record_id = item['RecordID'],
             is_active = item['IsActive'],
+            is_synced = True,
             )
             try:
                 save_data.save()
-                messages.success(request, "Service Item data has been synchronized with Method.")
             except Exception as e:
                 messages.warning(request, e)
 
         skip += 100
     
+    messages.success(request, "Service Item data has been synchronized with Method.")
+        
     return redirect('/assist_did/did_status_service')
 
 
@@ -465,14 +523,16 @@ def did_sync_sms_type_method(request):
             name = item['MISMSType'],
             record_id = item['RecordID'],
             is_active = item['MIIsActive'],
+            is_synced = True,
             )
             try:
                 save_data.save()
-                messages.success(request, "SMS Type data has been synchronized with Method.")
             except Exception as e:
                 messages.warning(request, e)
 
         skip += 100
+
+    messages.success(request, "SMS Type data has been synchronized with Method.")
     
     return redirect('/assist_did/did_sms_type_term_location')
 
@@ -503,15 +563,17 @@ def did_sync_term_location_method(request):
             save_data = Term_Location(
             name = item['MITermLocation'],
             record_id = item['RecordID'],
+            is_synced = True,
             )
             try:
                 save_data.save()
-                messages.success(request, "Term location data has been synchronized with Method.")
             except Exception as e:
                 messages.warning(request, e)
 
         skip += 100
     
+    messages.success(request, "Term location data has been synchronized with Method.")
+
     return redirect('/assist_did/did_sms_type_term_location')
 
 
@@ -542,16 +604,18 @@ def did_sync_voice_carrier_method(request):
             name = item['MIVoiceCarrierName'],
             is_active = item['MIIsActive'],
             record_id = item['RecordID'],
+            is_synced = True,
             )
             try:
                 save_data.save()
-                messages.success(request, "Voice carrier data has been synchronized with Method.")
             except Exception as e:
                 messages.warning(request, e)
 
         skip += 100
+
+    messages.success(request, "Voice carrier data has been synchronized with Method.")
     
-    return redirect('/assist_did/did_voice_sms_carrier')
+    return redirect('/assist_did/did_voice_sms_carrier_customer_type')
 
 
 @login_required
@@ -581,13 +645,56 @@ def did_sync_sms_carrier_method(request):
             name = item['MIVoiceCarrierName'],
             is_active = item['MIIsActive'],
             record_id = item['RecordID'],
+            is_synced = True,
             )
             try:
                 save_data.save()
-                messages.success(request, "SMS carrier data has been synchronized with Method.")
             except Exception as e:
                 messages.warning(request, e)
 
         skip += 100
     
-    return redirect('/assist_did/did_voice_sms_carrier')
+    messages.success(request, "SMS carrier data has been synchronized with Method.")
+    
+    return redirect('/assist_did/did_voice_sms_carrier_customer_type')
+
+
+@login_required
+def did_sync_customer_type_method(request):
+    skip = 0
+    top = 100
+    headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
+    while True:
+        params = {'skip': skip, 'top': top, 'select':'FullName,IsActive,RecordID'}
+
+        response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}CustomerType", headers=headers, params=params)
+
+        if response.status_code != 200:
+            messages.warning(request, f"Error {response.status_code} when getting data from API.")
+            break
+
+        response_json = response.json()
+
+        if 'value' not in response_json:
+            messages.warning(request, "Unexpected response structure from API.")
+            break
+
+        if(len(response_json['value']) == 0):
+            break
+        for item in response_json['value']:
+            save_data = Customer_Type(
+            name = item['FullName'],
+            is_active = item['IsActive'],
+            record_id = item['RecordID'],
+            is_synced = True,
+            )
+            try:
+                save_data.save()
+            except Exception as e:
+                messages.warning(request, e)
+
+        skip += 100
+    
+    messages.success(request, "Customer type data has been synchronized with Method.")
+    
+    return redirect('/assist_did/did_voice_sms_carrier_customer_type')
