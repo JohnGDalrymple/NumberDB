@@ -36,7 +36,7 @@ def is_valid_email(email):
 
 init_header = ['Full name', 'Company name', 'Phone', 'Fax', 'Mobile', 'Email', 'Billing address', 'Billing city', 'Billing state', 'Billing ZIP code', 'Billing country', 'E911 address', 'E911 city', 'E911 state', 'E911 ZIP code', 'E911 country', 'Customer type', 'Support contact', 'Attachments', 'Open balance', 'Note']
 
-default_data_header = ['full_name', 'company_name', 'phone', 'fax', 'mobile', 'email', 'billing_address', 'billing_city', 'billing_state', 'billing_zipcode', 'billing_country', 'e911_address', 'e911_city', 'e911_state', 'e911_zipcode', 'e911_country']
+default_data_header = ['full_name', 'company_name', 'phone', 'fax', 'mobile', 'email', 'billing_address', 'billing_city', 'billing_state', 'billing_zipcode', 'billing_country', 'e911_address', 'e911_city', 'e911_state', 'e911_zipcode', 'e911_country', 'support_contact', 'attachments', 'open_balance', 'note']
 
 @login_required
 def index(request):
@@ -179,7 +179,7 @@ def customer_list(request):
                                 phone = item['Phone'],
                                 fax = item['Fax'],
                                 mobile = item['Mobile'],
-                                email = item['Email'],
+                                email = is_valid_email(item['Email']),
                                 billing_address = item['Billing address'],
                                 billing_city = item['Billing city'],
                                 billing_state = item['Billing state'],
@@ -235,7 +235,7 @@ def customer_add(request):
             phone = request.POST['phone'],
             fax = request.POST['fax'],
             mobile = request.POST['mobile'],
-            email = request.POST['email'],
+            email = is_valid_email(request.POST['email']),
             billing_address = request.POST['billing_address'],
             billing_city = request.POST['billing_city'],
             billing_state = request.POST['billing_state'],
@@ -282,7 +282,7 @@ def customer_update(request, id):
             customer.phone = request.POST['phone']
             customer.fax = request.POST['fax']
             customer.mobile = request.POST['mobile']
-            customer.email = request.POST['email']
+            customer.email = is_valid_email(request.POST['email'])
             customer.billing_address = request.POST['billing_address']
             customer.billing_city = request.POST['billing_city']
             customer.billing_state = request.POST['billing_state']

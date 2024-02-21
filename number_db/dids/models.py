@@ -38,7 +38,7 @@ class Did(models.Model):
     user_first_name = models.CharField(max_length=50, null=True, blank=True)
     user_last_name = models.CharField(max_length=50, null=True, blank=True)
     extension = models.BigIntegerField(null=True, blank=True)
-    email = models.EmailField(max_length=150, null=True, blank=True)
+    email = models.CharField(max_length=150, null=True, blank=True)
     onboard_date = models.DateField('%m/%d/%Y', null=True, blank=True)
     note = models.TextField(max_length=255, null=True, blank=True)
     e911_enabled_billed = models.CharField(max_length=3, choices=E911EnabledBilledValues.choices, null=True, blank=True)
@@ -52,6 +52,8 @@ class Did(models.Model):
     updated_date_time = models.DateField('%m/%d/%Y %H:%M:%S', default=datetime.datetime.now, null=True, blank=True)
     updated_by = models.CharField(max_length=50, null=True, blank=True)
     record_id = models.BigIntegerField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    is_synced = models.BooleanField(default=False)
 
 
 class Did_Error(models.Model):
