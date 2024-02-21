@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from assist_dids.models import *
 from customers.models import *
-from django.db.models import Q
 import datetime
 import uuid
 
@@ -36,10 +35,10 @@ class Did(models.Model):
     change_date = models.DateField('%m/%d/%Y', null=True, blank=True)
     sms_enabled = models.CharField(max_length=3, choices=SmsEnabledValues.choices, null=True, blank=True)
     sms_campaign = models.CharField(max_length=20, null=True, blank=True)
-    user_first_name = models.CharField(max_length=30, null=True, blank=True)
-    user_last_name = models.CharField(max_length=30, null=True, blank=True)
+    user_first_name = models.CharField(max_length=50, null=True, blank=True)
+    user_last_name = models.CharField(max_length=50, null=True, blank=True)
     extension = models.BigIntegerField(null=True, blank=True)
-    email = models.EmailField(max_length=30, null=True, blank=True)
+    email = models.EmailField(max_length=150, null=True, blank=True)
     onboard_date = models.DateField('%m/%d/%Y', null=True, blank=True)
     note = models.TextField(max_length=255, null=True, blank=True)
     e911_enabled_billed = models.CharField(max_length=3, choices=E911EnabledBilledValues.choices, null=True, blank=True)

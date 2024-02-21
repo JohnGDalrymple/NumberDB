@@ -173,6 +173,21 @@ document.getElementById("edit_sms_carrier_form")?.addEventListener('submit', ()=
     document.getElementById("edit_sms_carrier_form").action = `${window.location.origin}/assist_did/sms_carrier_update/${document.getElementById("edit_sms_carrier_button").name}`
 ])
 
+function editCustomerType(id) {
+    $.ajax({
+        url: `${window.location.origin}/assist_did/customer_type_read/${id}`,
+        method: 'GET',
+        success: function(response) {
+            document.getElementById("edit_customer_type_name").value = response.name
+            document.getElementById("edit_customer_type_button").name = response.id
+        }
+    });
+}
+
+document.getElementById("edit_customer_type_form")?.addEventListener('submit', ()=>[
+    document.getElementById("edit_customer_type_form").action = `${window.location.origin}/assist_did/customer_type_update/${document.getElementById("edit_customer_type_button").name}`
+])
+
 function editSMSType(id) {
     $.ajax({
         url: `${window.location.origin}/assist_did/sms_type_read/${id}`,

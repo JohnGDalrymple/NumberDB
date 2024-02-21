@@ -3,7 +3,7 @@ from django.urls import path
 
 urlpatterns = [
     path('did_status_service/', views.did_status_service, name='did_status_service'),
-    path('did_voice_sms_carrier/', views.did_voice_sms_carrier, name='did_voice_sms_carrier'),
+    path('did_voice_sms_carrier_customer_type/', views.did_voice_sms_carrier_customer_type, name='did_voice_sms_carrier_customer_type'),
     path('did_sms_type_term_location/', views.did_sms_type_term_location, name='did_sms_type_term_location'),
     path('service_status_add/', views.did_service_status_add, name='did_service_status_add'),
     path('service_status_read/<int:id>', views.did_service_status_read, name='did_service_status_read'),
@@ -21,6 +21,10 @@ urlpatterns = [
     path('sms_carrier_read/<int:id>', views.did_sms_carrier_read, name='did_sms_carrier_read'),
     path('sms_carrier_update/<int:id>', views.did_sms_carrier_update, name='did_sms_carrier_update'),
     path('sms_carrier_delete/<int:id>', views.did_sms_carrier_delete, name='did_sms_carrier_delete'),
+    path('customer_type_add/', views.did_customer_type_add, name='did_customer_type_add'),
+    path('customer_type_read/<int:id>', views.did_customer_type_read, name='did_customer_type_read'),
+    path('customer_type_update/<int:id>', views.did_customer_type_update, name='did_customer_type_update'),
+    path('customer_type_delete/<int:id>', views.did_customer_type_delete, name='did_customer_type_delete'),
     path('sms_type_add/', views.did_sms_type_add, name='did_sms_type_add'),
     path('sms_type_read/<int:id>', views.did_sms_type_read, name='did_sms_type_read'),
     path('sms_type_update/<int:id>', views.did_sms_type_update, name='did_sms_type_update'),
@@ -33,6 +37,7 @@ urlpatterns = [
     path('did_status_service/sync_service_item_method/', views.did_sync_service_item_method, name='did_sync_service_item_method'),
     path('did_sms_type_term_location/sync_sms_type_method/', views.did_sync_sms_type_method, name='did_sync_sms_type_method'),
     path('did_sms_type_term_location/sync_term_location_method/', views.did_sync_term_location_method, name='did_sync_term_location_method'),
-    path('did_voice_sms_carrier/sync_voice_carrier_method/', views.did_sync_voice_carrier_method, name='did_sync_voice_carrier_method'),
-    path('did_voice_sms_carrier/sync_sms_carrier_method/', views.did_sync_sms_carrier_method, name='did_sync_sms_carrier_method'),
+    path('did_voice_sms_carrier_customer_type/sync_voice_carrier_method/', views.did_sync_voice_carrier_method, name='did_sync_voice_carrier_method'),
+    path('did_voice_sms_carrier_customer_type/sync_sms_carrier_method/', views.did_sync_sms_carrier_method, name='did_sync_sms_carrier_method'),
+    path('did_voice_sms_carrier_customer_type/sync_customer_type_method/', views.did_sync_customer_type_method, name='did_sync_customer_type_method'),
 ]
