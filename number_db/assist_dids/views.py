@@ -63,7 +63,7 @@ def did_service_status_add(request):
 @login_required
 def did_service_status_read(request, id):
     try:
-        status = Status.objects.get(id = id)
+        status = Status.objects.get(id=id)
     except Exception as e:
         messages.warning(request, e)
 
@@ -73,9 +73,12 @@ def did_service_status_read(request, id):
 @login_required
 def did_service_status_update(request, id):
     if request.method == "POST":
-        status = Status.objects.get(id=id)
-        status.name = request.POST['name']
         try:
+            status = Status.objects.get(id=id)
+            
+            if not request.POST['name'] == status.name: status.is_synced = False
+            
+            status.name = request.POST['name']
             status.save()
             messages.success(request, 'The service status was updated successfully!')
         except Exception as e:
@@ -85,10 +88,10 @@ def did_service_status_update(request, id):
 
 @login_required
 def did_service_status_delete(request, id):
-    status = Status.objects.get(id=id)
-    status.name = status.name + " (deleted)"
-    status.is_active = False
     try:
+        status = Status.objects.get(id=id)
+        status.is_active = False
+        status.is_synced = False
         status.save()
         messages.success(request, 'The service status was deleted successfully!')
     except Exception as e:
@@ -127,10 +130,13 @@ def did_service_item_read(request, id):
 @login_required
 def did_service_item_update(request, id):
     if request.method == "POST":
-        service_item = Service.objects.get(id=id)
-        service_item.name = request.POST['name']
-        service_item.description = request.POST['description']
         try:
+            service_item = Service.objects.get(id=id)
+            
+            if not (service_item.name == request.POST['name'] or service_item.description == request.POST['description']): service_item.is_synced = False
+            
+            service_item.name = request.POST['name']
+            service_item.description = request.POST['description']
             service_item.save()
             messages.success(request, 'The service item was updated successfully!')
         except Exception as e:
@@ -140,10 +146,9 @@ def did_service_item_update(request, id):
 
 @login_required
 def did_service_item_delete(request, id):
-    service_item = Service.objects.get(id=id)
-    service_item.name = service_item.name + " (deleted)"
-    service_item.is_active = False
     try:
+        service_item = Service.objects.get(id=id)
+        service_item.is_active = False
         service_item.save()
         messages.success(request, 'The service item was deleted successfully!')
     except Exception as e:
@@ -181,9 +186,10 @@ def did_voice_carrier_read(request, id):
 @login_required
 def did_voice_carrier_update(request, id):
     if request.method == "POST":
-        voice_carrier = Voice_Carrier.objects.get(id=id)
-        voice_carrier.name = request.POST['name']
         try:
+            voice_carrier = Voice_Carrier.objects.get(id=id)
+            if not voice_carrier.name == request.POST['name']: voice_carrier.is_synced = False
+            voice_carrier.name = request.POST['name']
             voice_carrier.save()
             messages.success(request, 'The voice carrier was updated successfully!')
         except Exception as e:
@@ -193,10 +199,9 @@ def did_voice_carrier_update(request, id):
 
 @login_required
 def did_voice_carrier_delete(request, id):
-    voice_carrier = Voice_Carrier.objects.get(id=id)
-    voice_carrier.name = voice_carrier.name + " (deleted)"
-    voice_carrier.is_active = False
     try:
+        voice_carrier = Voice_Carrier.objects.get(id=id)
+        voice_carrier.is_active = False
         voice_carrier.save()
         messages.success(request, 'The voice carrier was deleted successfully!')
     except Exception as e:
@@ -234,9 +239,10 @@ def did_sms_carrier_read(request, id):
 @login_required
 def did_sms_carrier_update(request, id):
     if request.method == "POST":
-        sms_carrier = SMS_Carrier.objects.get(id=id)
-        sms_carrier.name = request.POST['name']
         try:
+            sms_carrier = SMS_Carrier.objects.get(id=id)
+            if not sms_carrier.name == request.POST['name']: sms_carrier.is_synced = False
+            sms_carrier.name = request.POST['name']
             sms_carrier.save()
             messages.success(request, 'The SMS carrier was updated successfully!')
         except Exception as e:
@@ -246,10 +252,10 @@ def did_sms_carrier_update(request, id):
 
 @login_required
 def did_sms_carrier_delete(request, id):
-    sms_carrier = SMS_Carrier.objects.get(id=id)
-    sms_carrier.name = sms_carrier.name + " (deleted)"
-    sms_carrier.is_active = False
     try:
+        sms_carrier = SMS_Carrier.objects.get(id=id)
+        sms_carrier.is_active = False
+        sms_carrier.is_synced = False
         sms_carrier.save()
         messages.success(request, 'The SMS carrier was deleted successfully!')
     except Exception as e:
@@ -287,9 +293,10 @@ def did_customer_type_read(request, id):
 @login_required
 def did_customer_type_update(request, id):
     if request.method == "POST":
-        customer_type = Customer_Type.objects.get(id=id)
-        customer_type.name = request.POST['name']
         try:
+            customer_type = Customer_Type.objects.get(id=id)
+            if not customer_type.name == request.POST['name']: customer_type.is_synced = False
+            customer_type.name = request.POST['name']
             customer_type.save()
             messages.success(request, 'The Customer was updated successfully!')
         except Exception as e:
@@ -299,10 +306,10 @@ def did_customer_type_update(request, id):
 
 @login_required
 def did_customer_type_delete(request, id):
-    customer_type = Customer_Type.objects.get(id=id)
-    customer_type.name = customer_type.name + " (deleted)"
-    customer_type.is_active = False
     try:
+        customer_type = Customer_Type.objects.get(id=id)
+        customer_type.is_active = False
+        customer_type.is_synced = False
         customer_type.save()
         messages.success(request, 'The Customer type was deleted successfully!')
     except Exception as e:
@@ -340,9 +347,10 @@ def did_sms_type_read(request, id):
 @login_required
 def did_sms_type_update(request, id):
     if request.method == "POST":
-        sms_type = SMS_Type.objects.get(id=id)
-        sms_type.name = request.POST['name']
         try:
+            sms_type = SMS_Type.objects.get(id=id)
+            if not sms_type.name == request.POST['name']: sms_type.is_synced = False
+            sms_type.name = request.POST['name']
             sms_type.save()
             messages.success(request, 'The SMS type was updated successfully!')
         except Exception as e:
@@ -352,10 +360,10 @@ def did_sms_type_update(request, id):
 
 @login_required
 def did_sms_type_delete(request, id):
-    sms_type = SMS_Type.objects.get(id=id)
-    sms_type.name = sms_type.name + " (deleted)"
-    sms_type.is_active = False
     try:
+        sms_type = SMS_Type.objects.get(id=id)
+        sms_type.is_active = False
+        sms_type.is_synced = False
         sms_type.save()
         messages.success(request, 'The SMS type was deleted successfully!')
     except Exception as e:
@@ -392,9 +400,10 @@ def did_term_location_read(request, id):
 @login_required
 def did_term_location_update(request, id):
     if request.method == "POST":
-        term_location = Term_Location.objects.get(id=id)
-        term_location.name = request.POST['name']
         try:
+            term_location = Term_Location.objects.get(id=id)
+            if term_location.name == request.POST['name']: term_location.is_synced = False
+            term_location.name = request.POST['name']
             term_location.save()
             messages.success(request, 'The term location was updated successfully!')
         except Exception as e:
@@ -404,9 +413,11 @@ def did_term_location_update(request, id):
 
 @login_required
 def did_term_location_delete(request, id):
-    term_location = Term_Location.objects.get(id=id)
     try:
-        term_location.delete()
+        term_location = Term_Location.objects.get(id=id)
+        term_location.is_active = False
+        term_location.is_synced = False
+        term_location.save()
         messages.success(request, 'The term location was deleted successfully!')
     except Exception as e:
         messages.warning(request, e)
@@ -419,7 +430,7 @@ def did_sync_status_method(request):
     top = 100
     headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
     while True:
-        params = {'skip': skip, 'top': top, 'select':'MITypeName,RecordID,MIIsActive'}
+        params = {'skip': skip, 'top': top, 'select':'MITypeName,RecordID,MIIsActive', 'filter': 'MIIsActive eq true'}
 
         response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MIType", headers=headers, params=params)
 
@@ -436,14 +447,20 @@ def did_sync_status_method(request):
         if(len(response_json['value']) == 0):
             break
         for item in response_json['value']:
-            save_data = Status(
-            name = item['MITypeName'],
-            record_id = item['RecordID'],
-            is_active = item['MIIsActive'],
-            is_synced = True,
-            )
             try:
-                save_data.save()
+                try:
+                    find_one = Status.objects.get(record_id = item['RecordID'])
+                    if find_one.is_synced == True:
+                        find_one.name = item['MITypeName']
+                        find_one.is_active = True
+                    find_one.save()
+                except Exception:
+                    save_data = Status(
+                    name = item['MITypeName'],
+                    record_id = item['RecordID'],
+                    is_synced = True,
+                    )
+                    save_data.save()
             except Exception as e:
                 messages.warning(request, e)
 
@@ -460,7 +477,7 @@ def did_sync_service_item_method(request):
     top = 100
     headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
     while True:
-        params = {'skip': skip, 'top': top, 'select':'FullName,RecordID,SalesDesc,IsActive'}
+        params = {'skip': skip, 'top': top, 'select':'FullName,RecordID,SalesDesc,IsActive', 'filter': 'IsActive eq true'}
 
         response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}Item", headers=headers, params=params)
 
@@ -477,15 +494,22 @@ def did_sync_service_item_method(request):
         if(len(response_json['value']) == 0):
             break
         for item in response_json['value']:
-            save_data = Service(
-            name = item['FullName'],
-            description = item['SalesDesc'],
-            record_id = item['RecordID'],
-            is_active = item['IsActive'],
-            is_synced = True,
-            )
             try:
-                save_data.save()
+                try:
+                    find_one = Service.objects.get(record_id = item['RecordID'])
+                    if find_one.is_synced == True:
+                        find_one.name = item['FullName']
+                        find_one.description = item['SalesDesc']
+                        find_one.is_active = True
+                    find_one.save()
+                except Exception:
+                    save_data = Service(
+                    name = item['FullName'],
+                    description = item['SalesDesc'],
+                    record_id = item['RecordID'],
+                    is_synced = True,
+                    )
+                    save_data.save()
             except Exception as e:
                 messages.warning(request, e)
 
@@ -502,7 +526,7 @@ def did_sync_sms_type_method(request):
     top = 100
     headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
     while True:
-        params = {'skip': skip, 'top': top, 'select':'RecordID,MISMSType,MIIsActive'}
+        params = {'skip': skip, 'top': top, 'select':'RecordID,MISMSType,MIIsActive', 'filter': 'MIIsActive eq true'}
 
         response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MISMSType", headers=headers, params=params)
 
@@ -519,14 +543,20 @@ def did_sync_sms_type_method(request):
         if(len(response_json['value']) == 0):
             break
         for item in response_json['value']:
-            save_data = SMS_Type(
-            name = item['MISMSType'],
-            record_id = item['RecordID'],
-            is_active = item['MIIsActive'],
-            is_synced = True,
-            )
             try:
-                save_data.save()
+                try:
+                    find_one = SMS_Type.objects.get(record_id = item['RecordID'])
+                    if find_one.is_synced == True:
+                        find_one.name = item['MISMSType']
+                        find_one.is_active = True
+                    find_one.save()
+                except Exception:
+                    save_data = SMS_Type(
+                    name = item['MISMSType'],
+                    record_id = item['RecordID'],
+                    is_synced = True,
+                    )
+                    save_data.save()
             except Exception as e:
                 messages.warning(request, e)
 
@@ -560,13 +590,20 @@ def did_sync_term_location_method(request):
         if(len(response_json['value']) == 0):
             break
         for item in response_json['value']:
-            save_data = Term_Location(
-            name = item['MITermLocation'],
-            record_id = item['RecordID'],
-            is_synced = True,
-            )
             try:
-                save_data.save()
+                try:
+                    find_one = Term_Location.objects.get(record_id = item['RecordID'])
+                    if find_one.is_synced == True:
+                        find_one.name = item['MITermLocation']
+                        find_one.is_active = True
+                    find_one.save()
+                except Exception:
+                    save_data = Term_Location(
+                    name = item['MITermLocation'],
+                    record_id = item['RecordID'],
+                    is_synced = True,
+                    )
+                    save_data.save()
             except Exception as e:
                 messages.warning(request, e)
 
@@ -583,7 +620,7 @@ def did_sync_voice_carrier_method(request):
     top = 100
     headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
     while True:
-        params = {'skip': skip, 'top': top, 'select':'MIVoiceCarrierName,MIIsActive,RecordID'}
+        params = {'skip': skip, 'top': top, 'select':'MIVoiceCarrierName,MIIsActive,RecordID', 'filter': 'MIIsActive eq true'}
 
         response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MIVoiceCarrier", headers=headers, params=params)
 
@@ -600,14 +637,20 @@ def did_sync_voice_carrier_method(request):
         if(len(response_json['value']) == 0):
             break
         for item in response_json['value']:
-            save_data = Voice_Carrier(
-            name = item['MIVoiceCarrierName'],
-            is_active = item['MIIsActive'],
-            record_id = item['RecordID'],
-            is_synced = True,
-            )
             try:
-                save_data.save()
+                try:
+                    find_one = Voice_Carrier.objects.get(record_id = item['RecordID'])
+                    if find_one.is_synced == True:
+                        find_one.name = item['MIVoiceCarrierName']
+                        find_one.is_active = True
+                    find_one.save()
+                except Exception:
+                    save_data = Voice_Carrier(
+                    name = item['MIVoiceCarrierName'],
+                    record_id = item['RecordID'],
+                    is_synced = True,
+                    )
+                    save_data.save()
             except Exception as e:
                 messages.warning(request, e)
 
@@ -624,7 +667,7 @@ def did_sync_sms_carrier_method(request):
     top = 100
     headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
     while True:
-        params = {'skip': skip, 'top': top, 'select':'MIVoiceCarrierName,MIIsActive,RecordID'}
+        params = {'skip': skip, 'top': top, 'select':'MIVoiceCarrierName,RecordID', 'filter': 'MIIsActive eq true'}
 
         response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MIVoiceCarrier", headers=headers, params=params)
 
@@ -641,14 +684,20 @@ def did_sync_sms_carrier_method(request):
         if(len(response_json['value']) == 0):
             break
         for item in response_json['value']:
-            save_data = SMS_Carrier(
-            name = item['MIVoiceCarrierName'],
-            is_active = item['MIIsActive'],
-            record_id = item['RecordID'],
-            is_synced = True,
-            )
             try:
-                save_data.save()
+                try:
+                    find_one = SMS_Carrier.objects.get(record_id = item['RecordID'])
+                    if find_one.is_synced == True:
+                        find_one.name = item['MIVoiceCarrierName']
+                        find_one.is_active = True
+                    find_one.save()
+                except Exception:
+                    save_data = SMS_Carrier(
+                    name = item['MIVoiceCarrierName'],
+                    record_id = item['RecordID'],
+                    is_synced = True,
+                    )
+                    save_data.save()
             except Exception as e:
                 messages.warning(request, e)
 
@@ -665,7 +714,7 @@ def did_sync_customer_type_method(request):
     top = 100
     headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
     while True:
-        params = {'skip': skip, 'top': top, 'select':'FullName,IsActive,RecordID'}
+        params = {'skip': skip, 'top': top, 'select':'FullName,IsActive,RecordID', 'filter': 'IsActive eq true'}
 
         response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}CustomerType", headers=headers, params=params)
 
@@ -682,14 +731,20 @@ def did_sync_customer_type_method(request):
         if(len(response_json['value']) == 0):
             break
         for item in response_json['value']:
-            save_data = Customer_Type(
-            name = item['FullName'],
-            is_active = item['IsActive'],
-            record_id = item['RecordID'],
-            is_synced = True,
-            )
             try:
-                save_data.save()
+                try:
+                    find_one = Customer_Type.objects.get(record_id = item['RecordID'])
+                    if find_one.is_synced == True:
+                        find_one.name = item['FullName']
+                        find_one.is_active = True
+                    find_one.save()
+                except Exception:
+                    save_data = Customer_Type(
+                    name = item['FullName'],
+                    record_id = item['RecordID'],
+                    is_synced = True,
+                    )
+                    save_data.save()
             except Exception as e:
                 messages.warning(request, e)
 
