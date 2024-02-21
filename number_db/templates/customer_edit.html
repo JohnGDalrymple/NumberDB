@@ -65,17 +65,25 @@
                             <label for="input_email">Enter your email</label>
                         </div>
                     </div>
+                    <div class="col">
+                        <select name="customer_type" class="form-select p-3" aria-label="Choose Customer Type">
+                            <option value="">Select Customer Type</option>
+                            {% for item in customer_types %}
+                            <option value="{{ item.record_id }}" {% if customer.customer_type_id == item.record_id %}selected{% endif %}>{{ item.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="billing_address" type="text" value="{{ customer.billing_address }}" placeholder="fax" id="billing_address">
+                            <input class="form-control" name="billing_address" type="text" value="{{ customer.billing_address }}" placeholder="billing_address" id="billing_address">
                             <label for="billing_address">Enter billing address</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="billing_city" type="text" value="{{ customer.billing_city }}" placeholder="mobile" id="billing_city">
+                            <input class="form-control" name="billing_city" type="text" value="{{ customer.billing_city }}" placeholder="billing_city" id="billing_city">
                             <label for="billing_city">Enter billing city</label>
                         </div>
                     </div>
@@ -83,19 +91,19 @@
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="billing_state" type="text" value="{{ customer.billing_state }}" placeholder="fax" id="billing_state">
+                            <input class="form-control" name="billing_state" type="text" value="{{ customer.billing_state }}" placeholder="billing_state" id="billing_state">
                             <label for="billing_state">Enter billing state</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="billing_zipcode" type="text" value="{{ customer.billing_zipcode }}" placeholder="mobile" id="billing_zipcode">
+                            <input class="form-control" name="billing_zipcode" type="text" value="{{ customer.billing_zipcode }}" placeholder="billing_zipcode" id="billing_zipcode">
                             <label for="billing_zipcode">Enter billing Zipcode</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="billing_country" type="text" value="{{ customer.billing_country }}" placeholder="mobile" id="billing_country">
+                            <input class="form-control" name="billing_country" type="text" value="{{ customer.billing_country }}" placeholder="billing_country" id="billing_country">
                             <label for="billing_country">Enter billing country</label>
                         </div>
                     </div>
@@ -103,13 +111,13 @@
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="e911_address" type="text" value="{{ customer.e911_address }}" placeholder="fax" id="e911_address">
+                            <input class="form-control" name="e911_address" type="text" value="{{ customer.e911_address }}" placeholder="e911_address" id="e911_address">
                             <label for="e911_address">Enter E911 address</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="e911_city" type="text" value="{{ customer.e911_city }}" placeholder="mobile" id="e911_city">
+                            <input class="form-control" name="e911_city" type="text" value="{{ customer.e911_city }}" placeholder="e911_city" id="e911_city">
                             <label for="e911_city">Enter E911 city</label>
                         </div>
                     </div>
@@ -117,20 +125,48 @@
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="e911_state" type="text" value="{{ customer.e911_state }}" placeholder="fax" id="e911_state">
+                            <input class="form-control" name="e911_state" type="text" value="{{ customer.e911_state }}" placeholder="e911_state" id="e911_state">
                             <label for="e911_state">Enter E911 state</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="e911_zipcode" type="text" value="{{ customer.e911_zipcode }}" placeholder="mobile" id="e911_zipcode">
+                            <input class="form-control" name="e911_zipcode" type="text" value="{{ customer.e911_zipcode }}" placeholder="e911_zipcode" id="e911_zipcode">
                             <label for="e911_zipcode">Enter E911 Zipcode</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="e911_country" type="text" value="{{ customer.e911_country }}" placeholder="mobile" id="e911_country">
+                            <input class="form-control" name="e911_country" type="text" value="{{ customer.e911_country }}" placeholder="e911_country" id="e911_country">
                             <label for="e911_country">Enter E911 country</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating mb-3 mb-md-0">
+                            <input class="form-control" name="support_contact" type="text" value="{{ customer.support_contact }}" placeholder="Enter support contact" id="support_contact">
+                            <label for="support_contact">Enter support contact</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <input class="form-control" name="attachments" type="text" value="{{ customer.attachments }}" placeholder="Enter attachments" id="attachments">
+                            <label for="attachments">Enter attachments</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <input class="form-control" name="open_balance" type="number" step="any" value="{{ customer.open_balance }}" placeholder="Enter open balance" id="open_balance" required>
+                            <label for="open_balance">Enter open balance</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating mb-3 mb-md-0">
+                            <input class="form-control" name="note" type="text" value="{{ customer.note }}" placeholder="Enter support contact" id="note">
+                            <label for="note">Enter note</label>
                         </div>
                     </div>
                 </div>

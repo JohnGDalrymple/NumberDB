@@ -41,12 +41,10 @@
                         </select>
                     </div>
                     <div class="col">
-                        <select name="reseller" class="form-select p-3" aria-label="Choose reseller">
-                            <option value="">Select reseller</option>
-                            {% for customer in customers %}
-                            <option value="{{ customer.id }}" {% if did.reseller == customer.id %}selected{% endif %}>{{ customer.full_name }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="form-floating mb-3 mb-md-0">
+                            <input class="form-control" name="reseller" type="text" value="{{ did.reseller }}" placeholder="Enter your reseller" id="reseller">
+                            <label for="did">Enter your reseller</label>
+                        </div>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -69,33 +67,37 @@
                         <select name="status" class="form-select p-3" aria-label="Choose status">
                             <option value="">Select status</option>
                             {% for item in status %}
-                            <option value="{{ item.id }}" {% if did.status == item.id %}selected{% endif %}>{{ item.name }}</option>
+                            <option value="{{ item.record_id }}" {% if did.status == item.record_id %}selected{% endif %}>{{ item.name }}</option>
                             {% endfor %}
                         </select>
+                    </div>
+                    <div class="col">
+                        <select id="voice_carrier" name="voice_carrier" class="form-select p-3" aria-label="{{ did.voice_carrier }}">
+                            <option value="">Select voice carrier</option>
+                            {% for item in voice_carrier %}
+                            <option value="{{ item.record_id }}" {% if did.voice_carrier == item.record_id %}selected{% endif %}>{{ item.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating mb-3 mb-md-0">
+                            <input class="form-control" name="email" type="email" value="{{ did.email }}" placeholder="email" id="email">
+                            <label for="email">Enter email</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating mb-3 mb-md-0">
+                            <input class="form-control" name="onboard_date" type="date" value="{{ did.onboard_date }}" placeholder="onboard_date" id="onboard_date">
+                            <label for="onboard_date">Enter onboard date</label>
+                        </div>
                     </div>
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
                             <input class="form-control" name="change_date" type="date" value="{{ did.change_date }}" placeholder="Change Date" id="change_date">
                             <label for="change_date">Change Date</label>
                         </div>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col">
-                        <select id="voice_carrier" name="voice_carrier" class="form-select p-3" aria-label="{{ did.voice_carrier }}">
-                            <option value="">Select voice carrier</option>
-                            {% for item in voice_carrier %}
-                            <option value="{{ item.id }}" {% if did.voice_carrier == item.id %}selected{% endif %}>{{ item.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col">
-                        <select name="type" class="form-select p-3" aria-label="Choose type">
-                            <option value="">Select service type</option>
-                            {% for item in service_type %}
-                            <option value="{{ item.id }}" {% if did.type == item.id %}selected{% endif %}>{{ item.name }}</option>
-                            {% endfor %}
-                        </select>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -110,7 +112,7 @@
                         <select name="sms_carrier" class="form-select p-3" aria-label="Choose sms carrier">
                             <option value="">Select SMS carrier</option>
                             {% for item in sms_carrier %}
-                            <option value="{{ item.id }}" {% if did.sms_carrier == item.id %}selected{% endif %}>{{ item.name }}</option>
+                            <option value="{{ item.record_id }}" {% if did.sms_carrier == item.record_id %}selected{% endif %}>{{ item.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -120,7 +122,7 @@
                         <select name="sms_type" class="form-select p-3" aria-label="Choose sms type">
                             <option value="">Select SMS type</option>
                             {% for item in sms_type %}
-                            <option value="{{ item.id }}" {% if did.sms_type == item.id %}selected{% endif %}>{{ item.name }}</option>
+                            <option value="{{ item.record_id }}" {% if did.sms_type == item.record_id %}selected{% endif %}>{{ item.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -134,7 +136,7 @@
                         <select name="term_location" class="form-select p-3" aria-label="Choose term location">
                             <option value="">Select term location</option>
                             {% for item in term_location %}
-                            <option value="{{ item.id }}" {% if did.term_location == item.id %}selected{% endif %}>{{ item.name }}</option>
+                            <option value="{{ item.record_id }}" {% if did.term_location == item.record_id %}selected{% endif %}>{{ item.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -156,26 +158,6 @@
                         <div class="form-floating mb-3 mb-md-0">
                             <input class="form-control" name="extension" type="number" value="{{ did.extension }}" placeholder="extension" id="extension">
                             <label for="extension">Enter extension</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="email" type="email" value="{{ did.email }}" placeholder="email" id="email">
-                            <label for="email">Enter email</label>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="onboard_date" type="date" value="{{ did.onboard_date }}" placeholder="onboard_date" id="onboard_date">
-                            <label for="onboard_date">Enter onboard date</label>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="note" type="text" value="{{ did.note }}" placeholder="note" id="note">
-                            <label for="note">Enter note</label>
                         </div>
                     </div>
                 </div>
@@ -202,27 +184,43 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="service_1" type="text" value="{{ did.service_1 }}" placeholder="service_1" id="service_1">
-                            <label for="service_1">Enter service_1</label>
-                        </div>
+                        <select name="service_1" class="form-select p-3" aria-label="Choose service 1">
+                            <option value="">Select service 1</option>
+                            {% for item in services %}
+                            <option value="{{ item.record_id }}" {% if did.service_1 == item.record_id %}selected{% endif %}>{{ item.name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="service_2" type="text" value="{{ did.service_2 }}" placeholder="service_2" id="service_2">
-                            <label for="service_2">Enter service_2</label>
-                        </div>
+                        <select name="service_2" class="form-select p-3" aria-label="Choose service 2">
+                            <option value="">Select service 1</option>
+                            {% for item in services %}
+                            <option value="{{ item.record_id }}" {% if did.service_2 == item.record_id %}selected{% endif %}>{{ item.name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="service_3" type="text" value="{{ did.service_3 }}" placeholder="service_3" id="service_3">
-                            <label for="service_3">Enter service_3</label>
-                        </div>
+                        <select name="service_3" class="form-select p-3" aria-label="Choose service 3">
+                            <option value="">Select service 1</option>
+                            {% for item in services %}
+                            <option value="{{ item.record_id }}" {% if did.service_3 == item.record_id %}selected{% endif %}>{{ item.name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="col">
+                        <select name="service_4" class="form-select p-3" aria-label="Choose service 4">
+                            <option value="">Select service 1</option>
+                            {% for item in services %}
+                            <option value="{{ item.record_id }}" {% if did.service_4 == item.record_id %}selected{% endif %}>{{ item.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="service_4" type="text" value="{{ did.service_4 }}" placeholder="service_4" id="service_4">
-                            <label for="service_4">Enter service_4</label>
+                            <input class="form-control" name="note" type="text" value="{{ did.note }}" placeholder="note" id="note">
+                            <label for="note">Enter note</label>
                         </div>
                     </div>
                 </div>
