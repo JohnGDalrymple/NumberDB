@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 import csv
 from .models import Customer
+from assist_dids.models import *
 import datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -274,9 +275,9 @@ def sync_method(request):
     top = 100
     headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
     while True:
-        params = {'skip': skip, 'top': top, 'select':'RecordID,FullName,Phone,Fax,Mobile,Email,BillAddressAddr1,BillAddressCity,BillAddressState,BillAddressPostalCode,BillAddressCountry,ShipAddressAddr1,ShipAddressCity,ShipAddressCountry,ShipAddressPostalCode,ShipAddressState,IsActive'}
+        params = {'skip': skip, 'top': top, 'select':'RecordID,FullName,Phone,Fax,Mobile,Email,BillAddressAddr1,BillAddressCity,BillAddressState,BillAddressPostalCode,BillAddressCountry,ShipAddressAddr1,ShipAddressCity,ShipAddressCountry,ShipAddressPostalCode,ShipAddressState,CustomerType_RecordID,CompanyName,Notes,Balance', 'filter': "IsActive eq true and Sublevel eq 0 and not (CompanyName eq '')"}
 
-        response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}Customer", headers=headers, params=params)
+        response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}Entity", headers=headers, params=params)
 
         if response.status_code != 200:
             messages.warning(request, f"Error {response.status_code} when getting data from API.")
@@ -293,6 +294,7 @@ def sync_method(request):
         for item in response_json['value']:
             save_data = Customer(
             full_name = item['FullName'],
+            company_name = item['CompanyName'],
             phone = item['Phone'],
             fax = item['Fax'],
             mobile = item['Mobile'],
@@ -307,14 +309,18 @@ def sync_method(request):
             e911_state = item['ShipAddressState'],
             e911_zipcode = item['ShipAddressPostalCode'],
             e911_country = item['ShipAddressCountry'],
+            customer_type = Customer_Type.objects.get(record_id = int(item['CustomerType_RecordID'])) if item['CustomerType_RecordID'] else None,
+            open_balance = float(item['Balance']),
+            note = item['Notes'],
             record_id = item['RecordID'],
-            is_active = item['IsActive'],
+            is_active = True,
+            is_synced = True,
             )
             try:
                 save_data.save()
             except Exception as e:
                 messages.warning(request, e)
-
+        print("here is the one length", len(response_json['value']))
         skip += 100
     
     messages.success(request, "Customer data has been synchronized with Method.")

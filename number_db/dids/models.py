@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from assist_dids.models import *
 from customers.models import *
-from django.db.models import Q
 import datetime
 import uuid
 
