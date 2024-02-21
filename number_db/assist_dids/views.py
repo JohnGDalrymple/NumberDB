@@ -9,7 +9,6 @@ from django.contrib.auth.decorators import login_required
 from dids.forms import *
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
-import unicodedata
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.hashers import make_password
 import pandas as pd

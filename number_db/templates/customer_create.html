@@ -39,21 +39,27 @@
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" id="input_Phone" type="tel" name="phone" placeholder="Enter your phone"/>
-                            <label for="input_Phone">Enter your phone</label>
+                            <input class="form-control" id="input_company_name" type="text" name="company_name" placeholder="Enter your company name" required/>
+                            <label for="input_company_name">Enter your company name</label>
                         </div>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col">
+                        <div class="form-floating">
+                            <input class="form-control" id="input_Phone" type="tel" name="phone" placeholder="Enter your phone"/>
+                            <label for="input_Phone">Enter your phone</label>
+                        </div>
+                    </div>
+                    <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="fax" type="text"  placeholder="fax" id="input_fax">
+                            <input class="form-control" name="fax" type="text"  placeholder="Enter your fax" id="input_fax">
                             <label for="input_fax">Enter your fax</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="mobile" type="text" placeholder="mobile" id="input_mobile">
+                            <input class="form-control" name="mobile" type="text" placeholder="Enter your mobile" id="input_mobile">
                             <label for="input_mobile">Enter your mobile</label>
                         </div>
                     </div>
@@ -61,21 +67,29 @@
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="email" type="text"  placeholder="email" id="input_email">
+                            <input class="form-control" name="email" type="text"  placeholder="Enter your email" id="input_email">
                             <label for="input_email">Enter your email</label>
                         </div>
+                    </div>
+                    <div class="col">
+                        <select name="customer_type" class="form-select p-3" aria-label="Choose Customer Type">
+                            <option value="" selected>Select customer type</option>
+                            {% for item in customer_types %}
+                            <option value="{{ item.record_id }}">{{ item.name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="billing_address" type="text"  placeholder="fax" id="billing_address">
+                            <input class="form-control" name="billing_address" type="text"  placeholder="Enter billing address" id="billing_address">
                             <label for="billing_address">Enter billing address</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="billing_city" type="text" placeholder="mobile" id="billing_city">
+                            <input class="form-control" name="billing_city" type="text" placeholder="Enter billing city" id="billing_city">
                             <label for="billing_city">Enter billing city</label>
                         </div>
                     </div>
@@ -83,19 +97,19 @@
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="billing_state" type="text"  placeholder="fax" id="billing_state">
+                            <input class="form-control" name="billing_state" type="text"  placeholder="Enter billing state" id="billing_state">
                             <label for="billing_state">Enter billing state</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="billing_zipcode" type="text" placeholder="mobile" id="billing_zipcode">
+                            <input class="form-control" name="billing_zipcode" type="text" placeholder="Enter billing Zipcode" id="billing_zipcode">
                             <label for="billing_zipcode">Enter billing Zipcode</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="billing_country" type="text" placeholder="mobile" id="billing_country">
+                            <input class="form-control" name="billing_country" type="text" placeholder="Enter billing country" id="billing_country">
                             <label for="billing_country">Enter billing country</label>
                         </div>
                     </div>
@@ -103,13 +117,13 @@
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="e911_address" type="text"  placeholder="fax" id="e911_address">
+                            <input class="form-control" name="e911_address" type="text"  placeholder="Enter E911 address" id="e911_address">
                             <label for="e911_address">Enter E911 address</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="e911_city" type="text" placeholder="mobile" id="e911_city">
+                            <input class="form-control" name="e911_city" type="text" placeholder="Enter E911 city" id="e911_city">
                             <label for="e911_city">Enter E911 city</label>
                         </div>
                     </div>
@@ -117,20 +131,48 @@
                 <div class="row mb-3">
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="e911_state" type="text"  placeholder="fax" id="e911_state">
+                            <input class="form-control" name="e911_state" type="text"  placeholder="Enter E911 state" id="e911_state">
                             <label for="e911_state">Enter E911 state</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="e911_zipcode" type="text" placeholder="mobile" id="e911_zipcode">
+                            <input class="form-control" name="e911_zipcode" type="text" placeholder="Enter E911 Zipcode" id="e911_zipcode">
                             <label for="e911_zipcode">Enter E911 Zipcode</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" name="e911_country" type="text" placeholder="mobile" id="e911_country">
+                            <input class="form-control" name="e911_country" type="text" placeholder="Enter E911 country" id="e911_country">
                             <label for="e911_country">Enter E911 country</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating mb-3 mb-md-0">
+                            <input class="form-control" name="support_contact" type="text"  placeholder="Enter support contact" id="support_contact">
+                            <label for="support_contact">Enter support contact</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <input class="form-control" name="attachments" type="text" placeholder="Enter attachments" id="attachments">
+                            <label for="attachments">Enter attachments</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <input class="form-control" name="open_balance" type="number" step="any" placeholder="Enter open balance" id="open_balance" required>
+                            <label for="open_balance">Enter open balance</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating mb-3 mb-md-0">
+                            <input class="form-control" name="note" type="text"  placeholder="Enter support contact" id="note">
+                            <label for="note">Enter note</label>
                         </div>
                     </div>
                 </div>
