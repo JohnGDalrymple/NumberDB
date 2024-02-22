@@ -20,7 +20,12 @@ import os
 @login_required
 def did_status_service(request):
     status = Status.objects.all().values()
-    services = Service.objects.all().values()
+    services_data = Service.objects.all().values()
+    paginator = Paginator(services_data, 10) # Show 10 customers per page
+
+    page_number = request.GET.get('page')
+    services = paginator.get_page(page_number)
+
 
     return render(request, 'status_service.html', { 'status': status, 'services': services })
 

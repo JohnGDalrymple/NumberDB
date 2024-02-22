@@ -715,7 +715,7 @@ def did_sync_method(request):
     top = 100
     headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
     while True:
-        params = {'skip': skip, 'top': top, 'select':'Number,MIEntityFullName_RecordID,MIResellerMSP,MISMSType_RecordID,MISMSCarrier_RecordID,MISMSCarrier_RecordID,MISMSType_RecordID,MITermLocation_RecordID,IsDuplicated,LastModifiedDate,MISMSEnabled,MISMSCampaign,MIUserFirstName,MIUserLastName,MIExtension,MIEmail,MIStartDate,MIItemFullName_RecordID,MIItemFullName2_RecordID,MIItemFullName3_RecordID,MIItemFullName4_RecordID,LastModifiedDate,ImportBy,RecordID'}
+        params = {'skip': skip, 'top': top, 'select':'Number,MIEntityFullName_RecordID,MIResellerMSP,MISMSType_RecordID,MISMSCarrier_RecordID,MISMSCarrier_RecordID,MITermLocation_RecordID,IsDuplicated,LastModifiedDate,MISMSEnabled,MISMSCampaign,MIUserFirstName,MIUserLastName,MIExtension,MIEmail,MIStartDate,MIItemFullName_RecordID,MIItemFullName2_RecordID,MIItemFullName3_RecordID,MIItemFullName4_RecordID,LastModifiedDate,ImportBy,RecordID,MIType_RecordID'}
 
         response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MICustomerNumberRelationshipTable", headers=headers, params=params)
 
@@ -737,12 +737,12 @@ def did_sync_method(request):
                 did = item["Number"],
                 customer_id = item["MIEntityFullName_RecordID"],
                 reseller = item["MIResellerMSP"],
-                status_id = item["MISMSType_RecordID"],
+                status_id = item["MIType_RecordID"],
                 voice_carrier_id = item["MISMSCarrier_RecordID"],
                 sms_carrier_id = item["MISMSCarrier_RecordID"],
                 sms_type_id = item["MISMSType_RecordID"],
                 term_location_id = item["MITermLocation_RecordID"],
-                in_method = "Yes" if item["IsDuplicated"] else "No",
+                in_method = "Yes",
                 change_date = parse_date_sync(item["LastModifiedDate"]),
                 sms_enabled = "Yes" if item["MISMSEnabled"] else "No",
                 sms_campaign = item["MISMSCampaign"],
