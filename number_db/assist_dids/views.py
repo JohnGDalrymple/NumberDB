@@ -19,13 +19,13 @@ import os
 
 @login_required
 def did_status_service(request):
+    service_size = request.GET.get('service_size', 10)
+    page_number = request.GET.get('service_page')
     status = Status.objects.all().values()
     services_data = Service.objects.all().values()
-    paginator = Paginator(services_data, 10) # Show 10 customers per page
+    paginator = Paginator(services_data, service_size)
 
-    page_number = request.GET.get('page')
     services = paginator.get_page(page_number)
-
 
     return render(request, 'status_service.html', { 'status': status, 'services': services })
 
@@ -481,7 +481,7 @@ def did_sync_service_item_method(request):
     top = 100
     headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
     while True:
-        params = {'skip': skip, 'top': top, 'select':'FullName,RecordID,SalesDesc,IsActive', 'filter': 'IsActive eq true'}
+        params = {'skip': skip, 'top': top, 'select':'FullName,RecordID,SalesDesc,IsActive', 'filter': 'IsActive eq true', 'filter': 'IsActive eq true'}
 
         response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}Item", headers=headers, params=params)
 

@@ -89,7 +89,7 @@ def export_csv(request):
 def customer_list(request):
     if 'GET' == request.method:
         customers_list = []
-        if request.GET:
+        if request.GET.get('search'):
             query = request.GET['search']
             q_objects = Q()
             for field in default_data_header:
@@ -121,7 +121,12 @@ def customer_list(request):
                 item.open_balance =  "" if(item.open_balance == None) else item.open_balance
                 item.note =  "" if(item.note == None) else item.note
 
-            return render(request, 'customers.html', {'customers': customers_list, 'search': query})
+            size = request.GET.get('size', 10)
+            page_number = request.GET.get('page')
+            paginator = Paginator(customers_list, size)
+            customers = paginator.get_page(page_number)
+
+            return render(request, 'customers.html', {'customers': customers, 'search': query})
         else:
             customers_list = Customer.objects.all().select_related('customer_type')
 
@@ -147,7 +152,12 @@ def customer_list(request):
                 item.open_balance =  "" if(item.open_balance == None) else item.open_balance
                 item.note =  "" if(item.note == None) else item.note
 
-            return render(request, 'customers.html', {'customers': customers_list})
+            size = request.GET.get('size', 10)
+            page_number = request.GET.get('page')
+            paginator = Paginator(customers_list, size)
+            customers = paginator.get_page(page_number)
+
+            return render(request, 'customers.html', {'customers': customers})
     
     if 'POST' == request.method:
         try:

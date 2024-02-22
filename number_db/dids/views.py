@@ -149,7 +149,7 @@ def did(request):
     if 'GET' == request.method:
         did_error = Did_Error.objects.all().values()
         dids_list = []
-        if request.GET:
+        if request.GET.get('search'):
             query = request.GET['search']
 
             # dids_list = Did.objects.filter(q_objects).distinct().values()
@@ -195,8 +195,13 @@ def did(request):
                 item.onboard_date =  "" if(item.onboard_date == None) else item.onboard_date
                 item.e911_cid =  "" if(item.e911_cid == None) else item.e911_cid
                 item.updated_date_time =  "" if(item.updated_date_time == None) else item.updated_date_time
+            
+            size = request.GET.get('size', 10)
+            page_number = request.GET.get('page')
+            paginator = Paginator(dids_list, size)
+            dids = paginator.get_page(page_number)
                 
-            return render(request, 'dids.html', {'dids': dids_list, 'search': query, 'error': did_error})
+            return render(request, 'dids.html', {'dids': dids, 'search': query, 'error': did_error})
 
         else:
             dids_list = Did.objects.all().select_related('customer', 'status', 'voice_carrier', 'sms_carrier', 'sms_type', 'term_location', 'service_1', 'service_2', 'service_3', 'service_4')
@@ -210,8 +215,13 @@ def did(request):
                 item.onboard_date =  "" if(item.onboard_date == None) else item.onboard_date
                 item.e911_cid =  "" if(item.e911_cid == None) else item.e911_cid
                 item.updated_date_time =  "" if(item.updated_date_time == None) else item.updated_date_time
+            
+            size = request.GET.get('size', 10)
+            page_number = request.GET.get('page')
+            paginator = Paginator(dids_list, size)
+            dids = paginator.get_page(page_number)
                     
-            return render(request, 'dids.html', {'dids': dids_list, 'error': did_error})
+            return render(request, 'dids.html', {'dids': dids, 'error': did_error})
     
     if 'POST' == request.method:
             try:
