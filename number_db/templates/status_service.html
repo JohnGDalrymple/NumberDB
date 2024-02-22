@@ -107,6 +107,65 @@
                 {% endfor %}
               </tbody>
             </table>
+            <nav aria-label="...">
+              <ul class="pagination">
+                {% if services.has_previous %}
+                  <li class="page-item">
+                    <span class="page-link"><a href="?page=1">First</a></span>
+                  </li>
+                  <li class="page-item">
+                    <span class="page-link"><a href="?page={{ services.previous_page_number }}">Previous</a></span>
+                  </li>
+                <li class="page-item"><a class="page-link" href="?page={{ services.previous_page_number }}">{{ services.previous_page_number }}</a></li>
+                {% else %}
+                  <li class="page-item disabled">
+                    <span class="page-link">First</span>
+                  </li>
+                  <li class="page-item disabled">
+                    <span class="page-link">Previous</span>
+                  </li>
+                {% endif %}
+                <li class="page-item active">
+                  <span class="page-link">
+                    2
+                    <span class="sr-only">(current)</span>
+                  </span>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                {% if services.has_next %}
+                  <li class="page-item">
+                    <span class="page-link"><a href="?page={{ services.next_page_number }}">Next</a></span>
+                  </li>
+                  <li class="page-item">
+                    <span class="page-link"><a href="?page={{ services.paginator.num_pages }}">Last</a></span>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled">
+                    <span class="page-link">Next</span>
+                  </li>
+                  <li class="page-item disabled">
+                    <span class="page-link">Last</span>
+                  </li>
+                {% endif %}
+              </ul>
+            </nav>
+            <div class="pagination">
+              <span class="step-links">
+                  {% if services.has_previous %}
+                      <a href="?page=1">&laquo; first</a>
+                      <a href="?page={{ services.previous_page_number }}">previous</a>
+                  {% endif %}
+      
+                  <span class="current">
+                      Page {{ services.number }} of {{ services.paginator.num_pages }}.
+                  </span>
+      
+                  {% if services.has_next %}
+                      <a href="?page={{ services.next_page_number }}">next</a>
+                      <a href="?page={{ services.paginator.num_pages }}">&raquo; last</a>
+                  {% endif %}
+              </span>
+            </div>
           </div>
         </div>
       </div>
