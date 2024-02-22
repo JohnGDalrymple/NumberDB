@@ -404,15 +404,20 @@ def user_add(request):
 
 @login_required
 def user_update(request, id):
-    user = User.objects.get(id=id)
     if request.method == "POST":
-        user.first_name = request.POST['first_name']
-        user.last_name = request.POST['last_name']
-        user.username = request.POST['username']
-        user.email = request.POST['email']
-        user.date_joined = request.POST['date_joined']
-        user.save()
-        messages.success(request, 'User was updated successfully!')
+        try:
+            user = User.objects.get(id=id)
+            user.first_name = request.POST['first_name']
+            user.last_name = request.POST['last_name']
+            user.username = request.POST['username']
+            user.email = request.POST['email']
+            user.date_joined = request.POST['date_joined']
+            user.save()
+            messages.success(request, 'User was updated successfully!')
+
+        except Exception as e:
+            messages.warning(request, e)
+
         return redirect('/user')
 
 
