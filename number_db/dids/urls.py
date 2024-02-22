@@ -18,5 +18,5 @@ urlpatterns = [
     path('user/edit/<int:id>', views.user_edit, name='user_edit'),
     path('user/update/<int:id>', views.user_update, name='user_update'),
     path('user/add/', views.user_add, name='user_add'),
-    path('user/create/', views.user_create, name='user_create'),
+    path('user/create/', views.user_add, name='user_create'),
 ]

@@ -376,31 +376,30 @@ def user_edit(request, id):
 
 @login_required
 def user_add(request):
-    return render(request, 'user_create.html')
-
-
-@login_required
-def user_create(request):
     if request.method == "POST":
-        print(request.POST)
-        # form = RegistrationForm(request.POST)
-        # users = User(
-        #     username=form.cleaned_data['username'],
-        #     password=make_password(form.cleaned_data['password1']),
-        #     is_staff=True,
-        #     is_active=True,
-        #     is_superuser=True,
-        #     email=form.cleaned_data['email'],
-        #     first_name=form.cleaned_data['first_name'],
-        #     last_name=form.cleaned_data['last_name'],
-        # )
-        # try:
-        #     users.full_clean()
-        # except ValidationError as e:
-        #     pass
-        # users.save()
+        form = RegistrationForm(request.POST)
+        try:
+            users = User(
+                username = request.POST['username'],
+                password = make_password(request.POST['password1']),
+                is_staff = True,
+                is_active = True,
+                is_superuser = True,
+                email = request.POST['email'],
+                first_name = request.POST['first_name'],
+                last_name = request.POST['last_name'],
+            )
+            users.full_clean()
+            users.save()
+
+        except Exception as e:
+            messages.warning(request, e)
+
         messages.success(request, 'User was created successfully!')
         return HttpResponseRedirect('/user')
+    
+    else:
+        return render(request, 'user_create.html')
 
 
 @login_required
