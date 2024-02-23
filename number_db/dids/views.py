@@ -297,38 +297,72 @@ def did(request):
                                         messages.warning(request, e)
                                 else:
                                     try:
-                                        save_data = Did(
-                                        did_uuid = item['DID uuid'] if item['DID uuid'] else uuid.uuid4(), 
-                                        did = item['DID'] if item['DID'] else None, 
-                                        in_method = switch(item['In Method']), 
-                                        voice_carrier = voice_carrier_value, 
-                                        status = service_status_value, 
-                                        change_date =  datetime.datetime.now(), 
-                                        sms_enabled = switch(item['SMS Enabled']), 
-                                        sms_carrier = sms_carrier_value, 
-                                        sms_type = sms_type_value, 
-                                        sms_campaign = item['SMS Campaign'], 
-                                        term_location = term_location_value, 
-                                        customer = customer_value, 
-                                        reseller = item['Reseller'], 
-                                        user_first_name = item['User First Name'], 
-                                        user_last_name = item['User Last Name'], 
-                                        extension = item['Extension'] if item['Extension'] else None,
-                                        email = item['Email'], 
-                                        onboard_date = parse_date(item['Onboard Date']), 
-                                        note = item['Note'], 
-                                        e911_enabled_billed = switch(item['E911 Enabled Billed']), 
-                                        e911_cid = item['E911 CID'] if item['E911 CID'] else None, 
-                                        e911_address = item['E911 Address'], 
-                                        service_1 = service_item_1, 
-                                        service_2 = service_item_2, 
-                                        service_3 = service_item_3, 
-                                        service_4 = service_item_4, 
-                                        updated_date_time = datetime.datetime.now(),
-                                        updated_by = item['Updated By'], 
-                                        is_synced = False,
-                                        )
-                                        save_data.save()
+                                        try:
+                                            find_one = Did.objects.get(did = int(item['DID']))
+                                            find_one.did_uuid = item['DID uuid'] if item['DID uuid'] else uuid.uuid4()
+                                            find_one.did = item['DID'] if item['DID'] else None
+                                            find_one.in_method = switch(item['In Method'])
+                                            find_one.voice_carrier = voice_carrier_value
+                                            find_one.status = service_status_value
+                                            find_one.change_date =  datetime.datetime.now()
+                                            find_one.sms_enabled = switch(item['SMS Enabled'])
+                                            find_one.sms_carrier = sms_carrier_value
+                                            find_one.sms_type = sms_type_value
+                                            find_one.sms_campaign = item['SMS Campaign']
+                                            find_one.term_location = term_location_value
+                                            find_one.customer = customer_value
+                                            find_one.reseller = item['Reseller']
+                                            find_one.user_first_name = item['User First Name']
+                                            find_one.user_last_name = item['User Last Name']
+                                            find_one.extension = item['Extension'] if item['Extension'] else None
+                                            find_one.email = item['Email']
+                                            find_one.onboard_date = parse_date(item['Onboard Date'])
+                                            find_one.note = item['Note']
+                                            find_one.e911_enabled_billed = switch(item['E911 Enabled Billed'])
+                                            find_one.e911_cid = item['E911 CID'] if item['E911 CID'] else None
+                                            find_one.e911_address = item['E911 Address']
+                                            find_one.service_1 = service_item_1
+                                            find_one.service_2 = service_item_2
+                                            find_one.service_3 = service_item_3
+                                            find_one.service_4 = service_item_4
+                                            find_one.updated_date_time = datetime.datetime.now()
+                                            find_one.updated_by = item['Updated By']
+                                            find_one.is_synced = True if item['In Method'] == "Yes" else False
+                                            find_one.full_clean()
+                                            find_one.save()
+                                        except Exception:
+                                            save_data = Did(
+                                            did_uuid = item['DID uuid'] if item['DID uuid'] else uuid.uuid4(), 
+                                            did = item['DID'] if item['DID'] else None, 
+                                            in_method = switch(item['In Method']), 
+                                            voice_carrier = voice_carrier_value, 
+                                            status = service_status_value, 
+                                            change_date =  datetime.datetime.now(), 
+                                            sms_enabled = switch(item['SMS Enabled']), 
+                                            sms_carrier = sms_carrier_value, 
+                                            sms_type = sms_type_value, 
+                                            sms_campaign = item['SMS Campaign'], 
+                                            term_location = term_location_value, 
+                                            customer = customer_value, 
+                                            reseller = item['Reseller'], 
+                                            user_first_name = item['User First Name'], 
+                                            user_last_name = item['User Last Name'], 
+                                            extension = item['Extension'] if item['Extension'] else None,
+                                            email = item['Email'], 
+                                            onboard_date = parse_date(item['Onboard Date']), 
+                                            note = item['Note'], 
+                                            e911_enabled_billed = switch(item['E911 Enabled Billed']), 
+                                            e911_cid = item['E911 CID'] if item['E911 CID'] else None, 
+                                            e911_address = item['E911 Address'], 
+                                            service_1 = service_item_1, 
+                                            service_2 = service_item_2, 
+                                            service_3 = service_item_3, 
+                                            service_4 = service_item_4, 
+                                            updated_date_time = datetime.datetime.now(),
+                                            updated_by = item['Updated By'], 
+                                            is_synced = False,
+                                            )
+                                            save_data.save()
                                     except Exception as e:
                                         print(e)
                                         messages.warning(request, e)
