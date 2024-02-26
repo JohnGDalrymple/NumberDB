@@ -60,6 +60,7 @@
               <th>Request Port Date</th>
               <th>E911 Number</th>
               <th>E911 Address</th>
+              <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -78,9 +79,12 @@
               <td>{{ item.requested_port_date }}</td>
               <td>{{ item.e911_number }}</td>
               <td>{{ item.e911_address }}</td>
+              <td>{{ item.status }}</td>
               <td style="display: flex; justify-content: space-between;">
-                <a class="btn btn-sm btn-warning" href="edit/{{ item.id }}"><span class="fa fa-edit"></span> Edit</a>
-                <a class="btn btn-sm btn-danger" href="delete/{{ item.id }}"><span class="fa fa-trash"></span> Delete</a>
+                {% if item.status != "Deleted" %}
+                  <a class="btn btn-sm btn-warning" href="edit/{{ item.id }}"><span class="fa fa-edit"></span> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="delete/{{ item.id }}"><span class="fa fa-trash"></span> Delete</a>
+                {% endif %}
               </td>
             </tr>
             {% endfor %}
