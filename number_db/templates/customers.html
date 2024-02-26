@@ -106,8 +106,8 @@
               <td>{{ customer.e911_country }}</td>
               <td style="display: flex; justify-content: space-between;">
                 {% if customer.is_active %}
-                  <a class="btn btn-sm btn-danger" href="delete/{{ customer.id }}"><span class="fa fa-trash"></span> Delete</a>
                   <a class="btn btn-sm btn-warning" href="edit/{{ customer.id }}"><span class="fa fa-edit"></span> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="delete/{{ customer.id }}"><span class="fa fa-trash"></span> Delete</a>
                 {% endif %}
               </td>
             </tr>
