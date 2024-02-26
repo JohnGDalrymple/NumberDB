@@ -10,36 +10,27 @@
     <div class="card-header">
       <i class="fas fa-table me-1"></i>
       Service Orders
-        <!-- <a class="btn-sm btn btn-success" href="{% static 'sample_contact.csv' %}" download style="float: right"><span class="fa fa-download"></span> &nbsp;Download Sample CSV</a>
-        <a id="selectCustomerDownloadButton" class="btn-sm btn btn-success" style="float: right; margin-right: 10px;">
-          <span class="fa fa-download" ></span> 
-            &nbsp;Download Select CSV
-        </a> -->
     </div>
     <div class="card-body">
       <form class="form-horizontal mb-3" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="d-flex align-items-sm-start align-items-stretch  flex-column flex-sm-row gap-2">
-              <div class="flex-grow-1">
-                  <!-- <div class="input-group">
-                      <input type="file" class="form-control custom-file-input file" name="csv_file">
-                  </div> -->
-              </div>
-              <div class="d-flex">
-                  <!-- <button class="btn btn-primary btn-block" type="submit">Submit</button> -->
-                  <a class="btn btn-success ms-2" href="add/"><span class="fa fa-add"></span> Add</a>
-              </div>
+            <div class="flex-grow-1">
+            </div>
+            <div class="d-flex">
+              <a class="btn btn-success ms-2" href="add/"><span class="fa fa-add"></span> Add</a>
+            </div>
           </div>
       </form>
       <hr>
-      <!-- <div class="d-flex mb-3">
-          <form class="form-inline ms-auto w-100">
-            <div class="input-group">
-                <input class="form-control" type="text" name="search" value="{{ search }}" placeholder="Search for customer..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
-                <button class="btn btn-secondary" type="submit"><i class="fas fa-search"></i></button>
-            </div>
-          </form>
-      </div> -->
+      <div class="d-flex mb-3">
+        <form class="form-inline ms-auto w-100">
+          <div class="input-group">
+              <input class="form-control" type="text" name="search" value="{{ search }}" placeholder="Search for service order..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
+              <button class="btn btn-secondary" type="submit"><i class="fas fa-search"></i></button>
+          </div>
+        </form>
+      </div>
       {% for message in messages %}
       <div
         class="alert alert-{{ message.tags }} alert-dismissible"
@@ -68,8 +59,7 @@
               <th>Texting</th>
               <th>Request Port Date</th>
               <th>E911 Number</th>
-              <th>Created At</th>
-              <th>Updated At</th>
+              <th>E911 Address</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -87,8 +77,7 @@
               <td>{{ item.texting }}</td>
               <td>{{ item.requested_port_date }}</td>
               <td>{{ item.e911_number }}</td>
-              <td>{{ item.created_at }}</td>
-              <td>{{ item.updated_at }}</td>
+              <td>{{ item.e911_address }}</td>
               <td style="display: flex; justify-content: space-between;">
                 <a class="btn btn-sm btn-warning" href="edit/{{ item.id }}"><span class="fa fa-edit"></span> Edit</a>
                 <a class="btn btn-sm btn-danger" href="delete/{{ item.id }}"><span class="fa fa-trash"></span> Delete</a>
@@ -97,6 +86,62 @@
             {% endfor %}
           </tbody>
         </table>
+        <div class="d-flex flex-row justify-content-end gap-3">
+          <form method="get">
+            <input type="hidden" name="search" value="{{ request.GET.search }}">
+            <select class="form-select form-select" name="size" aria-label=".form-select-sm example" onchange="this.form.submit()">
+              <option value="10" {% if request.GET.size == "10" %}selected{% endif %}>10</option>
+              <option value="25" {% if request.GET.size == "25" %}selected{% endif %}>25</option>
+              <option value="50" {% if request.GET.size == "50" %}selected{% endif %}>50</option>
+            </select>
+          </form>
+          <nav aria-label="...">
+            <ul class="pagination">
+              {% if not service_orders.has_previous %}
+                <li class="page-item disabled"><a class="page-link" href="#"> << </a></li>
+                <li class="page-item disabled"><a class="page-link" href="#"> < </a></li>
+              {% else %}
+                {% if not request.GET.search %}
+                  <li class="page-item">
+                    <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page=1"{% else %}href="?page=1"{% endif %}> << </a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page={{ service_orders.previous_page_number }}"{% else %}href="?page={{ service_orders.previous_page_number }}"{% endif %}> < </a>
+                  </li>
+                {% else %}
+                  <li class="page-item">
+                    <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}&size={{ request.GET.size }}&page=1"{% else %}href="?search={{request.GET.search}}&page=1"{% endif %}> << </a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}size={{ request.GET.size }}&page={{ service_orders.previous_page_number }}"{% else %}href="?search={{request.GET.search}}&page={{ service_orders.previous_page_number }}"{% endif %}> < </a>
+                  </li>
+                {% endif %}
+              {% endif %}
+              <li class="page-item">
+                <span class="page-link">{{ service_orders.number }} / {{ service_orders.paginator.num_pages }}</span>
+              </li>
+              {% if not service_orders.has_next %}
+                <li class="page-item disabled"><a class="page-link" href="#"> > </a></li>
+                <li class="page-item disabled"><a class="page-link" href="#"> >> </a></li>
+              {% else %}
+                {% if request.GET.search %}
+                <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}&size={{ request.GET.size }}&page={{ service_orders.next_page_number }}"{% else %}href="?search={{request.GET.search}}&page={{ service_orders.next_page_number }}"{% endif %}> > </a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}&size={{ request.GET.size }}&page={{ service_orders.paginator.num_pages }}"{% else %}href="?search={{request.GET.search}}&page={{ service_orders.paginator.num_pages }}"{% endif %}> >> </a>
+                  </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page={{ service_orders.next_page_number }}"{% else %}href="?page={{ service_orders.next_page_number }}"{% endif %}> > </a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page={{ service_orders.paginator.num_pages }}"{% else %}href="?page={{ service_orders.paginator.num_pages }}"{% endif %}> >> </a>
+                  </li>
+                {% endif %}
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
       </div>
     </div>
   </div>

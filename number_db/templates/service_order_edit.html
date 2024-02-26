@@ -1,0 +1,91 @@
+{% extends 'layout/app.html' %}
+
+{% load static %}
+{% block stylesheet %}
+    <style>
+        .bd-example {
+            /* padding: 1.5rem; */
+            margin-right: 0;
+            margin-left: 0;
+            border-width: 1px;
+            border-top-left-radius: .25rem;
+            border-top-right-radius: .25rem;
+        }
+        .bd-example {
+            position: relative;
+            padding: 1rem;
+            margin: 1rem -.75rem 0;
+            border: solid #dee2e6;
+            border-width: 1px;
+        }
+    </style>
+{% endblock %}
+{% block body %}
+    <div class="container-fluid px-4">
+        <h1 class="mt-4">Service Orders</h1>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+            <li class="breadcrumb-item active">Edit Service Order</li>
+        </ol>
+        <div class="bd-example">
+            <form action="/service_order/edit/{{ service_order.id }}" method="POST">
+                {% csrf_token %}
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating mb-3 mb-md-0 ">
+                            <input class="form-control" id="input_username" type="text" name="username" placeholder="Enter username" value="{{ service_order.username }}" required/>
+                            <label for="input_username">Enter username</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <input class="form-control" id="input_email" type="email" name="email" value="{{ service_order.email }}" placeholder="Enter email" required/>
+                            <label for="input_email">Enter email</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating">
+                            <input class="form-control" id="input_number" type="number" name="number" value="{{ service_order.number }}" placeholder="Enter number"/>
+                            <label for="input_number">Enter number</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating mb-3 mb-md-0">
+                            <input class="form-control" name="requested_port_date" type="date"  placeholder="Select the requested port date" value="{{ service_order.requested_port_date }}" id="input_requested_port_date" required>
+                            <label for="input_requested_port_date">Select the requested port date</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                      <div class="form-floating">
+                          <input class="form-control" id="input_e911_number" type="number" name="e911_number" placeholder="Enter e911 number"/>
+                          <label for="input_e911_number">Enter e911 number</label>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="form-floating">
+                          <input class="form-control" id="input_e911_address" type="text" name="e911_address" placeholder="Enter e911 address"/>
+                          <label for="input_e911_address">Enter e911 address</label>
+                      </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating">
+                            <input class="form-control" name="texting" type="text" placeholder="Enter billing city" id="input_texting">
+                            <label for="input_texting">Enter the description</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 mb-0">
+                    <div class="d-grid"><button class="btn btn-primary btn-block" type="submit">Submit</button></div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block javascript %}
+{% endblock %}
