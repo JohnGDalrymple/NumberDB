@@ -709,6 +709,49 @@ def export_csv(request):
 
 
 @login_required
+def did_download_all(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="CurrentDID.csv"'
+    writer = csv.writer(response)
+    writer.writerow(default_header)
+
+    data = Did.objects.all()
+    for item in data:
+        writer.writerow([
+            item.did,
+            item.customer if item.customer == None else item.customer.full_name,
+            item.reseller,
+            item.in_method,
+            item.status if item.status == None else item.status.name, 
+            item.change_date,
+            item.voice_carrier if item.voice_carrier == None else item.voice_carrier.name,
+            item.sms_enabled,
+            item.sms_carrier if item.sms_carrier == None  else item.sms_carrier.name,
+            item.sms_type if item.sms_type == None  else item.sms_type.name,
+            item.sms_campaign,
+            item.term_location if item.term_location == None  else item.term_location.name,
+            item.user_first_name,
+            item.user_last_name,
+            item.extension,
+            item.email,
+            item.onboard_date,
+            item.note,
+            item.e911_enabled_billed,
+            item.e911_cid,
+            item.e911_address,
+            item.did_uuid,
+            item.service_1 if item.service_1 == None  else item.service_1.name,
+            item.service_2 if item.service_2 == None  else item.service_2.name,
+            item.service_3 if item.service_3 == None  else item.service_3.name,
+            item.service_4 if item.service_4 == None  else item.service_4.name,
+            item.updated_date_time,
+            item.updated_by,
+            ])
+
+    return response
+
+
+@login_required
 def export_error_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="ErrorReport.csv"'

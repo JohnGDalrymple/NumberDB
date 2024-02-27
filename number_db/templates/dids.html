@@ -1,19 +1,23 @@
 {% extends 'layout/app.html' %} {% load static %} {% block body %}
 <div class="container-fluid px-4">
-  <h1 class="mt-4">DID CRUD</h1>
+  <h1 class="mt-4">DIDs</h1>
   <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-    <li class="breadcrumb-item active">DID CRUD</li>
+    <li class="breadcrumb-item active">DIDs</li>
   </ol>
 
   <div class="card mb-4">
     <div class="card-header">
       <i class="fas fa-table me-1"></i>
-      DID CRUD
+      DIDs
       <a class="btn-sm btn btn-success" href="{% static 'sample.csv' %}" download style="float: right"><span class="fa fa-download"></span> &nbsp;Download Sample CSV</a>
       <a id="selectDownloadButton" class="btn-sm btn btn-success" style="float: right; margin-right: 10px;">
         <span class="fa fa-download" ></span> 
         &nbsp;Download Select CSV
+      </a>
+      <a href="download_all/" class="btn-sm btn btn-info" style="float: right; margin-right: 10px;">
+        <span class="fa fa-download" ></span> 
+        &nbsp;Download all data in CSV format
       </a>
       {% if error %}
       <a id="errorReportButton" class="btn-sm btn btn-danger" download style="float: right; margin-right: 10px;"><span class="fa fa-download"></span> &nbsp;Download Error Report CSV</a>

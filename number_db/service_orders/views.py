@@ -11,6 +11,8 @@ from django.contrib.auth.hashers import make_password
 import pandas as pd
 from operator import or_
 import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 # Create your views here.
 
@@ -115,22 +117,61 @@ def service_order_add(request):
             service_order.full_clean()
             service_order.save()
 
-            # sender = 'ginik0108@gmail.com'
-            # receivers = ['comsuper0030@gmail.com']
-            # message = """From: From Person <from@example.com>
-            # To: To Person <comsuper0030@gmail.com>
-            # Subject: SMTP email example
+            # s = smtplib.SMTP('smtp.gmail.com', 587)
+            # s.starttls()
+            # s.login("ginik0108@gmail.com", "xrbr vijt wwvb uezw")
 
-
-            # This is a test message.
+            # client_message_html = f"""\
+            # <html>
+            #     <body>
+            #         <p style="font-size:16px">Hello <strong>{request.POST['username']}</strong>.</p>
+            #         <br>
+            #         <p><strong>Congratulations🎉,</strong> The service order you requested has been registered correctly.</p>
+            #         <p>Our support team will review and let you know soon.</p>
+            #         <br>
+            #         <p>Thank you.</p>
+            #         <p style="font-size:16px"><strong>Mobex.</strong></p>
+            #     </body>
+            # </html>
             # """
 
-            # try:
-            #     smtpObj = smtplib.SMTP('localhost')
-            #     smtpObj.sendmail(sender, receivers, message)         
-            #     print("Successfully sent email")
-            # except Exception:
-            #     pass
+            # server_message_html = f"""\
+            # <html>
+            #     <body>
+            #         <p style="font-size:16px">Hello <strong>{request.user.username}</strong>.</p>
+            #         <br>
+            #         <p>A new service order was created.</p>
+            #         <p>Please review the service order and accept it.</p>
+            #         <br>
+            #         <p>Here is the detailed information.</p>
+            #         <p>Requested username: <strong>{request.POST['username']}</strong></p>
+            #         <p>Requested email: <strong>{request.POST['email']}</strong></p>
+            #         <p>Requested number: <strong>{request.POST['number']}</strong></p>
+            #         <p>Requested port date: <strong>{request.POST['requested_port_date']}</strong></p>
+            #         <p>Requested E911 number: <strong>{request.POST['e911_number']}</strong></p>
+            #         <p>Requested E911 address: <strong>{request.POST['e911_address']}</strong></p>
+            #         <p>Requested description: {request.POST['texting']}</p>
+            #         <p>Thank you.</p>
+            #     </body>
+            # </html>
+            # """
+
+            # client_message = MIMEMultipart('alternative')
+            # server_message = MIMEMultipart('alternative')
+            # client_message.attach(MIMEText(client_message_html, _subtype='html'))
+            # server_message.attach(MIMEText(server_message_html, _subtype='html'))
+            
+            # client_message["Subject"] = 'Welcome to Mobex Service!'
+            # client_message["From"] = 'ginik0108@gmail.com'
+            # client_message["To"] = request.POST['email']
+
+            # server_message["Subject"] = 'A new service order has arrived'
+            # server_message["From"] = request.POST['email']
+            # server_message["To"] = 'ginik0108@gmail.com'
+
+            # s.sendmail("ginik0108@gmail.com", request.POST['email'], client_message.as_string())
+            # s.sendmail(request.POST['email'], "ginik0108@gmail.com", server_message.as_string())
+            # s.quit()
         except Exception as e:
             messages.warning(request, e)
 
