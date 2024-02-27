@@ -1,15 +1,15 @@
 {% extends 'layout/app.html' %} {% load static %} {% block body %}
 <div class="container-fluid px-4">
-  <h1 class="mt-4">Customer CRUD</h1>
+  <h1 class="mt-4">Customers</h1>
   <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-    <li class="breadcrumb-item active">Customer CRUD</li>
+    <li class="breadcrumb-item active">Customers</li>
   </ol>
 
   <div class="card mb-4">
     <div class="card-header">
       <i class="fas fa-table me-1"></i>
-      Customer CRUD
+      Customers
         <a class="btn-sm btn btn-success" href="{% static 'sample_contact.csv' %}" download style="float: right"><span class="fa fa-download"></span> &nbsp;Download Sample CSV</a>
         <a id="selectCustomerDownloadButton" class="btn-sm btn btn-success" style="float: right; margin-right: 10px;">
           <span class="fa fa-download" ></span> 
