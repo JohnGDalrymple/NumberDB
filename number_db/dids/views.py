@@ -19,6 +19,9 @@ from operator import or_
 import requests
 import os
 import re
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 email_regex = r"(^[a-zA-Z0-9_.+\-']+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
 
@@ -421,7 +424,6 @@ def user_edit(request, id):
 @login_required
 def user_add(request):
     if request.method == "POST":
-        form = RegistrationForm(request.POST)
         try:
             users = User(
                 username = request.POST['username'],
@@ -435,6 +437,35 @@ def user_add(request):
             )
             users.full_clean()
             users.save()
+            s = smtplib.SMTP('smtp.gmail.com', 587)
+            s.starttls()
+            s.login("ginik0108@gmail.com", "xrbr vijt wwvb uezw")
+
+            client_message_html = f"""\
+            <html>
+                <body>
+                    <p style="font-size:16px">Hello <strong>{request.POST['first_name']}</strong>.</p>
+                    <br>
+                    <p><strong>Congratulations🎉,</strong> You have been invited to become an administrator of the Mobex server.</p>
+                    <p>You can access <a href="http://51.222.178.73/" style="text-decoration:none"><strong>Mobex admin panel</strong></a> using below credential</p>
+                    <p>Username: <strong>{request.POST['username']}</strong></p>
+                    <p>Password: <strong>{request.POST['password1']}</strong></p>
+                    <br>
+                    <p>Thank you.</p>
+                    <p style="font-size:16px"><strong>Mobex.</strong></p>
+                </body>
+            </html>
+            """
+
+            client_message = MIMEMultipart('alternative')
+            client_message.attach(MIMEText(client_message_html, _subtype='html'))
+            
+            client_message["Subject"] = 'Welcome to Mobex!'
+            client_message["From"] = 'ginik0108@gmail.com'
+            client_message["To"] = request.POST['email']
+
+            s.sendmail("ginik0108@gmail.com", request.POST['email'], client_message.as_string())
+            s.quit()
 
         except Exception as e:
             messages.warning(request, e)
