@@ -11,11 +11,7 @@
         <div class="d-flex flex-row justify-content-around">
           <div>
             <i class="fas fa-table me-1"></i>
-            Voice Carrier
-          </div>
-          <div>
-            <i class="fas fa-table me-1"></i>
-            SMS Carrier
+            Voice/SMS Carrier
           </div>
           <div>
             <i class="fas fa-table me-1"></i>
@@ -39,7 +35,10 @@
               <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#create_voice_carrier">
                 <span class="fa fa-add"></span> Add
               </button>
-              <a class="btn btn-info ms-2" href="sync_voice_carrier_method/"><span class="fa fa-cloud-arrow-down"></span> Sync from Method</a>
+              <div>
+                <a class="btn btn-info ms-2" href="sync_voice_carrier_to_method/"><span class="fa fa-cloud-arrow-up"></span> Sync to Method</a>
+                <a class="btn btn-info ms-2" href="sync_voice_carrier_method/"><span class="fa fa-cloud-arrow-down"></span> Sync from Method</a>
+              </div>
             </div>
           </div>
           <div class="table-container">
@@ -75,49 +74,13 @@
         <div class="w-100">
           <div class="d-flex align-items-sm-start align-items-stretch flex-column flex-sm-row mb-3">
             <div class="w-100 d-flex justify-content-between">
-              <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#create_sms_carrier">
-                <span class="fa fa-add"></span> Add
-              </button>
-              <a class="btn btn-info ms-2" href="sync_sms_carrier_method/"><span class="fa fa-cloud-arrow-down"></span> Sync from Method</a>
-          </div>
-          </div>
-          <div class="table-container">
-            <table
-              class="table table-bordered"
-              id="dataTable"
-              width="100%"
-              cellspacing="0"
-            >
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for item in sms_carrier %}
-                <tr class="table-row" id="tr_{{item.id}}">
-                  <td>{{ item.name }}</td>
-                  <td style="display: flex; justify-content: space-between;">
-                    {% if item.is_active %}
-                      <button type="button" class="btn btn-sm btn-warning" onclick="editSMSCarrier('{{item.id}}')" data-bs-toggle="modal" data-bs-target="#edit_sms_carrier"><span class="fa fa-edit"></span> Edit</button>
-                      <a class="btn btn-sm btn-danger" href="/assist_did/sms_carrier_delete/{{ item.id }}"><span class="fa fa-trash"></span> Delete</a>
-                    {% endif %}
-                  </td>
-                </tr>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="w-100">
-          <div class="d-flex align-items-sm-start align-items-stretch flex-column flex-sm-row mb-3">
-            <div class="w-100 d-flex justify-content-between">
               <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#create_customer_type">
                 <span class="fa fa-add"></span> Add
               </button>
-              <a class="btn btn-info ms-2" href="sync_customer_type_method/"><span class="fa fa-cloud-arrow-down"></span> Sync from Method</a>
+              <div>
+                <a class="btn btn-info ms-2" href="sync_customer_type_to_method/"><span class="fa fa-cloud-arrow-up"></span> Sync to Method</a>
+                <a class="btn btn-info ms-2" href="sync_customer_type_method/"><span class="fa fa-cloud-arrow-down"></span> Sync from Method</a>
+              </div>
           </div>
           </div>
           <div class="table-container">

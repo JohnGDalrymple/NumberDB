@@ -117,9 +117,9 @@ def service_order_add(request):
             service_order.full_clean()
             service_order.save()
 
-            # s = smtplib.SMTP('smtp.gmail.com', 587)
+            # s = smtplib.SMTP(os.getenv('SMTP_SERVICE'), os.getenv('EMAIL_PORT'))
             # s.starttls()
-            # s.login("ginik0108@gmail.com", "xrbr vijt wwvb uezw")
+            # s.login(os.getenv('EMAIL_SERVER'), os.getenv('EMAIL_PASSWORD'))
 
             # client_message_html = f"""\
             # <html>
@@ -162,15 +162,15 @@ def service_order_add(request):
             # server_message.attach(MIMEText(server_message_html, _subtype='html'))
             
             # client_message["Subject"] = 'Welcome to Mobex Service!'
-            # client_message["From"] = 'ginik0108@gmail.com'
+            # client_message["From"] = os.getenv('EMAIL_SERVER')
             # client_message["To"] = request.POST['email']
 
             # server_message["Subject"] = 'A new service order has arrived'
             # server_message["From"] = request.POST['email']
-            # server_message["To"] = 'ginik0108@gmail.com'
+            # server_message["To"] = os.getenv('EMAIL_SERVER')
 
-            # s.sendmail("ginik0108@gmail.com", request.POST['email'], client_message.as_string())
-            # s.sendmail(request.POST['email'], "ginik0108@gmail.com", server_message.as_string())
+            # s.sendmail(os.getenv('EMAIL_SERVER'), request.POST['email'], client_message.as_string())
+            # s.sendmail(request.POST['email'], os.getenv('EMAIL_SERVER'), server_message.as_string())
             # s.quit()
         except Exception as e:
             messages.warning(request, e)
