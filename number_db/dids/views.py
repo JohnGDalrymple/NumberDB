@@ -19,6 +19,11 @@ from operator import or_
 import requests
 import os
 import re
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import jwt
+import time
 
 email_regex = r"(^[a-zA-Z0-9_.+\-']+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
 
@@ -99,20 +104,12 @@ def check_service_status(status_value):
         return True if status_value else None
 
 
-def check_voice_carrier(voice_carrier_value):
+def check_voice_sms_carrier(carrier_value):
     try:
-        voice_carrier = Voice_Carrier.objects.get(name__iexact = voice_carrier_value)
+        voice_carrier = Voice_Carrier.objects.get(name__iexact = carrier_value)
         return voice_carrier
     except Exception as e:
-        return True if voice_carrier_value else None
-    
-
-def check_sms_carrier(sms_carrier_value):
-    try:
-        sms_carrier = SMS_Carrier.objects.get(name__iexact = sms_carrier_value)
-        return sms_carrier
-    except Exception as e:
-        return True if sms_carrier_value else None
+        return True if carrier_value else None
     
 
 def check_sms_type(sms_type_value):
@@ -137,6 +134,16 @@ def check_service_item(service_item_value):
         return service_item
     except Exception as e:
         return True if service_item_value else None
+    
+
+def is_date(date_value):
+    if date_value:
+        try:
+            datetime.datetime.strptime(date_value, "%Y-%m-%d")
+            return False
+        except Exception:
+            return True
+    else: return False
 
 
 @login_required
@@ -237,7 +244,7 @@ def did(request):
                     if csv_file.multiple_chunks():
                         messages.warning(request, 'Uploaded file is too big (%.2f MB).' % (csv_file.size / (1000 * 1000),))
 
-                    data_df = pd.read_csv(csv_file)
+                    data_df = pd.read_csv(csv_file, dtype=str)
                     data_dict = data_df.to_dict('records')
                     
                     if data_dict != []:
@@ -250,19 +257,21 @@ def did(request):
                             for item in convert_data:
                                 customer_value = check_customer(item['Customer'])
                                 service_status_value = check_service_status(item['Status'])
-                                voice_carrier_value = check_voice_carrier(item['Voice Carrier'])
-                                sms_carrier_value = check_sms_carrier(item['SMS Carrier'])
+                                voice_carrier_value = check_voice_sms_carrier(item['Voice Carrier'])
+                                sms_carrier_value = check_voice_sms_carrier(item['SMS Carrier'])
                                 sms_type_value = check_sms_type(item['SMS Type'])
                                 term_location_value = check_term_location(item['Term Location'])
                                 service_item_1 = check_service_item(item['Service 1'])
                                 service_item_2 = check_service_item(item['Service 2'])
                                 service_item_3 = check_service_item(item['Service 3'])
                                 service_item_4 = check_service_item(item['Service 4'])
+                                print(item['DID'], customer_value, service_status_value, voice_carrier_value, sms_carrier_value, term_location_value)
 
-                                if not item['DID'] or switch(item['In Method']) == True or voice_carrier_value == True or service_status_value == True or switch(item['SMS Enabled']) == True or sms_carrier_value == True or sms_type_value == True or term_location_value == True or switch(item['E911 Enabled Billed']) == True or customer_value == True or service_item_1 == True or service_item_2 == True or service_item_3 == True or service_item_4 == True:
+                                if (not item['DID'].isdigit()) or (switch(item['In Method']) == True) or (voice_carrier_value == True) or (service_status_value == True) or (switch(item['SMS Enabled']) == True) or (sms_carrier_value == True) or (sms_type_value == True) or (term_location_value == True) or (switch(item['E911 Enabled Billed']) == True) or (customer_value == True) or (service_item_1 == True) or (service_item_2 == True) or (service_item_3 == True) or (service_item_4 == True) or not ( not item['Extension'] or item['Extension'].isdigit()) or not ( not item['E911 CID'] or item['E911 CID'].isdigit()) or is_date(item['Change Date']) or is_date(item['Updated Date Time']) or is_date(item['Onboard Date']):
                                     error_flag = True
                                     save_data = Did_Error(
-                                    did_uuid = item['DID uuid'], 
+                                    # did_uuid = item['DID uuid'], 
+                                    did_uuid = uuid.uuid4(), 
                                     did = item['DID'], 
                                     in_method = item['In Method'], 
                                     voice_carrier = item['Voice Carrier'], 
@@ -293,6 +302,7 @@ def did(request):
                                     )
                                     try:
                                         save_data.save()
+                                        print("Error saved!")
                                     except Exception as e:
                                         messages.warning(request, e)
                                 else:
@@ -332,7 +342,8 @@ def did(request):
                                             find_one.save()
                                         except Exception:
                                             save_data = Did(
-                                            did_uuid = item['DID uuid'] if item['DID uuid'] else uuid.uuid4(), 
+                                            # did_uuid = item['DID uuid'] if item['DID uuid'] else uuid.uuid4(), 
+                                            did_uuid = uuid.uuid4(), 
                                             did = item['DID'] if item['DID'] else None, 
                                             in_method = switch(item['In Method']), 
                                             voice_carrier = voice_carrier_value, 
@@ -363,6 +374,7 @@ def did(request):
                                             is_synced = False,
                                             )
                                             save_data.save()
+                                            print("Success saved!")
                                     except Exception as e:
                                         print(e)
                                         messages.warning(request, e)
@@ -421,7 +433,6 @@ def user_edit(request, id):
 @login_required
 def user_add(request):
     if request.method == "POST":
-        form = RegistrationForm(request.POST)
         try:
             users = User(
                 username = request.POST['username'],
@@ -435,6 +446,35 @@ def user_add(request):
             )
             users.full_clean()
             users.save()
+            s = smtplib.SMTP(os.getenv('SMTP_SERVICE'), os.getenv('EMAIL_PORT'))
+            s.starttls()
+            s.login(os.getenv('EMAIL_SERVER'), os.getenv('EMAIL_PASSWORD'))
+
+            client_message_html = f"""\
+            <html>
+                <body>
+                    <p style="font-size:16px">Hello <strong>{request.POST['first_name']}</strong>.</p>
+                    <br>
+                    <p><strong>Congratulations🎉,</strong> You have been invited to become an administrator of the Mobex server.</p>
+                    <p>You can access <a href="{os.getenv('BASE_URL')}" style="text-decoration:none"><strong>Mobex admin panel</strong></a> using below credential</p>
+                    <p>Username: <strong>{request.POST['username']}</strong></p>
+                    <p>Password: <strong>{request.POST['password1']}</strong></p>
+                    <br>
+                    <p>Thank you.</p>
+                    <p style="font-size:16px"><strong>Mobex.</strong></p>
+                </body>
+            </html>
+            """
+
+            client_message = MIMEMultipart('alternative')
+            client_message.attach(MIMEText(client_message_html, _subtype='html'))
+            
+            client_message["Subject"] = 'Welcome to Mobex!'
+            client_message["From"] = os.getenv('EMAIL_SERVER')
+            client_message["To"] = request.POST['email']
+
+            s.sendmail(os.getenv('EMAIL_SERVER'), request.POST['email'], client_message.as_string())
+            s.quit()
 
         except Exception as e:
             messages.warning(request, e)
@@ -508,7 +548,7 @@ def did_add(request):
                 change_date = parse_date(request.POST['change_date']),
                 voice_carrier = Voice_Carrier.objects.get(record_id = int(request.POST['voice_carrier'])) if request.POST['voice_carrier'] else None,
                 sms_enabled = request.POST['sms_enabled'],
-                sms_carrier = SMS_Carrier.objects.get(record_id = int(request.POST['sms_carrier'])) if request.POST['sms_carrier'] else None,
+                sms_carrier = Voice_Carrier.objects.get(record_id = int(request.POST['sms_carrier'])) if request.POST['sms_carrier'] else None,
                 sms_type = SMS_Type.objects.get(record_id = int(request.POST['sms_type'])) if request.POST['sms_type'] else None,
                 sms_campaign = request.POST['sms_campaign'],
                 term_location = Term_Location.objects.get(record_id = int(request.POST['term_location'])) if request.POST['term_location'] else None,
@@ -543,14 +583,13 @@ def did_add(request):
         customers_data = Customer.objects.values_list('record_id', 'full_name')
         status = Status.objects.all()
         voice_carrier = Voice_Carrier.objects.all()
-        sms_carrier = SMS_Carrier.objects.all()
         sms_type = SMS_Type.objects.all()
         term_location = Term_Location.objects.all()
         services = Service.objects.all()
         customers = []
         for item in customers_data:
             customers.append({'id': item[0], 'full_name': item[1]})
-        return render(request, 'did_create.html', {'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'sms_carrier': sms_carrier, 'sms_type': sms_type, 'term_location': term_location, 'services': services})
+        return render(request, 'did_create.html', {'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'sms_carrier': voice_carrier, 'sms_type': sms_type, 'term_location': term_location, 'services': services})
     
 
 @login_required
@@ -604,7 +643,6 @@ def did_edit(request, id):
     customers_data = Customer.objects.values_list('record_id', 'full_name')
     status = Status.objects.all()
     voice_carrier = Voice_Carrier.objects.all()
-    sms_carrier = SMS_Carrier.objects.all()
     sms_type = SMS_Type.objects.all()
     term_location = Term_Location.objects.all()
     services = Service.objects.all()
@@ -612,7 +650,7 @@ def did_edit(request, id):
     for item in customers_data:
             customers.append({'id': item[0], 'full_name': item[1]})
 
-    return render(request, 'did_edit.html', {'did': didData, 'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'sms_carrier': sms_carrier, 'sms_type': sms_type, 'term_location': term_location, 'services': services})
+    return render(request, 'did_edit.html', {'did': didData, 'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'sms_carrier': voice_carrier, 'sms_type': sms_type, 'term_location': term_location, 'services': services})
 
 
 @login_required
@@ -628,7 +666,7 @@ def did_update(request, id):
             did.change_date = parse_date(request.POST['change_date'])
             did.voice_carrier = Voice_Carrier.objects.get(record_id = int(request.POST['voice_carrier'])) if request.POST['voice_carrier'] else None
             did.sms_enabled = request.POST['sms_enabled']
-            did.sms_carrier = SMS_Carrier.objects.get(record_id = int(request.POST['sms_carrier'])) if request.POST['sms_carrier'] else None
+            did.sms_carrier = Voice_Carrier.objects.get(record_id = int(request.POST['sms_carrier'])) if request.POST['sms_carrier'] else None
             did.sms_type = SMS_Type.objects.get(record_id = int(request.POST['sms_type'])) if request.POST['sms_type'] else None
             did.sms_campaign = request.POST['sms_campaign']
             did.term_location = Term_Location.objects.get(record_id = int(request.POST['term_location'])) if request.POST['term_location'] else None
@@ -857,3 +895,76 @@ def did_sync_method(request):
     
     messages.success(request, "DID data has been synchronized with Method.")
     return redirect('/did')
+
+
+def user_verify(request):
+    if request.method == "GET":
+        return render(request, 'verify.html')
+    else:
+        try:
+            user = User.objects.get(username = request.POST["username"])
+
+            payload = {
+                "user_id": user.id,
+                "username": user.username,
+            }
+
+            expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=3)
+            payload["exp"] = expiration
+            token = jwt.encode(payload, os.getenv('JWT_SECRET_KEY'), algorithm='HS256')
+
+            s = smtplib.SMTP(os.getenv('SMTP_SERVICE'), os.getenv('EMAIL_PORT'))
+            s.starttls()
+            s.login(os.getenv('EMAIL_SERVER'), os.getenv('EMAIL_PASSWORD'))
+
+            verify_message_html = f"""\
+            <html>
+                <body>
+                    <p style="font-size:16px">Hello <strong>{user.username}</strong>.</p>
+                    <br>
+                    <p><strong>Mobex Server</strong> had verified your account, so you can reset your password using <a href="http://localhost:8000/reset/password/?verify={token}" style="text-decoration:none"><strong>here link</strong></a> in three hours</p>
+                    <p>After reseting your password, you can access <a href="http://localhost:8000/" style="text-decoration:none"><strong>here</strong></a> using new password</p>
+                    <br>
+                    <p>Thank you.</p>
+                    <p style="font-size:16px"><strong>Mobex.</strong></p>
+                </body>
+            </html>
+            """
+
+            verify_message = MIMEMultipart('alternative')
+            verify_message.attach(MIMEText(verify_message_html, _subtype='html'))
+            
+            verify_message["Subject"] = 'Verify User'
+            verify_message["From"] = os.getenv('EMAIL_SERVER')
+            verify_message["To"] = user.email
+
+            s.sendmail(os.getenv('EMAIL_SERVER'), user.email, verify_message.as_string())
+            s.quit()
+            messages.success(request, f"Please check your email inbox({user.email}).")
+        except Exception as e:
+            messages.warning(request, e)
+        return redirect('/user/verify')
+
+
+def reset_password(request):
+    if request.GET.get('verify'):
+        try:
+            decoded_data = jwt.decode(request.GET.get('verify'), os.getenv('JWT_SECRET_KEY'), algorithms=['HS256'])
+            if request.method == 'GET':
+                return render(request, 'reset_password.html')
+            else:
+                if ( not request.POST['password1'] == request.POST['password2']):
+                    messages.warning(request, "The password is not match, please check confirm password.")
+                else:
+                    try:
+                        user = User.objects.get(id=decoded_data['user_id'])
+                        user.password = make_password(request.POST['password2'])
+                        user.save()
+                        return render(request, 'reset_password_success.html')
+                    except Exception as e:
+                        messages.warning(request, e)
+                return redirect(f"/reset/password/?verify={request.GET.get('verify')}")
+        except jwt.ExpiredSignatureError:
+            return redirect('/')
+        except jwt.InvalidTokenError:
+            return redirect('/')
