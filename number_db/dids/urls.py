@@ -20,6 +20,9 @@ urlpatterns = [
     path('user/create/', views.user_add, name='user_create'),
     path('user/verify/', views.user_verify, name='user_verify'),
     path('reset/password/', views.reset_password, name='reset_password'),
+    path('did_standardization/', views.did_standardization, name='did_standardization'),
+    path('did_standardization/delete/<int:id>', views.did_standardization_delete, name='did_standardization_delete'),
+    path('did_standardization/edit/<int:id>', views.did_standardization_edit, name='did_standardization_edit'),
     # path('register', views.register, name='register'),
     # path('register/success/', views.register_success, name='register_success'),
 ]

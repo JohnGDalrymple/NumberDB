@@ -22,49 +22,53 @@
 {% endblock %}
 {% block body %}
     <div class="container-fluid px-4">
-        <h1 class="mt-4">DIDs</h1>
+        <h1 class="mt-4">DIDs Standardization</h1>
         <ol class="breadcrumb mb-4">
             <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-            <li class="breadcrumb-item active">Edit DID</li>
+            <li class="breadcrumb-item active">Standardization DID</li>
         </ol>
         <div class="bd-example">
             <form action="/did/update/{{ did.id }}" method="POST">
                 {% csrf_token %}
-                
-                <div class="row mb-3">
+                <div class="row mb-2">
                     <div class="col">
-                        <select name="customer" class="form-select p-3" aria-label="Choose Customer">
+                        <span>Customer <strong>:</strong>{% if not did.customer_status %}<span class="text-danger"> Current customer(<strong>{{ did.customer }}</strong>) is not available</span>{% endif %}</span>
+                        <select name="customer" class="form-select p-3 mt-1" aria-label="Choose Customer" required>
                             <option value="">Select customer</option>
                             {% for customer in customers %}
-                            <option value="{{ customer.id }}" {% if did.customer == customer.id %}selected{% endif %}>{{ customer.full_name }}</option>
+                                <option value="{{ customer.id }}" {% if did.customer == customer.full_name %}selected{% endif %}>{{ customer.full_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
+                        <span>Reseller <strong>:</strong></span>
+                        <div class="form-floating mt-1 mb-md-0">
                             <input class="form-control" name="reseller" type="text" value="{{ did.reseller }}" placeholder="Enter your reseller" id="reseller">
                             <label for="did">Enter your reseller</label>
                         </div>
                     </div>
                 </div>
-                <div class="row mb-3">
+                <div class="row mb-2">
                     <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
+                        <span>DID <strong>:</strong>{% if not did.did_status %}<span class="text-danger"> Current did(<strong>{{ did.did }}</strong>) is not available</span>{% endif %}</span>
+                        <div class="form-floating mt-1 mb-md-0">
                             <input class="form-control" name="did" type="number" value="{{ did.did }}" placeholder="DID" id="did" required>
                             <label for="did">Enter your DID</label>
                         </div>
                     </div>
                     <div class="col">
-                        <select name="in_method" class="form-select p-3" aria-label="Choose in method">
+                        <span>In Method <strong>:</strong>{% if not did.in_method_status %}<span class="text-danger"> Current in_method(<strong>{{ did.in_method }}</strong>) is not available</span>{% endif %}</span>
+                        <select name="in_method" class="form-select mt-1 p-3" aria-label="Choose in method" {% if not did.in_method_status %} required {% endif %}>
                             <option value="">Select in method</option>
                             <option value="Yes" {% if did.in_method == "Yes" %}selected{% endif %}>Yes</option>
                             <option value="No" {% if did.in_method == "No" %}selected{% endif %}>No</option>
                         </select>
                     </div>
                 </div>
-                <div class="row mb-3">
+                <div class="row mb-2">
                     <div class="col">
-                        <select name="status" class="form-select p-3" aria-label="Choose status">
+                        <span>Service Status <strong>:</strong>{% if not did.status_status %}<span class="text-danger"> Current service_status(<strong>{{ did.status }}</strong>) is not available</span>{% endif %}</span>
+                        <select name="status" class="form-select mt-1 p-3" aria-label="Choose status" {% if not did.status_status %} required {% endif %}>
                             <option value="">Select status</option>
                             {% for item in status %}
                             <option value="{{ item.record_id }}" {% if did.status == item.record_id %}selected{% endif %}>{{ item.name }}</option>
@@ -72,7 +76,8 @@
                         </select>
                     </div>
                     <div class="col">
-                        <select id="voice_carrier" name="voice_carrier" class="form-select p-3" aria-label="{{ did.voice_carrier }}">
+                        <span>Voice Carrier <strong>:</strong>{% if not did.voice_carrier_status %}<span class="text-danger"> Current voice_carrier(<strong>{{ did.voice_carrier }}</strong>) is not available</span>{% endif %}</span>
+                        <select id="voice_carrier" name="voice_carrier" class="form-select mt-1 p-3" aria-label="{{ did.voice_carrier }}" {% if not did.voice_carrier_status %} required {% endif %}>
                             <option value="">Select voice carrier</option>
                             {% for item in voice_carrier %}
                             <option value="{{ item.record_id }}" {% if did.voice_carrier == item.record_id %}selected{% endif %}>{{ item.name }}</option>
@@ -80,36 +85,41 @@
                         </select>
                     </div>
                 </div>
-                <div class="row mb-3">
+                <div class="row mb-2">
                     <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="email" type="email" value="{{ did.email }}" placeholder="email" id="email">
+                        <span>Email <strong>:</strong>{% if not did.email_status %}<span class="text-danger"> Current email(<strong>{{ did.email }}</strong>) is not available</span>{% endif %}</span>
+                        <div class="form-floating mt-1 mb-md-0">
+                            <input class="form-control" name="email" type="email" value="{{ did.email }}" placeholder="email" id="email" {% if not did.email_status %} required {% endif %}>
                             <label for="email">Enter email</label>
                         </div>
                     </div>
                     <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="onboard_date" type="date" value="{{ did.onboard_date }}" placeholder="onboard_date" id="onboard_date">
+                        <span>Onboard Date <strong>:</strong>{% if not did.onboard_date_status %}<span class="text-danger"> Current onboard_date(<strong>{{ did.onboard_date }}</strong>) is not correct date format</span>{% endif %}</span>
+                        <div class="form-floating mt-1 mb-md-0">
+                            <input class="form-control" name="onboard_date" type="date" value="{{ did.onboard_date }}" placeholder="onboard_date" id="onboard_date" {% if not did.onboard_date_status %} required {% endif %}>
                             <label for="onboard_date">Enter onboard date</label>
                         </div>
                     </div>
                     <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="change_date" type="date" value="{{ did.change_date }}" placeholder="Change Date" id="change_date">
+                        <span>Change Date <strong>:</strong>{% if not did.change_date_status %}<span class="text-danger"> Current change_date(<strong>{{ did.change_date }}</strong>) is not correct date format</span>{% endif %}</span>
+                        <div class="form-floating mt-1 mb-md-0">
+                            <input class="form-control" name="change_date" type="date" value="{{ did.change_date }}" placeholder="Change Date" id="change_date" {% if not did.change_date_status %} required {% endif %}>
                             <label for="change_date">Change Date</label>
                         </div>
                     </div>
                 </div>
-                <div class="row mb-3">
+                <div class="row mb-2">
                     <div class="col">
-                        <select name="sms_enabled" class="form-select p-3" aria-label="Choose sms enable">
+                        <span>SMS Enabled <strong>:</strong>{% if not did.sms_enabled_status %}<span class="text-danger"> Current sms_enabled(<strong>{{ did.sms_enabled }}</strong>) is not available</span>{% endif %}</span>
+                        <select name="sms_enabled" class="form-select mt-1 p-3" aria-label="Choose sms enable" {% if not did.sms_enabled_status %} required {% endif %}>
                             <option value="" selected>Select SMS activation</option>
                             <option value="Yes" {% if did.sms_enabled == "Yes" %}selected{% endif %}>Yes</option>
                             <option value="No" {% if did.sms_enabled == "No" %}selected{% endif %}>No</option>
                         </select>
                     </div>
                     <div class="col">
-                        <select name="sms_carrier" class="form-select p-3" aria-label="Choose sms carrier">
+                        <span>SMS Carrier <strong>:</strong>{% if not did.sms_carrier_status %}<span class="text-danger"> Current sms_carrier(<strong>{{ did.sms_carrier }}</strong>) is not available</span>{% endif %}</span>
+                        <select name="sms_carrier" class="form-select mt-1 p-3" aria-label="Choose sms carrier" {% if not did.sms_carrier_status %} required {% endif %}>
                             <option value="">Select SMS carrier</option>
                             {% for item in sms_carrier %}
                             <option value="{{ item.record_id }}" {% if did.sms_carrier == item.record_id %}selected{% endif %}>{{ item.name }}</option>
@@ -117,9 +127,10 @@
                         </select>
                     </div>
                 </div>
-                <div class="row mb-3">
+                <div class="row mb-2">
                     <div class="col">
-                        <select name="sms_type" class="form-select p-3" aria-label="Choose sms type">
+                        <span>SMS Type <strong>:</strong>{% if not did.sms_type_status %}<span class="text-danger"> Current sms_type(<strong>{{ did.sms_type }}</strong>) is not available</span>{% endif %}</span>
+                        <select name="sms_type" class="form-select mt-1 p-3" aria-label="Choose sms type" {% if not did.sms_type_status %} required {% endif %}>
                             <option value="">Select SMS type</option>
                             {% for item in sms_type %}
                             <option value="{{ item.record_id }}" {% if did.sms_type == item.record_id %}selected{% endif %}>{{ item.name }}</option>
@@ -127,13 +138,15 @@
                         </select>
                     </div>
                     <div class="col">
-                        <div class="form-floating">
+                        <span>SMS Campagin <strong>:</strong></span>
+                        <div class="form-floating mt-1">
                             <input class="form-control" name="sms_campaign" type="text" value="{{ did.sms_campaign }}" placeholder="sms_campaign" id="sms_campaign">
                             <label for="sms_campaign">Enter SMS campagin</label>
                         </div>
                     </div>
                     <div class="col">
-                        <select name="term_location" class="form-select p-3" aria-label="Choose term location">
+                        <span>Term Location <strong>:</strong>{% if not did.term_location_status %}<span class="text-danger"> Current term_location(<strong>{{ did.term_location }}</strong>) is not available</span>{% endif %}</span>
+                        <select name="term_location" class="form-select mt-1 p-3" aria-label="Choose term location" {% if not did.term_location_status %} required {% endif %}>
                             <option value="">Select term location</option>
                             {% for item in term_location %}
                             <option value="{{ item.record_id }}" {% if did.term_location == item.record_id %}selected{% endif %}>{{ item.name }}</option>
@@ -141,50 +154,57 @@
                         </select>
                     </div>
                 </div>
-                <div class="row mb-3">
+                <div class="row mb-2">
                     <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
+                        <span>First Name <strong>:</strong></span>
+                        <div class="form-floating mt-1 mb-md-0">
                             <input class="form-control" name="user_first_name" type="text" value="{{ did.user_first_name }}" placeholder="user_first_name" id="user_first_name">
                             <label for="user_first_name">Enter first name</label>
                         </div>
                     </div>
                     <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
+                        <span>Last Name <strong>:</strong></span>
+                        <div class="form-floating mt-1 mb-md-0">
                             <input class="form-control" name="user_last_name" type="text" value="{{ did.user_last_name }}" placeholder="user_last_name" id="user_last_name">
                             <label for="user_last_name">Enter last name</label>
                         </div>
                     </div>
                     <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="extension" type="number" value="{{ did.extension }}" placeholder="extension" id="extension">
+                        <span>Extension <strong>:</strong>{% if not did.extension_status %}<span class="text-danger"> Current extension(<strong>{{ did.extension }}</strong>) is not available</span>{% endif %}</span>
+                        <div class="form-floating mt-1 mb-md-0">
+                            <input class="form-control" name="extension" type="number" value="{{ did.extension }}" placeholder="extension" id="extension" {% if not did.extension_status %} required {% endif %}>
                             <label for="extension">Enter extension</label>
                         </div>
                     </div>
                 </div>
-                <div class="row mb-3">
+                <div class="row mb-2">
                     <div class="col-3">
-                        <select name="e911_enabled_billed" class="form-select p-3" aria-label="Choose e911 enable and billed">
+                        <span>E911 Enabled Billed <strong>:</strong>{% if not did.e911_enabled_billed_status %}<span class="text-danger"> Current e911_enabled_billed(<strong>{{ did.e911_enabled_billed }}</strong>) is not available</span>{% endif %}</span>
+                        <select name="e911_enabled_billed" class="form-select mt-1 p-3" aria-label="Choose e911 enable and billed" {% if not did.e911_enabled_billed_status %} required {% endif %}>
                             <option value="">Select E911 enable and billed</option>
                             <option value="Yes" {% if did.e911_enabled_billed == "Yes" %}selected{% endif %}>Yes</option>
                             <option value="No" {% if did.e911_enabled_billed == "No" %}selected{% endif %}>No</option>
                         </select>
                     </div>
                     <div class="col-3">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="e911_cid" type="number" value="{{ did.e911_cid }}" placeholder="e911_cid" id="e911_cid">
+                        <span>E911 CID <strong>:</strong>{% if not did.e911_cid_status %}<span class="text-danger"> Current e911_cid(<strong>{{ did.e911_cid }}</strong>) is not available</span>{% endif %}</span>
+                        <div class="form-floating mt-1 mb-md-0">
+                            <input class="form-control" name="e911_cid" type="number" value="{{ did.e911_cid }}" placeholder="e911_cid" id="e911_cid" {% if not did.e911_cid_status %} required {% endif %}>
                             <label for="e911_cid">Enter E911 cid</label>
                         </div>
                     </div>
                     <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
+                        <span>E911 Address <strong>:</strong></span>
+                        <div class="form-floating mt-1 mb-md-0">
                             <input class="form-control" name="e911_address" type="text" value="{{ did.e911_address }}" placeholder="e911_address" id="e911_address">
                             <label for="e911_address">Enter E911 Address</label>
                         </div>
                     </div>
                 </div>
-                <div class="row mb-3">
+                <div class="row mb-2">
                     <div class="col">
-                        <select name="service_1" class="form-select p-3" aria-label="Choose service 1">
+                        <span>Service 1 <strong>:</strong>{% if not did.service_1_status %}<span class="text-danger"> Current service_1(<strong>{{ did.service_1 }}</strong>) is not available</span>{% endif %}</span>
+                        <select name="service_1" class="form-select mt-1 p-3" aria-label="Choose service 1" {% if not did.service_1_status %} required {% endif %}>
                             <option value="">Select service 1</option>
                             {% for item in services %}
                             <option value="{{ item.record_id }}" {% if did.service_1 == item.record_id %}selected{% endif %}>{{ item.name }}</option>
@@ -192,7 +212,8 @@
                         </select>
                     </div>
                     <div class="col">
-                        <select name="service_2" class="form-select p-3" aria-label="Choose service 2">
+                        <span>Service 2 <strong>:</strong>{% if not did.service_2_status %}<span class="text-danger"> Current service_2(<strong>{{ did.service_2 }}</strong>) is not available</span>{% endif %}</span>
+                        <select name="service_2" class="form-select mt-1 p-3" aria-label="Choose service 2" {% if not did.service_2_status %} required {% endif %}>
                             <option value="">Select service 2</option>
                             {% for item in services %}
                             <option value="{{ item.record_id }}" {% if did.service_2 == item.record_id %}selected{% endif %}>{{ item.name }}</option>
@@ -200,7 +221,8 @@
                         </select>
                     </div>
                     <div class="col">
-                        <select name="service_3" class="form-select p-3" aria-label="Choose service 3">
+                        <span>Service 3 <strong>:</strong>{% if not did.service_3_status %}<span class="text-danger"> Current service_3(<strong>{{ did.service_3 }}</strong>) is not available</span>{% endif %}</span>
+                        <select name="service_3" class="form-select mt-1 p-3" aria-label="Choose service 3" {% if not did.service_3_status %} required {% endif %}>
                             <option value="">Select service 3</option>
                             {% for item in services %}
                             <option value="{{ item.record_id }}" {% if did.service_3 == item.record_id %}selected{% endif %}>{{ item.name }}</option>
@@ -208,7 +230,8 @@
                         </select>
                     </div>
                     <div class="col">
-                        <select name="service_4" class="form-select p-3" aria-label="Choose service 4">
+                        <span>Service 4 <strong>:</strong>{% if not did.service_4_status %}<span class="text-danger"> Current service_4(<strong>{{ did.service_4 }}</strong>) is not available</span>{% endif %}</span>
+                        <select name="service_4" class="form-select mt-1 p-3" aria-label="Choose service 4" {% if not did.service_4_status %} required {% endif %}>
                             <option value="">Select service 4</option>
                             {% for item in services %}
                             <option value="{{ item.record_id }}" {% if did.service_4 == item.record_id %}selected{% endif %}>{{ item.name }}</option>
@@ -216,16 +239,17 @@
                         </select>
                     </div>
                 </div>
-                <div class="row mb-3">
+                <div class="row mb-2">
                     <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
+                        <span>Note <strong>:</strong></span>
+                        <div class="form-floating mt-1 mb-md-0">
                             <input class="form-control" name="note" type="text" value="{{ did.note }}" placeholder="note" id="note">
                             <label for="note">Enter note</label>
                         </div>
                     </div>
                 </div>
                 <div class="mt-4 mb-0">
-                    <div class="d-grid"><button class="btn btn-primary btn-block" type="submit">Submit</button></div>
+                    <div class="d-grid"><button class="btn btn-primary btn-block" type="submit">Standardization</button></div>
                 </div>
             </form>
         </div>

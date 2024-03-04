@@ -23,7 +23,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import jwt
-import time
+from dateutil import parser
 
 email_regex = r"(^[a-zA-Z0-9_.+\-']+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
 
@@ -139,7 +139,9 @@ def check_service_item(service_item_value):
 def is_date(date_value):
     if date_value:
         try:
-            datetime.datetime.strptime(date_value, "%Y-%m-%d")
+            dt = parser.parse(date_value)
+            formatted_date = dt.strftime('%Y-%m-%d')
+            # datetime.datetime.strptime(date_value, "%Y-%m-%d")
             return False
         except Exception:
             return True
@@ -153,7 +155,7 @@ def index(request):
 
 @login_required
 def did(request):
-    if 'GET' == request.method:
+    if request.method == 'GET':
         did_error = Did_Error.objects.all().values()
         dids_list = []
         if request.GET.get('search'):
@@ -230,7 +232,7 @@ def did(request):
                     
             return render(request, 'dids.html', {'dids': dids, 'error': did_error})
     
-    if 'POST' == request.method:
+    if request.method == 'POST':
             try:
                 if request.FILES:
                     csv_file = request.FILES["csv_file"]
@@ -265,7 +267,7 @@ def did(request):
                                 service_item_2 = check_service_item(item['Service 2'])
                                 service_item_3 = check_service_item(item['Service 3'])
                                 service_item_4 = check_service_item(item['Service 4'])
-                                print(item['DID'], customer_value, service_status_value, voice_carrier_value, sms_carrier_value, term_location_value)
+                                # print(item['DID'], item['Change Date'], is_date(item['Change Date']), item['Updated Date Time'], is_date(item['Updated Date Time']), item['Onboard Date'], is_date(item['Onboard Date']))
 
                                 if (not item['DID'].isdigit()) or (switch(item['In Method']) == True) or (voice_carrier_value == True) or (service_status_value == True) or (switch(item['SMS Enabled']) == True) or (sms_carrier_value == True) or (sms_type_value == True) or (term_location_value == True) or (switch(item['E911 Enabled Billed']) == True) or (customer_value == True) or (service_item_1 == True) or (service_item_2 == True) or (service_item_3 == True) or (service_item_4 == True) or not ( not item['Extension'] or item['Extension'].isdigit()) or not ( not item['E911 CID'] or item['E911 CID'].isdigit()) or is_date(item['Change Date']) or is_date(item['Updated Date Time']) or is_date(item['Onboard Date']):
                                     error_flag = True
@@ -648,7 +650,7 @@ def did_edit(request, id):
     services = Service.objects.all()
     customers = []
     for item in customers_data:
-            customers.append({'id': item[0], 'full_name': item[1]})
+        customers.append({'id': item[0], 'full_name': item[1]})
 
     return render(request, 'did_edit.html', {'did': didData, 'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'sms_carrier': voice_carrier, 'sms_type': sms_type, 'term_location': term_location, 'services': services})
 
@@ -830,7 +832,6 @@ def export_error_csv(request):
             item.updated_by,
             ])
         
-    Did_Error.objects.all().delete()
     return response
 
 
@@ -968,3 +969,197 @@ def reset_password(request):
             return redirect('/')
         except jwt.InvalidTokenError:
             return redirect('/')
+
+
+@login_required
+def did_standardization(request):
+    did_error = Did_Error.objects.all()
+
+    convert_did_error = []
+
+    size = request.GET.get('size', 10)
+    page_number = request.GET.get('page')
+    paginator = Paginator(did_error, size)
+    dids_error_list = paginator.get_page(page_number)
+
+    for item in dids_error_list:
+        convert_did_error.append({
+            'id': item.id,
+            'did': item.did,
+            'did_status': item.did.isdigit(),
+            'customer': item.customer,
+            'customer_status': False if check_customer(item.customer) == True else True,
+            'reseller': item.reseller,
+            'in_method': item.in_method,
+            'in_method_status': True if item.in_method.lower() == 'yes' or item.in_method.lower() == 'no' or item.in_method == '' else False,
+            'status': item.status,
+            'status_status': False if check_service_status(item.status) == True else True,
+            'change_date': item.change_date,
+            'change_date_status': not is_date(item.change_date),
+            'voice_carrier': item.voice_carrier,
+            'voice_carrier_status': False if check_voice_sms_carrier(item.voice_carrier) == True else True,
+            'sms_carrier': item.sms_carrier,
+            'sms_carrier_status': False if check_voice_sms_carrier(item.sms_carrier) == True else True,
+            'sms_enabled': item.sms_enabled,
+            'sms_enabled_status': True if item.sms_enabled.lower() == 'yes' or item.sms_enabled.lower() == 'no' or item.sms_enabled == '' else False,
+            'sms_type': item.sms_type,
+            'sms_type_status': False if check_sms_type(item.sms_type) == True else True,
+            'sms_campaign': item.sms_campaign,
+            'term_location': item.term_location,
+            'term_location_status': False if check_term_location(item.term_location) == True else True,
+            'user_first_name': item.user_first_name,
+            'user_last_name': item.user_last_name,
+            'extension': item.extension,
+            'extension_status': item.extension.isdigit() if item.extension else True,
+            'email': item.email,
+            'email_status': True if item.email == None or item.email == '' else True if re.search(email_regex, item.email.strip()) else False,
+            'onboard_date': item.onboard_date,
+            'onboard_date_status': not is_date(item.onboard_date),
+            'note': item.note,
+            'e911_enabled_billed': item.e911_enabled_billed,
+            'e911_enabled_billed_status': True if item.e911_enabled_billed.lower() == 'yes' or item.e911_enabled_billed.lower() == 'no' or item.e911_enabled_billed == '' else False,
+            'e911_cid': item.e911_cid,
+            'e911_cid_status': item.e911_cid.isdigit() if item.e911_cid else True,
+            'e911_address': item.e911_address,
+            'service_1': item.service_1,
+            'service_1_status': False if check_service_item(item.service_1) == True else True,
+            'service_2': item.service_2,
+            'service_2_status': False if check_service_item(item.service_2) == True else True,
+            'service_3': item.service_3,
+            'service_3_status': False if check_service_item(item.service_3) == True else True,
+            'service_4': item.service_4,
+            'service_4_status': False if check_service_item(item.service_4) == True else True,
+            'updated_date_time': item.updated_date_time,
+            'updated_date_time_status': not is_date(item.updated_date_time),
+            'updated_by': item.updated_by,
+        })
+
+    convert_data = {
+        'did': convert_did_error,
+        'has_next': dids_error_list.has_next(),
+        'has_previous': dids_error_list.has_previous(),
+        'number': dids_error_list.number,
+        'paginator': dids_error_list.paginator,
+        'next_page_number': dids_error_list.next_page_number() if dids_error_list.has_next() else None,
+        'previous_page_number': dids_error_list.previous_page_number() if dids_error_list.has_previous() else None,
+    }
+
+    return render(request, 'dids_standardization.html', {'dids_error_list': convert_data})
+
+
+@login_required
+def did_standardization_delete(request, id):
+    did_error = Did_Error.objects.get(id=id)
+    did_error.delete()
+    messages.success(request, 'The Non-standard DID was deleted successfully!')
+    return redirect('/did_standardization')
+
+
+@login_required
+def did_standardization_edit(request, id):
+    if request.method == 'GET':
+        did_error = Did_Error.objects.get(id=id)
+        did_error_data = {
+            'id': did_error.id,
+            'did': did_error.did,
+            'did_status': did_error.did.isdigit(),
+            'customer': did_error.customer,
+            'customer_status': False if check_customer(did_error.customer) == True else True,
+            'reseller': did_error.reseller,
+            'in_method': did_error.in_method,
+            'in_method_status': True if did_error.in_method.lower() == 'yes' or did_error.in_method.lower() == 'no' or did_error.in_method == '' else False,
+            'status': did_error.status,
+            'status_status': False if check_service_status(did_error.status) == True else True,
+            'change_date': did_error.change_date,
+            'change_date_status': not is_date(did_error.change_date),
+            'voice_carrier': did_error.voice_carrier,
+            'voice_carrier_status': False if check_voice_sms_carrier(did_error.voice_carrier) == True else True,
+            'sms_carrier': did_error.sms_carrier,
+            'sms_carrier_status': False if check_voice_sms_carrier(did_error.sms_carrier) == True else True,
+            'sms_enabled': did_error.sms_enabled,
+            'sms_enabled_status': True if did_error.sms_enabled.lower() == 'yes' or did_error.sms_enabled.lower() == 'no' or did_error.sms_enabled == '' else False,
+            'sms_type': did_error.sms_type,
+            'sms_type_status': False if check_sms_type(did_error.sms_type) == True else True,
+            'sms_campaign': did_error.sms_campaign,
+            'term_location': did_error.term_location,
+            'term_location_status': False if check_term_location(did_error.term_location) == True else True,
+            'user_first_name': did_error.user_first_name,
+            'user_last_name': did_error.user_last_name,
+            'extension': did_error.extension,
+            'extension_status': did_error.extension.isdigit() if did_error.extension else True,
+            'email': did_error.email,
+            'email_status': True if did_error.email == None or did_error.email == '' else True if re.search(email_regex, did_error.email.strip()) else False,
+            'onboard_date': did_error.onboard_date,
+            'onboard_date_status': not is_date(did_error.onboard_date),
+            'note': did_error.note,
+            'e911_enabled_billed': did_error.e911_enabled_billed,
+            'e911_enabled_billed_status': True if did_error.e911_enabled_billed.lower() == 'yes' or did_error.e911_enabled_billed.lower() == 'no' or did_error.e911_enabled_billed == '' else False,
+            'e911_cid': did_error.e911_cid,
+            'e911_cid_status': did_error.e911_cid.isdigit() if did_error.e911_cid else True,
+            'e911_address': did_error.e911_address,
+            'service_1': did_error.service_1,
+            'service_1_status': False if check_service_item(did_error.service_1) == True else True,
+            'service_2': did_error.service_2,
+            'service_2_status': False if check_service_item(did_error.service_2) == True else True,
+            'service_3': did_error.service_3,
+            'service_3_status': False if check_service_item(did_error.service_3) == True else True,
+            'service_4': did_error.service_4,
+            'service_4_status': False if check_service_item(did_error.service_4) == True else True,
+            'updated_date_time': did_error.updated_date_time,
+            'updated_date_time_status': not is_date(did_error.updated_date_time),
+            'updated_by': did_error.updated_by,
+        }
+
+        customers_data = Customer.objects.values_list('record_id', 'full_name')
+        status = Status.objects.all()
+        voice_carrier = Voice_Carrier.objects.all()
+        sms_type = SMS_Type.objects.all()
+        term_location = Term_Location.objects.all()
+        services = Service.objects.all()
+        customers = []
+        for item in customers_data:
+            customers.append({'id': item[0], 'full_name': item[1]})
+
+        return render(request, 'non_standard_did_edit.html', {'did': did_error_data, 'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'sms_carrier': voice_carrier, 'sms_type': sms_type, 'term_location': term_location, 'services': services})
+    else:
+        try:
+            did_error = Did_Error.objects.get(id=id)
+            did_error.delete()
+            did = Did(
+                did = int(request.POST['did']) if request.POST['did'].isdigit() else None,
+                customer = Customer.objects.get(record_id = int(request.POST['customer'])) if request.POST['customer'] else None,
+                reseller = request.POST['reseller'],
+                in_method = request.POST['in_method'],
+                status = Status.objects.get(record_id = int(request.POST['status'])) if request.POST['status'] else None,
+                change_date = parse_date(request.POST['change_date']),
+                voice_carrier = Voice_Carrier.objects.get(record_id = int(request.POST['voice_carrier'])) if request.POST['voice_carrier'] else None,
+                sms_enabled = request.POST['sms_enabled'],
+                sms_carrier = Voice_Carrier.objects.get(record_id = int(request.POST['sms_carrier'])) if request.POST['sms_carrier'] else None,
+                sms_type = SMS_Type.objects.get(record_id = int(request.POST['sms_type'])) if request.POST['sms_type'] else None,
+                sms_campaign = request.POST['sms_campaign'],
+                term_location = Term_Location.objects.get(record_id = int(request.POST['term_location'])) if request.POST['term_location'] else None,
+                user_first_name = request.POST['user_first_name'],
+                user_last_name = request.POST['user_last_name'],
+                extension = int(request.POST['extension']) if request.POST['extension'].isdigit() else None,
+                email = is_valid_email(request.POST['email']),
+                onboard_date = parse_date(request.POST['onboard_date']),
+                note = request.POST['note'],
+                e911_enabled_billed = request.POST['e911_enabled_billed'],
+                e911_cid = int(request.POST['e911_cid']) if request.POST['e911_cid'].isdigit() else None,
+                e911_address = request.POST['e911_address'],
+                did_uuid = uuid.uuid4(),
+                service_1 = Service.objects.get(record_id = int(request.POST['service_1'])) if request.POST['service_1'] else None,
+                service_2 = Service.objects.get(record_id = int(request.POST['service_2'])) if request.POST['service_2'] else None,
+                service_3 = Service.objects.get(record_id = int(request.POST['service_3'])) if request.POST['service_3'] else None,
+                service_4 = Service.objects.get(record_id = int(request.POST['service_3'])) if request.POST['service_3'] else None,
+                updated_date_time = datetime.datetime.now(),
+                updated_by = request.user,
+                )
+            
+            did.full_clean()
+            did.save()
+            messages.success(request, f"{request.POST['did']} was standardized successfully.")
+        except Exception as e:
+            messages.warning(request, e)
+
+        return redirect('/did_standardization')
