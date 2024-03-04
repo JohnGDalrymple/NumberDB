@@ -1123,8 +1123,7 @@ def did_standardization_edit(request, id):
         return render(request, 'non_standard_did_edit.html', {'did': did_error_data, 'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'sms_carrier': voice_carrier, 'sms_type': sms_type, 'term_location': term_location, 'services': services})
     else:
         try:
-            did_error = Did_Error.objects.get(id=id)
-            did_error.delete()
+            
             did = Did(
                 did = int(request.POST['did']) if request.POST['did'].isdigit() else None,
                 customer = Customer.objects.get(record_id = int(request.POST['customer'])) if request.POST['customer'] else None,
@@ -1158,6 +1157,10 @@ def did_standardization_edit(request, id):
             
             did.full_clean()
             did.save()
+
+            did_error = Did_Error.objects.get(id=id)
+            did_error.delete()
+            
             messages.success(request, f"{request.POST['did']} was standardized successfully.")
         except Exception as e:
             messages.warning(request, e)
