@@ -23,7 +23,7 @@ class E911EnabledBilledValues(models.TextChoices):
 
 
 class Did(models.Model):
-    did = models.BigIntegerField(null=True, blank=True)
+    did = models.BigIntegerField(unique=True, null=True, blank=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True, related_name='customer_dids', to_field='record_id')
     reseller = models.CharField(max_length=200, null=True, blank=True)
     status = models.ForeignKey(Status, on_delete=models.CASCADE, null=True, blank=True, to_field='record_id')

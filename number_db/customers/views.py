@@ -87,7 +87,7 @@ def export_csv(request):
 
 @login_required
 def customer_list(request):
-    if 'GET' == request.method:
+    if request.method == 'GET':
         customers_list = []
         if request.GET.get('search'):
             query = request.GET['search']
@@ -159,7 +159,7 @@ def customer_list(request):
 
             return render(request, 'customers.html', {'customers': customers})
     
-    if 'POST' == request.method:
+    if request.method == 'POST':
         try:
             if request.FILES:
                 csv_file = request.FILES["csv_file"]

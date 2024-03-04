@@ -20,7 +20,8 @@
         &nbsp;Download all data in CSV format
       </a>
       {% if error %}
-      <a id="errorReportButton" class="btn-sm btn btn-danger" download style="float: right; margin-right: 10px;"><span class="fa fa-download"></span> &nbsp;Download Error Report CSV</a>
+      <!-- <a id="errorReportButton" class="btn-sm btn btn-danger" download style="float: right; margin-right: 10px;"><span class="fa fa-download"></span> &nbsp;Download Error Report CSV</a> -->
+      <a class="btn-sm btn btn-danger" href="/did_standardization" style="float: right; margin-right: 10px;"><span class="fa fa-edit"></span> &nbsp;Edit Non-standard DID</a>
       {% endif %}
     </div>
     <div class="card-body">
@@ -139,7 +140,6 @@
                 <a class="btn btn-sm btn-warning" href="edit/{{ did.id }}"><span class="fa fa-edit"></span> Edit</a>
                 <a class="btn btn-sm btn-danger" href="delete/{{ did.id }}"><span class="fa fa-trash"></span> Delete</a>
               </td>
-            </tr>
             </tr>
             {% endfor %}
           </tbody>

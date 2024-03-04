@@ -1,0 +1,179 @@
+{% extends 'layout/app.html' %} {% load static %} {% block body %}
+<div class="container-fluid px-4">
+  <h1 class="mt-4">DIDs Standardization</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+    <li class="breadcrumb-item active">DIDs Standardization</li>
+  </ol>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <i class="fas fa-table me-1"></i>
+      Standardization for non-standard DIDs
+      </div>
+    <div class="card-body">
+      <hr>
+      <div class="d-flex mb-3">
+          <form class="form-inline ms-auto w-100">
+            <div class="input-group">
+                <input class="form-control" type="text" name="search" value="{{ request.GET.search }}" placeholder="Search in non-standard DID..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
+                <button class="btn btn-secondary" type="submit"><i class="fas fa-search"></i></button>
+            </div>
+          </form>
+      </div>
+      {% for message in messages %}
+      <div
+        class="alert alert-{{ message.tags }} alert-dismissible"
+        role="alert"
+      >
+        {{ message }}
+      </div>
+      {% endfor %}
+      <div class="table-container">
+        <table
+          class="table table-bordered"
+          id="dataTable"
+          width="100%"
+          cellspacing="0"
+        >
+          <thead>
+            <tr>
+              <!-- <th scope="col">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="fullCheckAction" onclick="fullCheck()"/>
+                </div>
+              </th> -->
+              <th>DID</th>
+              <th>Customer</th>
+              <th>Reseller</th>
+              <th>In Method</th>
+              <th>Voice Carrier</th>
+              <th>Status</th>
+              <th>Change Date</th>
+              <th>SMS Enabled</th>
+              <th>SMS Carrier</th>
+              <th>SMS Type</th>
+              <th>SMS Campaign</th>
+              <th>Term Location</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Extension</th>
+              <th>Email</th>
+              <th>Onboard Date</th>
+              <th>Note</th>
+              <th>E911 Enabled_Billed</th>
+              <th>E911 CID</th>
+              <th>E911 Address</th>
+              <th>Service 1</th>
+              <th>Service 2</th>
+              <th>Service 3</th>
+              <th>Service 4</th>
+              <th>Update Date Time</th>
+              <th>Update By</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for did in dids_error_list.did %}
+            <tr class="table-row" id="tr_{{did.id}}">
+              <!-- <th scope="row">
+                <div class="form-check">
+                  <input class="form-check-input item" type="checkbox" value="" id="select_{{did.id}}"/>
+                </div>
+              </th> -->
+              <td {% if not did.did_status %}class="text-danger"{% endif %}>{{ did.did }}</td>
+              <td {% if not did.customer_status %}class="text-danger"{% endif %}>{{ did.customer }}</td>
+              <td>{{ did.reseller }}</td>
+              <td {% if not did.in_method_status %}class="text-danger"{% endif %}>{{ did.in_method }}</td>
+              <td {% if not did.voice_carrier_status %}class="text-danger"{% endif %}>{{ did.voice_carrier }}</td>
+              <td {% if not did.status_status %}class="text-danger"{% endif %}>{{ did.status }}</td>
+              <td {% if not did.change_date_status %}class="text-danger"{% endif %}>{{ did.change_date }}</td>
+              <td {% if not did.sms_enabled_status %}class="text-danger"{% endif %}>{{ did.sms_enabled }}</td>
+              <td {% if not did.sms_carrier_status %}class="text-danger"{% endif %}>{{ did.sms_carrier }}</td>
+              <td {% if not did.sms_type_status %}class="text-danger"{% endif %}>{{ did.sms_type }}</td>
+              <td>{{ did.sms_campaign }}</td>
+              <td {% if not did.term_location_status %}class="text-danger"{% endif %}>{{ did.term_location }}</td>
+              <td>{{ did.user_first_name }}</td>
+              <td>{{ did.user_last_name }}</td>
+              <td {% if not did.extension_status %}class="text-danger"{% endif %}>{{ did.extension }}</td>
+              <td {% if not did.email_status %}class="text-danger"{% endif %}>{{ did.email }}</td>
+              <td {% if not did.onboard_date_status %}class="text-danger"{% endif %}>{{ did.onboard_date }}</td>
+              <td>{{ did.note }}</td>
+              <td {% if not did.e911_enabled_billed_status %}class="text-danger"{% endif %}>{{ did.e911_enabled_billed }}</td>
+              <td {% if not did.e911_cid_status %}class="text-danger"{% endif %}>{{ did.e911_cid }}</td>
+              <td>{{ did.e911_address }}</td>
+              <td {% if not did.service_1_status %}class="text-danger"{% endif %}>{{ did.service_1 }}</td>
+              <td {% if not did.service_2_status %}class="text-danger"{% endif %}>{{ did.service_2 }}</td>
+              <td {% if not did.service_3_status %}class="text-danger"{% endif %}>{{ did.service_3 }}</td>
+              <td {% if not did.service_4_status %}class="text-danger"{% endif %}>{{ did.service_4 }}</td>
+              <td {% if not did.updated_date_time_status %}class="text-danger"{% endif %}>{{ did.updated_date_time }}</td>
+              <td>{{ did.updated_by }}</td>
+              <td style="display: flex; justify-content: space-between;">
+                <a class="btn btn-sm btn-warning" href="edit/{{ did.id }}"><span class="fa fa-edit"></span> Standardization</a>
+                <a class="btn btn-sm btn-danger" href="delete/{{ did.id }}"><span class="fa fa-trash"></span> Delete</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="d-flex flex-row justify-content-end mt-3">
+        <form method="get">
+          <input type="hidden" name="search" value="{{ request.GET.search }}">
+          <select class="form-select form-select" name="size" aria-label=".form-select-sm example" onchange="this.form.submit()">
+            <option value="10" {% if request.GET.size == "10" %}selected{% endif %}>10</option>
+            <option value="25" {% if request.GET.size == "25" %}selected{% endif %}>25</option>
+            <option value="50" {% if request.GET.size == "50" %}selected{% endif %}>50</option>
+          </select>
+        </form>
+        <nav aria-label="...">
+          <ul class="pagination">
+            {% if not dids_error_list.has_previous %}
+              <li class="page-item disabled"><a class="page-link" href="#"> << </a></li>
+              <li class="page-item disabled"><a class="page-link" href="#"> < </a></li>
+            {% else %}
+              {% if not request.GET.search %}
+                <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page=1"{% else %}href="?page=1"{% endif %}> << </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page={{ dids_error_list.previous_page_number }}"{% else %}href="?page={{ dids_error_list.previous_page_number }}"{% endif %}> < </a>
+                </li>
+              {% else %}
+                <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}&size={{ request.GET.size }}&page=1"{% else %}href="?search={{request.GET.search}}&page=1"{% endif %}> << </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}size={{ request.GET.size }}&page={{ dids_error_list.previous_page_number }}"{% else %}href="?search={{request.GET.search}}&page={{ dids_error_list.previous_page_number }}"{% endif %}> < </a>
+                </li>
+              {% endif %}
+            {% endif %}
+            <li class="page-item">
+              <span class="page-link">{{ dids_error_list.number }} / {{ dids_error_list.paginator.num_pages }}</span>
+            </li>
+            {% if not dids_error_list.has_next %}
+              <li class="page-item disabled"><a class="page-link" href="#"> > </a></li>
+              <li class="page-item disabled"><a class="page-link" href="#"> >> </a></li>
+            {% else %}
+              {% if request.GET.search %}
+              <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}&size={{ request.GET.size }}&page={{ dids_error_list.next_page_number }}"{% else %}href="?search={{request.GET.search}}&page={{ dids_error_list.next_page_number }}"{% endif %}> > </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}&size={{ request.GET.size }}&page={{ dids_error_list.paginator.num_pages }}"{% else %}href="?search={{request.GET.search}}&page={{ dids_error_list.paginator.num_pages }}"{% endif %}> >> </a>
+                </li>
+              {% else %}
+              <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page={{ dids_error_list.next_page_number }}"{% else %}href="?page={{ dids_error_list.next_page_number }}"{% endif %}> > </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page={{ dids_error_list.paginator.num_pages }}"{% else %}href="?page={{ dids_error_list.paginator.num_pages }}"{% endif %}> >> </a>
+                </li>
+              {% endif %}
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block javascript %} {% endblock %}

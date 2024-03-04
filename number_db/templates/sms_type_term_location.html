@@ -65,7 +65,6 @@
                     {% endif %}
                   </td>
                 </tr>
-                </tr>
                 {% endfor %}
               </tbody>
             </table>
@@ -104,7 +103,6 @@
                     <button type="button" class="btn btn-sm btn-warning" onclick="editTermLocation('{{item.id}}')" data-bs-toggle="modal" data-bs-target="#edit_term_location"><span class="fa fa-edit"></span> Edit</button>
                     <a class="btn btn-sm btn-danger" href="/assist_did/term_location_delete/{{ item.id }}"><span class="fa fa-trash"></span> Delete</a>
                   </td>
-                </tr>
                 </tr>
                 {% endfor %}
               </tbody>
