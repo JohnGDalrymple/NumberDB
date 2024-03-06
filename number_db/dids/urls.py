@@ -23,6 +23,7 @@ urlpatterns = [
     path('did_standardization/', views.did_standardization, name='did_standardization'),
     path('did_standardization/delete/<int:id>', views.did_standardization_delete, name='did_standardization_delete'),
     path('did_standardization/edit/<int:id>', views.did_standardization_edit, name='did_standardization_edit'),
+    path('did_standardization/multi_standardization', views.multi_standardization, name='multi_standardization'),
     # path('register', views.register, name='register'),
     # path('register/success/', views.register_success, name='register_success'),
 ]
