@@ -137,8 +137,10 @@
               <td>{{ did.updated_date_time | date:"d-m-Y" }}</td>
               <td>{{ did.updated_by }}</td>
               <td style="display: flex; justify-content: space-between;">
-                <a class="btn btn-sm btn-warning" href="edit/{{ did.id }}"><span class="fa fa-edit"></span> Edit</a>
-                <a class="btn btn-sm btn-danger" href="delete/{{ did.id }}"><span class="fa fa-trash"></span> Delete</a>
+                {% if did.is_active %}
+                  <a class="btn btn-sm btn-warning" href="edit/{{ did.id }}"><span class="fa fa-edit"></span> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="delete/{{ did.id }}"><span class="fa fa-trash"></span> Delete</a>
+                {% endif %}
               </td>
             </tr>
             {% endfor %}

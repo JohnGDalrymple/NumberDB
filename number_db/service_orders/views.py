@@ -13,6 +13,8 @@ from operator import or_
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import pymsteams
+import os
 
 # Create your views here.
 
@@ -117,61 +119,71 @@ def service_order_add(request):
             service_order.full_clean()
             service_order.save()
 
-            # s = smtplib.SMTP(os.getenv('SMTP_SERVICE'), os.getenv('EMAIL_PORT'))
-            # s.starttls()
-            # s.login(os.getenv('EMAIL_SERVER'), os.getenv('EMAIL_PASSWORD'))
+            s = smtplib.SMTP(os.getenv('SMTP_SERVICE'), os.getenv('EMAIL_PORT'))
+            s.starttls()
+            s.login(os.getenv('EMAIL_SERVER'), os.getenv('EMAIL_PASSWORD'))
 
-            # client_message_html = f"""\
-            # <html>
-            #     <body>
-            #         <p style="font-size:16px">Hello <strong>{request.POST['username']}</strong>.</p>
-            #         <br>
-            #         <p><strong>Congratulations🎉,</strong> The service order you requested has been registered correctly.</p>
-            #         <p>Our support team will review and let you know soon.</p>
-            #         <br>
-            #         <p>Thank you.</p>
-            #         <p style="font-size:16px"><strong>Mobex.</strong></p>
-            #     </body>
-            # </html>
-            # """
+            client_message_html = f"""\
+            <html>
+                <body>
+                    <p style="font-size:16px">Hello <strong>{request.POST['username']}</strong>.</p>
+                    <br>
+                    <p><strong>Congratulations🎉,</strong> The service order you requested has been registered correctly.</p>
+                    <p>Our support team will review and let you know soon.</p>
+                    <br>
+                    <p>Thank you.</p>
+                    <p style="font-size:16px"><strong>Mobex.</strong></p>
+                </body>
+            </html>
+            """
 
-            # server_message_html = f"""\
-            # <html>
-            #     <body>
-            #         <p style="font-size:16px">Hello <strong>{request.user.username}</strong>.</p>
-            #         <br>
-            #         <p>A new service order was created.</p>
-            #         <p>Please review the service order and accept it.</p>
-            #         <br>
-            #         <p>Here is the detailed information.</p>
-            #         <p>Requested username: <strong>{request.POST['username']}</strong></p>
-            #         <p>Requested email: <strong>{request.POST['email']}</strong></p>
-            #         <p>Requested number: <strong>{request.POST['number']}</strong></p>
-            #         <p>Requested port date: <strong>{request.POST['requested_port_date']}</strong></p>
-            #         <p>Requested E911 number: <strong>{request.POST['e911_number']}</strong></p>
-            #         <p>Requested E911 address: <strong>{request.POST['e911_address']}</strong></p>
-            #         <p>Requested description: {request.POST['texting']}</p>
-            #         <p>Thank you.</p>
-            #     </body>
-            # </html>
-            # """
+            server_message_html = f"""\
+            <html>
+                <body>
+                    <p style="font-size:16px">Hello <strong>{request.user.username}</strong>.</p>
+                    <br>
+                    <p>A new service order was created.</p>
+                    <p>Please review the service order and accept it.</p>
+                    <br>
+                    <p>Here is the detailed information.</p>
+                    <p>Requested username: <strong>{request.POST['username']}</strong></p>
+                    <p>Requested email: <strong>{request.POST['email']}</strong></p>
+                    <p>Requested number: <strong>{request.POST['number']}</strong></p>
+                    <p>Requested port date: <strong>{request.POST['requested_port_date']}</strong></p>
+                    <p>Requested E911 number: <strong>{request.POST['e911_number']}</strong></p>
+                    <p>Requested E911 address: <strong>{request.POST['e911_address']}</strong></p>
+                    <p>Requested description: {request.POST['texting']}</p>
+                    <p>Thank you.</p>
+                </body>
+            </html>
+            """
 
-            # client_message = MIMEMultipart('alternative')
-            # server_message = MIMEMultipart('alternative')
-            # client_message.attach(MIMEText(client_message_html, _subtype='html'))
-            # server_message.attach(MIMEText(server_message_html, _subtype='html'))
+            client_message = MIMEMultipart('alternative')
+            server_message = MIMEMultipart('alternative')
+            client_message.attach(MIMEText(client_message_html, _subtype='html'))
+            server_message.attach(MIMEText(server_message_html, _subtype='html'))
             
-            # client_message["Subject"] = 'Welcome to Mobex Service!'
-            # client_message["From"] = os.getenv('EMAIL_SERVER')
-            # client_message["To"] = request.POST['email']
+            client_message["Subject"] = 'Welcome to Mobex Service!'
+            client_message["From"] = os.getenv('EMAIL_SERVER')
+            client_message["To"] = request.POST['email']
 
-            # server_message["Subject"] = 'A new service order has arrived'
-            # server_message["From"] = request.POST['email']
-            # server_message["To"] = os.getenv('EMAIL_SERVER')
+            server_message["Subject"] = 'A new service order has arrived'
+            server_message["From"] = request.POST['email']
+            server_message["To"] = os.getenv('EMAIL_SERVER')
 
-            # s.sendmail(os.getenv('EMAIL_SERVER'), request.POST['email'], client_message.as_string())
-            # s.sendmail(request.POST['email'], os.getenv('EMAIL_SERVER'), server_message.as_string())
-            # s.quit()
+            s.sendmail(os.getenv('EMAIL_SERVER'), request.POST['email'], client_message.as_string())
+            s.sendmail(request.POST['email'], os.getenv('EMAIL_SERVER'), server_message.as_string())
+            s.quit()
+
+            post_create_msg = pymsteams.connectorcard(os.getenv('TEAMS_WEBHOOK_URL'))
+            post_create_msg.title("A new service order was created.")
+            msg_text = f"\nHere is the detailed information.\n Requested username: {request.POST['username']}\n Requested email: {request.POST['email']}\n Requested number: {request.POST['number']}\n"
+            msg_text += f" Requested port date: {request.POST['requested_port_date']}\n" if request.POST['requested_port_date'] else ''
+            msg_text += f" Requested E911 number: {request.POST['e911_number']}\n" if request.POST['e911_number'] else ''
+            msg_text += f" Requested E911 address: {request.POST['e911_address']}\n" if request.POST['e911_address'] else ''
+            msg_text += f" Requested description: {request.POST['texting']}\n" if request.POST['texting'] else ''
+            post_create_msg.text(msg_text)
+            post_create_msg.send()
         except Exception as e:
             messages.warning(request, e)
 
@@ -211,5 +223,6 @@ def service_order_update(request, id):
             'requested_port_date': service_order.requested_port_date.strftime('%Y-%m-%d'),
             'e911_number': service_order.e911_number,
             'e911_address': service_order.e911_address,
+            'texting': service_order.texting,
         }
         return render(request, 'service_order_edit.html', {'service_order': service_order_data})
