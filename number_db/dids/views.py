@@ -24,6 +24,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import jwt
 from dateutil import parser
+import json
 
 email_regex = r"(^[a-zA-Z0-9_.+\-']+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
 
@@ -583,14 +584,43 @@ def did_add(request):
         return redirect('/did')
     else:
         customers_data = Customer.objects.values_list('record_id', 'full_name')
-        status = Status.objects.all()
-        voice_carrier = Voice_Carrier.objects.all()
-        sms_type = SMS_Type.objects.all()
-        term_location = Term_Location.objects.all()
-        services = Service.objects.all()
+        status_data = Status.objects.all()
+        voice_carrier_data = Voice_Carrier.objects.all()
+        sms_type_data = SMS_Type.objects.all()
+        term_location_data = Term_Location.objects.all()
+        services_data = Service.objects.all()
+
         customers = []
+        status = []
+        voice_carrier = []
+        sms_type = []
+        term_location = []
+        services = []
+
         for item in customers_data:
-            customers.append({'id': item[0], 'full_name': item[1]})
+            if str(item[0]).isdigit():
+                customers.append({'id': item[0], 'full_name': item[1]})
+
+        for item in status_data:
+            if str(item.record_id).isdigit():
+                status.append({'id': item.record_id, 'name': item.name})
+
+        for item in voice_carrier_data:
+            if str(item.record_id).isdigit():
+                voice_carrier.append({'id': item.record_id, 'name': item.name})
+
+        for item in sms_type_data:
+            if str(item.record_id).isdigit():
+                sms_type.append({'id': item.record_id, 'name': item.name})
+
+        for item in term_location_data:
+            if str(item.record_id).isdigit():
+                term_location.append({'id': item.record_id, 'name': item.name})
+
+        for item in services_data:
+            if str(item.record_id).isdigit():
+                services.append({'id': item.record_id, 'name': item.name})
+
         return render(request, 'did_create.html', {'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'sms_carrier': voice_carrier, 'sms_type': sms_type, 'term_location': term_location, 'services': services})
     
 
@@ -643,14 +673,42 @@ def did_edit(request, id):
     }
 
     customers_data = Customer.objects.values_list('record_id', 'full_name')
-    status = Status.objects.all()
-    voice_carrier = Voice_Carrier.objects.all()
-    sms_type = SMS_Type.objects.all()
-    term_location = Term_Location.objects.all()
-    services = Service.objects.all()
+    status_data = Status.objects.all()
+    voice_carrier_data = Voice_Carrier.objects.all()
+    sms_type_data = SMS_Type.objects.all()
+    term_location_data = Term_Location.objects.all()
+    services_data = Service.objects.all()
+
     customers = []
+    status = []
+    voice_carrier = []
+    sms_type = []
+    term_location = []
+    services = []
+
     for item in customers_data:
-        customers.append({'id': item[0], 'full_name': item[1]})
+        if str(item[0]).isdigit():
+            customers.append({'id': item[0], 'full_name': item[1]})
+
+    for item in status_data:
+        if str(item.record_id).isdigit():
+            status.append({'id': item.record_id, 'name': item.name})
+
+    for item in voice_carrier_data:
+        if str(item.record_id).isdigit():
+            voice_carrier.append({'id': item.record_id, 'name': item.name})
+
+    for item in sms_type_data:
+        if str(item.record_id).isdigit():
+            sms_type.append({'id': item.record_id, 'name': item.name})
+
+    for item in term_location_data:
+        if str(item.record_id).isdigit():
+            term_location.append({'id': item.record_id, 'name': item.name})
+
+    for item in services_data:
+        if str(item.record_id).isdigit():
+            services.append({'id': item.record_id, 'name': item.name})
 
     return render(request, 'did_edit.html', {'did': didData, 'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'sms_carrier': voice_carrier, 'sms_type': sms_type, 'term_location': term_location, 'services': services})
 
@@ -973,10 +1031,20 @@ def reset_password(request):
 
 @login_required
 def did_standardization(request):
-    did_error = Did_Error.objects.all()
-
+    did_error = None
+    
     convert_did_error = []
 
+    if request.GET.get('search'):
+        query = request.GET['search']
+        q_objects = Q()
+        for field in default_data_header:
+            q_objects |= Q(**{field + '__icontains': query})
+
+        did_error = Did_Error.objects.filter(q_objects)
+    else:
+        did_error = Did_Error.objects.all()
+        
     size = request.GET.get('size', 10)
     page_number = request.GET.get('page')
     paginator = Paginator(did_error, size)
@@ -991,17 +1059,15 @@ def did_standardization(request):
             'customer_status': False if check_customer(item.customer) == True else True,
             'reseller': item.reseller,
             'in_method': item.in_method,
-            'in_method_status': True if item.in_method.lower() == 'yes' or item.in_method.lower() == 'no' or item.in_method == '' else False,
+            'in_method_status': True if item.in_method == None or item.in_method.lower() == 'yes' or item.in_method.lower() == 'no' or item.in_method == '' else False,
             'status': item.status,
             'status_status': False if check_service_status(item.status) == True else True,
-            'change_date': item.change_date,
-            'change_date_status': not is_date(item.change_date),
             'voice_carrier': item.voice_carrier,
             'voice_carrier_status': False if check_voice_sms_carrier(item.voice_carrier) == True else True,
             'sms_carrier': item.sms_carrier,
             'sms_carrier_status': False if check_voice_sms_carrier(item.sms_carrier) == True else True,
             'sms_enabled': item.sms_enabled,
-            'sms_enabled_status': True if item.sms_enabled.lower() == 'yes' or item.sms_enabled.lower() == 'no' or item.sms_enabled == '' else False,
+            'sms_enabled_status': True if item.sms_enabled == None or item.sms_enabled.lower() == 'yes' or item.sms_enabled.lower() == 'no' or item.sms_enabled == '' else False,
             'sms_type': item.sms_type,
             'sms_type_status': False if check_sms_type(item.sms_type) == True else True,
             'sms_campaign': item.sms_campaign,
@@ -1017,7 +1083,7 @@ def did_standardization(request):
             'onboard_date_status': not is_date(item.onboard_date),
             'note': item.note,
             'e911_enabled_billed': item.e911_enabled_billed,
-            'e911_enabled_billed_status': True if item.e911_enabled_billed.lower() == 'yes' or item.e911_enabled_billed.lower() == 'no' or item.e911_enabled_billed == '' else False,
+            'e911_enabled_billed_status': True if item.e911_enabled_billed == None or item.e911_enabled_billed.lower() == 'yes' or item.e911_enabled_billed.lower() == 'no' or item.e911_enabled_billed == '' else False,
             'e911_cid': item.e911_cid,
             'e911_cid_status': item.e911_cid.isdigit() if item.e911_cid else True,
             'e911_address': item.e911_address,
@@ -1029,10 +1095,46 @@ def did_standardization(request):
             'service_3_status': False if check_service_item(item.service_3) == True else True,
             'service_4': item.service_4,
             'service_4_status': False if check_service_item(item.service_4) == True else True,
-            'updated_date_time': item.updated_date_time,
-            'updated_date_time_status': not is_date(item.updated_date_time),
             'updated_by': item.updated_by,
         })
+
+    customers_data = Customer.objects.values_list('record_id', 'full_name')
+    status_data = Status.objects.all()
+    voice_carrier_data = Voice_Carrier.objects.all()
+    sms_type_data = SMS_Type.objects.all()
+    term_location_data = Term_Location.objects.all()
+    services_data = Service.objects.all()
+
+    customers = []
+    status = []
+    voice_carrier = []
+    sms_type = []
+    term_location = []
+    services = []
+
+    for item in customers_data:
+        if str(item[0]).isdigit():
+            customers.append({'id': item[0], 'full_name': item[1]})
+
+    for item in status_data:
+        if str(item.record_id).isdigit():
+            status.append({'id': item.record_id, 'name': item.name})
+
+    for item in voice_carrier_data:
+        if str(item.record_id).isdigit():
+            voice_carrier.append({'id': item.record_id, 'name': item.name})
+
+    for item in sms_type_data:
+        if str(item.record_id).isdigit():
+            sms_type.append({'id': item.record_id, 'name': item.name})
+
+    for item in term_location_data:
+        if str(item.record_id).isdigit():
+            term_location.append({'id': item.record_id, 'name': item.name})
+
+    for item in services_data:
+        if str(item.record_id).isdigit():
+            services.append({'id': item.record_id, 'name': item.name})
 
     convert_data = {
         'did': convert_did_error,
@@ -1042,6 +1144,13 @@ def did_standardization(request):
         'paginator': dids_error_list.paginator,
         'next_page_number': dids_error_list.next_page_number() if dids_error_list.has_next() else None,
         'previous_page_number': dids_error_list.previous_page_number() if dids_error_list.has_previous() else None,
+        'customers': customers,
+        'status': status,
+        'voice_carrier': voice_carrier,
+        'sms_carrier': voice_carrier,
+        'sms_type': sms_type,
+        'term_location': term_location,
+        'services': services
     }
 
     return render(request, 'dids_standardization.html', {'dids_error_list': convert_data})
@@ -1111,19 +1220,46 @@ def did_standardization_edit(request, id):
         }
 
         customers_data = Customer.objects.values_list('record_id', 'full_name')
-        status = Status.objects.all()
-        voice_carrier = Voice_Carrier.objects.all()
-        sms_type = SMS_Type.objects.all()
-        term_location = Term_Location.objects.all()
-        services = Service.objects.all()
+        status_data = Status.objects.all()
+        voice_carrier_data = Voice_Carrier.objects.all()
+        sms_type_data = SMS_Type.objects.all()
+        term_location_data = Term_Location.objects.all()
+        services_data = Service.objects.all()
+
         customers = []
+        status = []
+        voice_carrier = []
+        sms_type = []
+        term_location = []
+        services = []
+
         for item in customers_data:
-            customers.append({'id': item[0], 'full_name': item[1]})
+            if str(item[0]).isdigit():
+                customers.append({'id': item[0], 'full_name': item[1]})
+
+        for item in status_data:
+            if str(item.record_id).isdigit():
+                status.append({'id': item.record_id, 'name': item.name})
+
+        for item in voice_carrier_data:
+            if str(item.record_id).isdigit():
+                voice_carrier.append({'id': item.record_id, 'name': item.name})
+
+        for item in sms_type_data:
+            if str(item.record_id).isdigit():
+                sms_type.append({'id': item.record_id, 'name': item.name})
+
+        for item in term_location_data:
+            if str(item.record_id).isdigit():
+                term_location.append({'id': item.record_id, 'name': item.name})
+
+        for item in services_data:
+            if str(item.record_id).isdigit():
+                services.append({'id': item.record_id, 'name': item.name})
 
         return render(request, 'non_standard_did_edit.html', {'did': did_error_data, 'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'sms_carrier': voice_carrier, 'sms_type': sms_type, 'term_location': term_location, 'services': services})
     else:
         try:
-            
             did = Did(
                 did = int(request.POST['did']) if request.POST['did'].isdigit() else None,
                 customer = Customer.objects.get(record_id = int(request.POST['customer'])) if request.POST['customer'] else None,
@@ -1165,4 +1301,53 @@ def did_standardization_edit(request, id):
         except Exception as e:
             messages.warning(request, e)
 
+        return redirect('/did_standardization')
+
+
+@login_required
+def multi_standardization(request):
+    if request.method == 'POST':
+        request_data = json.loads(request.body)
+
+        for item in request_data:
+            try:
+                new_did = Did(
+                    did_uuid = uuid.uuid4(), 
+                    did = int(item['did']) if item['did'] else None, 
+                    in_method = switch(item['in_method']), 
+                    voice_carrier = Voice_Carrier.objects.get(record_id = int(item['voice_carrier'])) if item['voice_carrier'].isdigit() else None, 
+                    status = Status.objects.get(record_id = int(item['status'])) if item['status'].isdigit() else None,
+                    change_date =  datetime.datetime.now(), 
+                    sms_enabled = switch(item['in_method']), 
+                    sms_carrier = Voice_Carrier.objects.get(record_id = int(item['sms_carrier'])) if item['sms_carrier'].isdigit() else None,
+                    sms_type = SMS_Type.objects.get(record_id = int(item['sms_type'])) if item['sms_type'].isdigit() else None,
+                    sms_campaign = item['sms_campaign'],
+                    term_location = Term_Location.objects.get(record_id = int(item['term_location'])) if item['term_location'].isdigit() else None,
+                    customer = Customer.objects.get(record_id = int(item['customer'])) if item['customer'].isdigit() else None,
+                    reseller = item['reseller'],
+                    user_first_name = item['user_first_name'],
+                    user_last_name = item['user_last_name'],
+                    extension = int(item['extension']) if item['extension'].isdigit() else None,
+                    email = item['email'],
+                    onboard_date = parse_date(item['onboard_date']),
+                    note = item['note'],
+                    e911_enabled_billed = switch(item['e911_enabled_billed']),
+                    e911_cid = int(item['e911_cid']) if item['e911_cid'].isdigit() else None,
+                    e911_address = item['e911_address'],
+                    service_1 = Service.objects.get(record_id = int(item['service_1'])) if item['service_1'].isdigit() else None,
+                    service_2 = Service.objects.get(record_id = int(item['service_2'])) if item['service_2'].isdigit() else None,
+                    service_3 = Service.objects.get(record_id = int(item['service_3'])) if item['service_3'].isdigit() else None,
+                    service_4 = Service.objects.get(record_id = int(item['service_4'])) if item['service_4'].isdigit() else None,
+                    updated_date_time = datetime.datetime.now(),
+                    updated_by = item['updated_by'],
+                )
+                new_did.save()
+
+                error_did = Did_Error(id = int(item['id']))
+                error_did.delete()
+                
+            except Exception as e:
+                messages.warning(request, e)
+
+        messages.success(request, 'Multi Standardization was successflly.')
         return redirect('/did_standardization')

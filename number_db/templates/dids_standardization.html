@@ -1,4 +1,28 @@
-{% extends 'layout/app.html' %} {% load static %} {% block body %}
+{% extends 'layout/app.html' %}
+{% load static %}
+{% block stylesheet %}
+  <style>
+    /* .error-input::placeholder { */
+      /* Firefox, Chrome, Opera */ 
+      /* color: #DC3545;
+      opacity: 0.7;
+    } 
+    .error-input:-ms-input-placeholder {  */
+      /* Internet Explorer 10-11 */ 
+      /* color: #DC3545; 
+      opacity: 0.7;
+    } 
+    .error-input::-ms-input-placeholder {  */
+      /* Microsoft Edge */ 
+      /* color: #DC3545; 
+      opacity: 0.7;
+    }  */
+    .error {
+      color: #DC3545 !important;
+    }
+  </style>
+{% endblock %}
+{% block body %}
 <div class="container-fluid px-4">
   <h1 class="mt-4">DIDs Standardization</h1>
   <ol class="breadcrumb mb-4">
@@ -38,18 +62,12 @@
         >
           <thead>
             <tr>
-              <!-- <th scope="col">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="fullCheckAction" onclick="fullCheck()"/>
-                </div>
-              </th> -->
               <th>DID</th>
               <th>Customer</th>
               <th>Reseller</th>
               <th>In Method</th>
               <th>Voice Carrier</th>
               <th>Status</th>
-              <th>Change Date</th>
               <th>SMS Enabled</th>
               <th>SMS Carrier</th>
               <th>SMS Type</th>
@@ -68,47 +86,151 @@
               <th>Service 2</th>
               <th>Service 3</th>
               <th>Service 4</th>
-              <th>Update Date Time</th>
-              <th>Update By</th>
+              <th>Updated By</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {% for did in dids_error_list.did %}
-            <tr class="table-row" id="tr_{{did.id}}">
-              <!-- <th scope="row">
-                <div class="form-check">
-                  <input class="form-check-input item" type="checkbox" value="" id="select_{{did.id}}"/>
-                </div>
-              </th> -->
-              <td {% if not did.did_status %}class="text-danger"{% endif %}>{{ did.did }}</td>
-              <td {% if not did.customer_status %}class="text-danger"{% endif %}>{{ did.customer }}</td>
-              <td>{{ did.reseller }}</td>
-              <td {% if not did.in_method_status %}class="text-danger"{% endif %}>{{ did.in_method }}</td>
-              <td {% if not did.voice_carrier_status %}class="text-danger"{% endif %}>{{ did.voice_carrier }}</td>
-              <td {% if not did.status_status %}class="text-danger"{% endif %}>{{ did.status }}</td>
-              <td {% if not did.change_date_status %}class="text-danger"{% endif %}>{{ did.change_date }}</td>
-              <td {% if not did.sms_enabled_status %}class="text-danger"{% endif %}>{{ did.sms_enabled }}</td>
-              <td {% if not did.sms_carrier_status %}class="text-danger"{% endif %}>{{ did.sms_carrier }}</td>
-              <td {% if not did.sms_type_status %}class="text-danger"{% endif %}>{{ did.sms_type }}</td>
-              <td>{{ did.sms_campaign }}</td>
-              <td {% if not did.term_location_status %}class="text-danger"{% endif %}>{{ did.term_location }}</td>
-              <td>{{ did.user_first_name }}</td>
-              <td>{{ did.user_last_name }}</td>
-              <td {% if not did.extension_status %}class="text-danger"{% endif %}>{{ did.extension }}</td>
-              <td {% if not did.email_status %}class="text-danger"{% endif %}>{{ did.email }}</td>
-              <td {% if not did.onboard_date_status %}class="text-danger"{% endif %}>{{ did.onboard_date }}</td>
-              <td>{{ did.note }}</td>
-              <td {% if not did.e911_enabled_billed_status %}class="text-danger"{% endif %}>{{ did.e911_enabled_billed }}</td>
-              <td {% if not did.e911_cid_status %}class="text-danger"{% endif %}>{{ did.e911_cid }}</td>
-              <td>{{ did.e911_address }}</td>
-              <td {% if not did.service_1_status %}class="text-danger"{% endif %}>{{ did.service_1 }}</td>
-              <td {% if not did.service_2_status %}class="text-danger"{% endif %}>{{ did.service_2 }}</td>
-              <td {% if not did.service_3_status %}class="text-danger"{% endif %}>{{ did.service_3 }}</td>
-              <td {% if not did.service_4_status %}class="text-danger"{% endif %}>{{ did.service_4 }}</td>
-              <td {% if not did.updated_date_time_status %}class="text-danger"{% endif %}>{{ did.updated_date_time }}</td>
-              <td>{{ did.updated_by }}</td>
-              <td style="display: flex; justify-content: space-between;">
+            <tr id="{{did.id}}">
+              <td {% if not did.did_status %}class="text-danger"{% endif %}>
+                <input type="text" id="did_{{ did.id }}" name="did" class="form-control" value="{{did.did}}" {% if not did.did_status %} style="min-width: 150px; color: #DC3545;" data-toggle="tooltip" data-placement="top" title="Invalid DID Format - only number" {% else %} style="min-width: 150px;" {% endif %} required oninput="change_num('did_', '{{ did.id }}')">
+              </td>
+              <td>
+                <select name="customer" id="customer_{{ did.id }}" {% if not did.customer_status %} class="form-select error" data-toggle="tooltip" data-placement="top" title="Unregistered customer or Empty" {% else %} class="form-select" {% endif %} style="min-width: 180px;" required onchange="change_select('customer_', '{{ did.id }}')">
+                  {% if not did.customer_status or did.customer == '' %} <option value="" class="text-danger">{{ did.customer }}</option> {% endif %}
+                  {% for customer in dids_error_list.customers %}
+                    <option value="{{ customer.id }}" class="text-dark" {% if did.customer == customer.full_name %}selected{% endif %}>{{ customer.full_name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <input type="text" class="form-control" id="reseller_{{ did.id }}" name="reseller" style="min-width: 150px;" value="{{ did.reseller }}">
+              </td>
+              <td>
+                <select name="in_method" id="in_method_{{ did.id }}" {% if not did.in_method_status %} class="form-select error" data-toggle="tooltip" data-placement="top" title="Invalid in_method Format" {% else %} class="form-select" {% endif %} style="min-width: 80px;" onchange="change_select('in_method_', '{{ did.id }}')">
+                  {% if not did.in_method_status or did.in_method == '' %} <option value="" class="text-danger">{{ did.in_method }}</option> {% endif %}
+                  <option value="Yes" class="text-dark" {% if did.in_method == "Yes" %}selected{% endif %}>Yes</option>
+                  <option value="No" class="text-dark" {% if did.in_method == "No" %}selected{% endif %}>No</option>
+                </select>
+              </td>
+              <td>
+                <select name="voice_carrier" id="voice_carrier_{{ did.id }}" {% if not did.voice_carrier_status %} class="form-select error" data-toggle="tooltip" data-placement="top" title="Unregistered voice carrier or Empty" {% else %} class="form-select" {% endif %} style="min-width: 100px;" onchange="change_select('voice_carrier_', '{{ did.id }}')">
+                  {% if not did.voice_carrier_status or did.voice_carrier == '' %} <option value="" class="text-danger">{{ did.voice_carrier }}</option> {% endif %}
+                  {% for item in dids_error_list.voice_carrier %}
+                    <option value="{{ item.id }}" class="text-dark" {% if did.voice_carrier == item.name %}selected{% endif %}>{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="status" id="status_{{ did.id }}" {% if not did.status_status %} class="form-select error" data-toggle="tooltip" data-placement="top" title="Unregistered service status or Empty" {% else %} class="form-select" {% endif %} style="min-width: 130px;" onchange="change_select('status_', '{{ did.id }}')">
+                  {% if not did.status_status or did.status == '' %} <option value="" class="text-danger">{{ did.status }}</option> {% endif %}
+                  {% for item in dids_error_list.status %}
+                    <option value="{{ item.id }}" class="text-dark" {% if did.status == item.name %}selected{% endif %}>{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="sms_enabled" id="sms_enabled_{{ did.id }}" {% if not did.sms_enabled_status %} class="form-select error" data-toggle="tooltip" data-placement="top" title="Invalid sms_enabled Format" {% else %} class="form-select" {% endif %} style="min-width: 80px;" onchange="change_select('sms_enabled_', '{{ did.id }}')">
+                  {% if not did.sms_enabled_status or did.sms_enabled == '' %} <option value="" class="text-danger">{{ did.sms_enabled }}</option> {% endif %}
+                  <option value="Yes" class="text-dark" {% if did.sms_enabled == "Yes" %}selected{% endif %}>Yes</option>
+                  <option value="No" class="text-dark" {% if did.sms_enabled == "No" %}selected{% endif %}>No</option>
+                </select>
+              </td>
+              <td>
+                <select name="sms_carrier" id="sms_carrier_{{ did.id }}" {% if not did.sms_carrier_status %} class="form-select error" data-toggle="tooltip" data-placement="top" title="Unregistered SMS carrier or Empty" {% else %} class="form-select" {% endif %} style="min-width: 120px;" onchange="change_select('sms_carrier_', '{{ did.id }}')">
+                  {% if not did.sms_carrier_status or did.sms_carrier == '' %} <option value="" class="text-danger">{{ did.sms_carrier }}</option> {% endif %}
+                  {% for item in dids_error_list.sms_carrier %}
+                    <option value="{{ item.id }}" class="text-dark" {% if did.sms_carrier == item.name %}selected{% endif %}>{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="sms_type" id="sms_type_{{ did.id }}" {% if not did.sms_type_status %} class="form-select error" data-toggle="tooltip" data-placement="top" title="Unregistered SMS type or Empty" {% else %} class="form-select" {% endif %}  style="min-width: 150px;" onchange="change_select('sms_type_', '{{ did.id }}')">
+                  {% if not did.sms_type_status or did.sms_type == '' %} <option value="" class="text-danger">{{ did.sms_type }}</option> {% endif %}
+                  {% for item in dids_error_list.sms_type %}
+                    <option value="{{ item.id }}" class="text-dark" {% if did.sms_type == item.name %}selected{% endif %}>{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <input type="text" class="form-control" id="sms_campaign_{{ did.id }}" name="sms_campaign" style="min-width: 120px;" value="{{ did.sms_campaign }}">
+              </td>
+              <td>
+                <select name="term_location" id="term_location_{{ did.id }}" {% if not did.term_location_status %} class="form-select error" data-toggle="tooltip" data-placement="top" title="Unregistered term location or Empty" {% else %} class="form-select" {% endif %} style="min-width: 180px;" onchange="change_select('term_location_', '{{ did.id }}')">
+                  {% if not did.term_location_status or did.term_location == '' %} <option value="" class="text-danger">{{ did.term_location }}</option> {% endif %}
+                  {% for item in dids_error_list.term_location %}
+                    <option value="{{ item.id }}" class="text-dark" {% if did.term_location == item.name %}selected{% endif %}>{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <input type="text" class="form-control" id="user_first_name_{{ did.id }}" name="user_first_name" style="min-width: 150px;" value="{{ did.user_first_name }}">
+              </td>
+              <td>
+                <input type="text" class="form-control" id="user_last_name_{{ did.id }}" name="user_last_name" style="min-width: 150px;" value="{{ did.user_last_name }}">
+              </td>
+              <td>
+                <input type="text" id="extension_{{ did.id }}" name="extension" value="{{ did.extension }}" {% if not did.extension_status %} class="form-control error" {% else %} class="form-control" {% endif %} style="min-width: 150px;" oninput="change_num('extension_', '{{ did.id }}')">
+              </td>
+              <td>
+                <input type="text" id="email_{{ did.id }}" name="email" {% if not did.email_status %} class="form-control error" {% else %} class="form-control" {% endif %} style="min-width: 180px;" value="{{ did.email }}" oninput="change_email('{{ did.id }}')">
+              </td>
+              <td>
+                <input type="text" id="onboard_date_{{ did.id }}" name="onboard_date" {% if not did.onboard_date_status %} class="form-control error" data-toggle="tooltip" data-placement="top" title="Invalid Date Format - (MM/DD/YYYY)" {% else %} class="form-control" {% endif %} style="min-width: 130px;" value="{{ did.onboard_date }}" oninput="change_date('{{ did.id }}')">
+              </td>
+              <td>
+                <input type="text" class="form-control" id="note_{{ did.id }}" name="note" style="min-width: 150px;" value="{{ did.note }}">
+              </td>
+              <td>
+                <select name="e911_enabled_billed" id="e911_enabled_billed_{{ did.id }}" {% if not did.e911_enabled_billed_status %} class="form-select error" {% else %} class="form-select" {% endif %} style="min-width: 80px;" onchange="change_select('e911_enabled_billed_', '{{ did.id }}')">
+                  {% if not did.e911_enabled_billed_status or did.e911_enabled_billed == '' %} <option value="" class="text-danger">{{ did.e911_enabled_billed }}</option> {% endif %}
+                  <option value="Yes" class="text-dark" {% if did.e911_enabled_billed == "Yes" %}selected{% endif %}>Yes</option>
+                  <option value="No" class="text-dark" {% if did.e911_enabled_billed == "No" %}selected{% endif %}>No</option>
+                </select>
+              </td>
+              <td>
+                <input type="text" id="e911_cid_{{ did.id }}" name="e911_cid" {% if not did.e911_cid_status %} class="form-control error" data-toggle="tooltip" data-placement="top" title="Invalid CID Format - only number" {% else %} class="form-control" {% endif %} style="min-width: 150px;" value="{{ did.e911_cid }}" oninput="change_num('e911_cid_', '{{ did.id }}')">
+              </td>
+              <td>
+                <input type="text" class="form-control" id="e911_address_{{ did.id }}" name="e911_address" style="min-width: 200px;" value="{{ did.e911_address }}">
+              </td>
+              <td>
+                <select name="service_1" id="service_1_{{ did.id }}" {% if not did.service_1_status %} class="form-select error" data-toggle="tooltip" data-placement="top" title="Unregistered service value or Empty" {% else %} class="form-select" {% endif %} style="min-width: 180px;" onchange="change_select('service_1_', '{{ did.id }}')">
+                  {% if not did.service_1_status or did.service_1 == '' %} <option value="" class="text-danger">{{ did.service_1 }}</option> {% endif %}
+                  {% for item in dids_error_list.services %}
+                    <option value="{{ item.id }}" class="text-dark" {% if did.service_1 == item.name %}selected{% endif %}>{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="service_2" id="service_2_{{ did.id }}" {% if not did.service_2_status %} class="form-select error" data-toggle="tooltip" data-placement="top" title="Unregistered service value or Empty" {% else %} class="form-select" {% endif %} style="min-width: 180px;" onchange="change_select('service_2_', '{{ did.id }}')">
+                  {% if not did.service_2_status or did.service_2 == '' %} <option value="" class="text-danger">{{ did.service_2 }}</option> {% endif %}
+                  {% for item in dids_error_list.services %}
+                    <option value="{{ item.id }}" class="text-dark" {% if did.service_2 == item.name %}selected{% endif %}>{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="service_3" id="service_3_{{ did.id }}" {% if not did.service_3_status %} class="form-select error" data-toggle="tooltip" data-placement="top" title="Unregistered service value or Empty" {% else %} class="form-select" {% endif %} style="min-width: 180px;" onchange="change_select('service_3_', '{{ did.id }}')">
+                  {% if not did.service_3_status or did.service_3 == '' %} <option value="" class="text-danger">{{ did.service_3 }}</option> {% endif %}
+                  {% for item in dids_error_list.services %}
+                    <option value="{{ item.id }}" class="text-dark" {% if did.service_3 == item.name %}selected{% endif %}>{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="service_4" id="service_4_{{ did.id }}" {% if not did.service_4_status %} class="form-select error" data-toggle="tooltip" data-placement="top" title="Unregistered service value or Empty" {% else %} class="form-select" {% endif %} style="min-width: 180px;" onchange="change_select('service_4_', '{{ did.id }}')">
+                  {% if not did.service_4_status or did.service_4 == '' %} <option value="" class="text-danger">{{ did.service_4 }}</option> {% endif %}
+                  {% for item in dids_error_list.services %}
+                    <option value="{{ item.id }}" class="text-dark" {% if did.service_4 == item.name %}selected{% endif %}>{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <input type="text" class="form-control" id="updated_by_{{ did.id }}" name="updated_by" style="min-width: 120px;" value="{{ did.updated_by }}">
+              </td>
+              <td class="d-flex justify-content-between">
                 <a class="btn btn-sm btn-warning" href="edit/{{ did.id }}"><span class="fa fa-edit"></span> Standardization</a>
                 <a class="btn btn-sm btn-danger" href="delete/{{ did.id }}"><span class="fa fa-trash"></span> Delete</a>
               </td>
@@ -117,7 +239,10 @@
           </tbody>
         </table>
       </div>
-      <div class="d-flex flex-row justify-content-end mt-3">
+      <div class="d-flex flex-row justify-content-end mt-3 gap-3">
+        <div>
+          <button id="multi_standard" type="button" class="btn btn-primary" onclick="multi_submit()">Multi Standardization</button>
+        </div>
         <form method="get">
           <input type="hidden" name="search" value="{{ request.GET.search }}">
           <select class="form-select form-select" name="size" aria-label=".form-select-sm example" onchange="this.form.submit()">
