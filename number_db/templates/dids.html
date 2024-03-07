@@ -71,6 +71,7 @@
                   <input class="form-check-input" type="checkbox" value="" id="fullCheckAction" onclick="fullCheck()"/>
                 </div>
               </th>
+              <th>Action</th>
               <th>DID</th>
               <th>Customer</th>
               <th>Reseller</th>
@@ -98,7 +99,6 @@
               <th>Service 4</th>
               <th>Update Date Time</th>
               <th>Update By</th>
-              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -109,6 +109,12 @@
                   <input class="form-check-input item" type="checkbox" value="" id="select_{{did.id}}"/>
                 </div>
               </th>
+              <td style="display: flex; justify-content: space-between;">
+                {% if did.is_active %}
+                  <a class="btn btn-sm btn-warning" href="edit/{{ did.id }}"><span class="fa fa-edit"></span> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="delete/{{ did.id }}"><span class="fa fa-trash"></span> Delete</a>
+                {% endif %}
+              </td>
               <td>{{ did.did }}</td>
               <td>{{ did.customer.full_name }}</td>
               <td>{{ did.reseller }}</td>
@@ -136,12 +142,6 @@
               <td>{{ did.service_4.name }}</td>
               <td>{{ did.updated_date_time | date:"d-m-Y" }}</td>
               <td>{{ did.updated_by }}</td>
-              <td style="display: flex; justify-content: space-between;">
-                {% if did.is_active %}
-                  <a class="btn btn-sm btn-warning" href="edit/{{ did.id }}"><span class="fa fa-edit"></span> Edit</a>
-                  <a class="btn btn-sm btn-danger" href="delete/{{ did.id }}"><span class="fa fa-trash"></span> Delete</a>
-                {% endif %}
-              </td>
             </tr>
             {% endfor %}
           </tbody>
