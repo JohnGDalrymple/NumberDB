@@ -745,7 +745,7 @@ def did_update(request, id):
             did.service_3 = Service.objects.get(record_id = int(request.POST['service_3'])) if request.POST['service_3'] else None
             did.service_4 = Service.objects.get(record_id = int(request.POST['service_3'])) if request.POST['service_3'] else None
             did.updated_date_time = datetime.datetime.now()
-            did.updated_by = request.user.username
+            did.updated_by = request.user
             did.is_synced = False
             did.save()
             messages.success(request, 'DID was updated successfully!')

@@ -38,6 +38,17 @@ window.addEventListener('DOMContentLoaded', event => {
     if (document.getElementById('multi_standard')) {
         document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0 ? true : false;
     }
+
+    
+    document.getElementById('service_order_detail_less')?.addEventListener('click', () => {
+        $('#service_order_detail_show').fadeToggle(300)
+        if (document.getElementById('show_hide_text').innerText === 'Show more detail') {
+            document.getElementById('show_hide_text').innerText = 'Show less'
+        } else {
+            document.getElementById('show_hide_text').innerText = 'Show more detail'
+        }
+    })
+
 });
 
 window.document.getElementById("selectDownloadButton")?.addEventListener("click", () => {
