@@ -134,7 +134,7 @@ def service_order_add(request):
                 service_2 = Service.objects.get(record_id = int(request.POST['service_2'])) if request.POST['service_2'] else None,
                 service_3 = Service.objects.get(record_id = int(request.POST['service_3'])) if request.POST['service_3'] else None,
                 service_4 = Service.objects.get(record_id = int(request.POST['service_4'])) if request.POST['service_4'] else None,
-                updated_by = request.user,
+                updated_by = str(request.user),
                 )
             service_order.full_clean()
             service_order.save()
@@ -160,7 +160,7 @@ def service_order_add(request):
             # server_message_html = f"""\
             # <html>
             #     <body>
-            #         <p style="font-size:16px">Hello <strong>{request.user}</strong>.</p>
+            #         <p style="font-size:16px">Hello <strong>{str(request.user)}</strong>.</p>
             #         <br>
             #         <p>A new service order was created.</p>
             #         <p>Please review the service order and accept it.</p>
@@ -280,7 +280,7 @@ def service_order_update(request, id):
             service_order.service_2 = Service.objects.get(record_id = int(request.POST['service_2'])) if request.POST['service_2'] else None,
             service_order.service_3 = Service.objects.get(record_id = int(request.POST['service_3'])) if request.POST['service_3'] else None,
             service_order.service_4 = Service.objects.get(record_id = int(request.POST['service_4'])) if request.POST['service_4'] else None,
-            service_order.updated_by = request.user,
+            service_order.updated_by = str(request.user),
             service_order.updated_at = datetime.datetime.now()
             service_order.status = 1
             service_order.full_clean()
