@@ -24,7 +24,7 @@ from django.shortcuts import render
 
 
 def handler404(request, exception):
-    if request.user.is_authenticated:
+    if str(request.user).is_authenticated:
         print('True')
         return render(request, '404.html')
     else:

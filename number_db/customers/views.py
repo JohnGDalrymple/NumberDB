@@ -279,6 +279,24 @@ def customer_add(request):
 def customer_edit(request, id):
     customer_types = Customer_Type.objects.all()
     customer = Customer.objects.get(id=id)
+    customer.full_name = customer.full_name if customer.full_name else ''
+    customer.phone = customer.phone if customer.phone else ''
+    customer.fax = customer.fax if customer.fax else ''
+    customer.mobile = customer.mobile if customer.mobile else ''
+    customer.email = customer.email if customer.email else ''
+    customer.billing_address = customer.billing_address if customer.billing_address else ''
+    customer.billing_city = customer.billing_city if customer.billing_city else ''
+    customer.billing_state = customer.billing_state if customer.billing_state else ''
+    customer.billing_country = customer.billing_country if customer.billing_country else ''
+    customer.e911_address = customer.e911_address if customer.e911_address else ''
+    customer.e911_city = customer.e911_city if customer.e911_city else ''
+    customer.e911_state = customer.e911_state if customer.e911_state else ''
+    customer.e911_zipcode = customer.e911_zipcode if customer.e911_zipcode else ''
+    customer.e911_country = customer.e911_country if customer.e911_country else ''
+    customer.support_contact = customer.support_contact if customer.support_contact else ''
+    customer.attachments = customer.attachments if customer.attachments else ''
+    customer.open_balance = float(customer.attachments) if customer.attachments else 0
+    customer.note = customer.e911_country if customer.e911_country else ''
     context = {'customer': customer, 'customer_types': customer_types}
     return render(request, 'customer_edit.html', context)
 
@@ -288,7 +306,6 @@ def customer_update(request, id):
     if request.method == "POST":
         try:
             customer.full_name = request.POST['full_name']
-            customer.company_name = request.POST['company_name']
             customer.phone = request.POST['phone']
             customer.fax = request.POST['fax']
             customer.mobile = request.POST['mobile']
@@ -302,7 +319,7 @@ def customer_update(request, id):
             customer.e911_state = request.POST['e911_state']
             customer.e911_zipcode = request.POST['e911_zipcode']
             customer.e911_country = request.POST['billing_address']
-            customer.customer_type = Customer_Type.objects.get(record_id = request.POST['customer_type'])
+            customer.customer_type = Customer_Type.objects.get(record_id = request.POST['customer_type']) if request.POST['customer_type'] else None
             customer.support_contact = request.POST['support_contact']
             customer.attachments = request.POST['attachments']
             customer.open_balance = float(request.POST['open_balance']) if request.POST['open_balance'] else 0
