@@ -32,13 +32,17 @@ def switchStatus(value):
     elif value == 1:
         return 'Updated'
     elif value == 2:
+        return 'Submitted'
+    elif value == 3:
         return 'Deleted'
     elif value.lower() == 'created':
         return 0
     elif value.lower() == 'updated':
         return 1
-    elif value.lower() == 'deleted':
+    elif value.lower() == 'submitted':
         return 2
+    elif value.lower() == 'deleted':
+        return 3
     else:
         return None
 
@@ -96,8 +100,8 @@ def service_order_list(request):
 @login_required
 def service_order_delete(request, id):
     try:
-        service_order = Service_Order.objects.get(id=id)
-        service_order.status = 2
+        service_order = Service_Order.objects.get(id=int(id))
+        service_order.status = 3
         service_order.save()
         messages.warning(request, 'The service order was deleted successfully!')
     except Exception as e:
@@ -195,15 +199,6 @@ def service_order_add(request):
             # s.sendmail(request.POST['email'], os.getenv('EMAIL_SERVER'), server_message.as_string())
             # s.quit()
 
-            post_create_msg = pymsteams.connectorcard(os.getenv('TEAMS_WEBHOOK_URL'))
-            post_create_msg.title("A new service order was created.")
-            msg_text = f"\nHere is the detailed information.\n Requested username: {request.POST['username']}\n Requested email: {request.POST['email']}\n Requested number: {request.POST['number']}\n"
-            msg_text += f" Requested port date: {request.POST['requested_port_date']}\n" if request.POST['requested_port_date'] else ''
-            msg_text += f" Requested E911 number: {request.POST['e911_number']}\n" if request.POST['e911_number'] else ''
-            msg_text += f" Requested E911 address: {request.POST['e911_address']}\n" if request.POST['e911_address'] else ''
-            msg_text += f" Requested description: {request.POST['texting']}\n" if request.POST['texting'] else ''
-            post_create_msg.text(msg_text)
-            post_create_msg.send()
         except Exception as e:
             messages.warning(request, e)
 
@@ -254,7 +249,7 @@ def service_order_add(request):
 @login_required
 def service_order_update(request, id):
     if request.method == "POST":
-        service_order = Service_Order.objects.get(id=id)
+        service_order = Service_Order.objects.get(id=int(id))
         try:
             service_order.username = request.POST['username']
             service_order.email = request.POST['email']
@@ -263,24 +258,24 @@ def service_order_update(request, id):
             service_order.texting = request.POST['texting']
             service_order.e911_address = request.POST['e911_address']
             service_order.e911_number = int(request.POST['e911_number']) if request.POST['e911_number'] else None
-            service_order.customer = Customer.objects.get(record_id = int(request.POST['customer'])) if request.POST['customer'] else None,
-            service_order.reseller = request.POST['reseller'],
-            service_order.service_status = Status.objects.get(record_id = int(request.POST['status'])) if request.POST['status'] else None,
-            service_order.voice_carrier = Voice_Carrier.objects.get(record_id = int(request.POST['voice_carrier'])) if request.POST['voice_carrier'] else None,
-            service_order.sms_carrier = Voice_Carrier.objects.get(record_id = int(request.POST['sms_carrier'])) if request.POST['sms_carrier'] else None,
-            service_order.sms_type = SMS_Type.objects.get(record_id = int(request.POST['sms_type'])) if request.POST['sms_type'] else None,
-            service_order.term_location = Term_Location.objects.get(record_id = int(request.POST['term_location'])) if request.POST['term_location'] else None,
-            service_order.sms_enabled = request.POST['sms_enabled'] if request.POST['sms_enabled'] else None,
-            service_order.user_first_name = request.POST['user_first_name'],
-            service_order.user_last_name = request.POST['user_last_name'],
-            service_order.extension = int(request.POST['extension']) if request.POST['extension'] else None,
-            service_order.onboard_date = parse_date(request.POST['onboard_date']),
-            service_order.e911_enabled_billed = request.POST['e911_enabled_billed'] if request.POST['e911_enabled_billed'] else None,
-            service_order.service_1 = Service.objects.get(record_id = int(request.POST['service_1'])) if request.POST['service_1'] else None,
-            service_order.service_2 = Service.objects.get(record_id = int(request.POST['service_2'])) if request.POST['service_2'] else None,
-            service_order.service_3 = Service.objects.get(record_id = int(request.POST['service_3'])) if request.POST['service_3'] else None,
-            service_order.service_4 = Service.objects.get(record_id = int(request.POST['service_4'])) if request.POST['service_4'] else None,
-            service_order.updated_by = str(request.user),
+            service_order.customer = Customer.objects.get(record_id = int(request.POST['customer'])) if request.POST['customer'] else None
+            service_order.reseller = request.POST['reseller']
+            service_order.service_status = Status.objects.get(record_id = int(request.POST['status'])) if request.POST['status'] else None
+            service_order.voice_carrier = Voice_Carrier.objects.get(record_id = int(request.POST['voice_carrier'])) if request.POST['voice_carrier'] else None
+            service_order.sms_carrier = Voice_Carrier.objects.get(record_id = int(request.POST['sms_carrier'])) if request.POST['sms_carrier'] else None
+            service_order.sms_type = SMS_Type.objects.get(record_id = int(request.POST['sms_type'])) if request.POST['sms_type'] else None
+            service_order.term_location = Term_Location.objects.get(record_id = int(request.POST['term_location'])) if request.POST['term_location'] else None
+            service_order.sms_enabled = request.POST['sms_enabled'] if request.POST['sms_enabled'] else None
+            service_order.user_first_name = request.POST['user_first_name']
+            service_order.user_last_name = request.POST['user_last_name']
+            service_order.extension = int(request.POST['extension']) if request.POST['extension'] else None
+            service_order.onboard_date = parse_date(request.POST['onboard_date'])
+            service_order.e911_enabled_billed = request.POST['e911_enabled_billed'] if request.POST['e911_enabled_billed'] else None
+            service_order.service_1 = Service.objects.get(record_id = int(request.POST['service_1'])) if request.POST['service_1'] else None
+            service_order.service_2 = Service.objects.get(record_id = int(request.POST['service_2'])) if request.POST['service_2'] else None
+            service_order.service_3 = Service.objects.get(record_id = int(request.POST['service_3'])) if request.POST['service_3'] else None
+            service_order.service_4 = Service.objects.get(record_id = int(request.POST['service_4'])) if request.POST['service_4'] else None
+            service_order.updated_by = str(request.user)
             service_order.updated_at = datetime.datetime.now()
             service_order.status = 1
             service_order.full_clean()
@@ -290,7 +285,7 @@ def service_order_update(request, id):
             messages.warning(request, e)
         return redirect('/service_order')
     else:
-        service_order = Service_Order.objects.filter(id=id).values()[0]
+        service_order = Service_Order.objects.filter(id=int(id)).values()[0]
         customers_data = Customer.objects.values_list('record_id', 'full_name')
         status_data = Status.objects.all()
         voice_carrier_data = Voice_Carrier.objects.all()
@@ -358,3 +353,28 @@ def service_order_update(request, id):
         }
 
         return render(request, 'service_order_edit.html', {'service_order': service_order_data, 'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'sms_carrier': voice_carrier, 'sms_type': sms_type, 'term_location': term_location, 'services': services})
+    
+
+@login_required
+def service_order_submit(request, id):
+    try:
+        service_order = Service_Order.objects.get(id=int(id))
+        service_order.status = 2
+        service_order.save()
+
+        post_create_msg = pymsteams.connectorcard(os.getenv('TEAMS_WEBHOOK_URL'))
+        post_create_msg.title("A new service order was submitted.")
+        msg_temp = [f"Here is the detailed information.\n", f"- Requested username: {service_order.username}\n", f"- Requested email: {service_order.email}\n", f"- Requested number: {service_order.number}\n"]
+        msg_temp.append(f"- Requested port date: {service_order.requested_port_date}\n" if service_order.requested_port_date else '')
+        msg_temp.append(f"- Requested E911 number: {service_order.e911_number}\n" if service_order.e911_number else '')
+        msg_temp.append(f"- Requested E911 address: {service_order.e911_address}\n" if service_order.e911_address else '')
+        msg_temp.append(f"- Requested description: {service_order.texting}\n" if service_order.texting else '')
+        post_create_msg.text('\n'.join(msg_temp))
+        post_create_msg.send()
+        
+        messages.success(request, 'The service order was submitted successfully!')
+
+    except Exception as e:
+        messages.warning(request, e)
+
+    return redirect('/service_order')

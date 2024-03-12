@@ -7,6 +7,7 @@ urlpatterns = [
     path('did/sync_method/', views.did_sync_method, name='did_sync_method'),
     path('did/download_all/', views.did_download_all, name='did_download_all'),
     path('did/add/', views.did_add, name='did_add'),
+    path('did/multi_add/', views.did_multi_add, name='did_multi_add'),
     path('did/delete/<int:id>', views.did_delete, name='did_delete'),
     path('did/edit/<int:id>', views.did_edit, name='did_edit'),
     path('did/update/<int:id>', views.did_update, name='did_update'),
