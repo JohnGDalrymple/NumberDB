@@ -6,6 +6,7 @@ urlpatterns = [
     path('delete/<int:id>', views.service_order_delete, name='service_order_delete'),
     path('add/', views.service_order_add, name='service_order_add'),
     path('edit/<int:id>', views.service_order_update, name='service_order_update'),
+    path('submit/<int:id>', views.service_order_submit, name='service_order_submit'),
     # path('did/', views.did, name='did'),
     # path('did/edit/<int:id>', views.did_edit, name='did_edit'),
     # path('export-csv/', views.export_csv, name='export-csv'),

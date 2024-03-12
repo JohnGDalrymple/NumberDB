@@ -114,62 +114,62 @@
             {% endfor %}
           </tbody>
         </table>
-        <div class="d-flex flex-row justify-content-end gap-3">
-          <form method="get">
-            <input type="hidden" name="search" value="{{ request.GET.search }}">
-            <select class="form-select form-select" name="size" aria-label=".form-select-sm example" onchange="this.form.submit()">
-              <option value="10" {% if request.GET.size == "10" %}selected{% endif %}>10</option>
-              <option value="25" {% if request.GET.size == "25" %}selected{% endif %}>25</option>
-              <option value="50" {% if request.GET.size == "50" %}selected{% endif %}>50</option>
-            </select>
-          </form>
-          <nav aria-label="...">
-            <ul class="pagination">
-              {% if not customers.has_previous %}
-                <li class="page-item disabled"><a class="page-link" href="#"> << </a></li>
-                <li class="page-item disabled"><a class="page-link" href="#"> < </a></li>
-              {% else %}
-                {% if not request.GET.search %}
-                  <li class="page-item">
-                    <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page=1"{% else %}href="?page=1"{% endif %}> << </a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page={{ customers.previous_page_number }}"{% else %}href="?page={{ customers.previous_page_number }}"{% endif %}> < </a>
-                  </li>
-                {% else %}
-                  <li class="page-item">
-                    <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}&size={{ request.GET.size }}&page=1"{% else %}href="?search={{request.GET.search}}&page=1"{% endif %}> << </a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}size={{ request.GET.size }}&page={{ customers.previous_page_number }}"{% else %}href="?search={{request.GET.search}}&page={{ customers.previous_page_number }}"{% endif %}> < </a>
-                  </li>
-                {% endif %}
-              {% endif %}
-              <li class="page-item">
-                <span class="page-link">{{ customers.number }} / {{ customers.paginator.num_pages }}</span>
-              </li>
-              {% if not customers.has_next %}
-                <li class="page-item disabled"><a class="page-link" href="#"> > </a></li>
-                <li class="page-item disabled"><a class="page-link" href="#"> >> </a></li>
-              {% else %}
-                {% if request.GET.search %}
-                <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}&size={{ request.GET.size }}&page={{ customers.next_page_number }}"{% else %}href="?search={{request.GET.search}}&page={{ customers.next_page_number }}"{% endif %}> > </a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}&size={{ request.GET.size }}&page={{ customers.paginator.num_pages }}"{% else %}href="?search={{request.GET.search}}&page={{ customers.paginator.num_pages }}"{% endif %}> >> </a>
-                  </li>
-                {% else %}
+      </div>
+      <div class="d-flex flex-row justify-content-end gap-3">
+        <form method="get">
+          <input type="hidden" name="search" value="{{ request.GET.search }}">
+          <select class="form-select form-select" name="size" aria-label=".form-select-sm example" onchange="this.form.submit()">
+            <option value="10" {% if request.GET.size == "10" %}selected{% endif %}>10</option>
+            <option value="25" {% if request.GET.size == "25" %}selected{% endif %}>25</option>
+            <option value="50" {% if request.GET.size == "50" %}selected{% endif %}>50</option>
+          </select>
+        </form>
+        <nav aria-label="...">
+          <ul class="pagination">
+            {% if not customers.has_previous %}
+              <li class="page-item disabled"><a class="page-link" href="#"> << </a></li>
+              <li class="page-item disabled"><a class="page-link" href="#"> < </a></li>
+            {% else %}
+              {% if not request.GET.search %}
                 <li class="page-item">
-                    <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page={{ customers.next_page_number }}"{% else %}href="?page={{ customers.next_page_number }}"{% endif %}> > </a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page={{ customers.paginator.num_pages }}"{% else %}href="?page={{ customers.paginator.num_pages }}"{% endif %}> >> </a>
-                  </li>
-                {% endif %}
+                  <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page=1"{% else %}href="?page=1"{% endif %}> << </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page={{ customers.previous_page_number }}"{% else %}href="?page={{ customers.previous_page_number }}"{% endif %}> < </a>
+                </li>
+              {% else %}
+                <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}&size={{ request.GET.size }}&page=1"{% else %}href="?search={{request.GET.search}}&page=1"{% endif %}> << </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}size={{ request.GET.size }}&page={{ customers.previous_page_number }}"{% else %}href="?search={{request.GET.search}}&page={{ customers.previous_page_number }}"{% endif %}> < </a>
+                </li>
               {% endif %}
-            </ul>
-          </nav>
-        </div>
+            {% endif %}
+            <li class="page-item">
+              <span class="page-link">{{ customers.number }} / {{ customers.paginator.num_pages }}</span>
+            </li>
+            {% if not customers.has_next %}
+              <li class="page-item disabled"><a class="page-link" href="#"> > </a></li>
+              <li class="page-item disabled"><a class="page-link" href="#"> >> </a></li>
+            {% else %}
+              {% if request.GET.search %}
+              <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}&size={{ request.GET.size }}&page={{ customers.next_page_number }}"{% else %}href="?search={{request.GET.search}}&page={{ customers.next_page_number }}"{% endif %}> > </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}&size={{ request.GET.size }}&page={{ customers.paginator.num_pages }}"{% else %}href="?search={{request.GET.search}}&page={{ customers.paginator.num_pages }}"{% endif %}> >> </a>
+                </li>
+              {% else %}
+              <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page={{ customers.next_page_number }}"{% else %}href="?page={{ customers.next_page_number }}"{% endif %}> > </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page={{ customers.paginator.num_pages }}"{% else %}href="?page={{ customers.paginator.num_pages }}"{% endif %}> >> </a>
+                </li>
+              {% endif %}
+            {% endif %}
+          </ul>
+        </nav>
       </div>
     </div>
   </div>

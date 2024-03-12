@@ -37,6 +37,7 @@
                 <button class="btn btn-primary btn-block" type="submit">Submit</button>
                 <a class="btn btn-info ms-2" href="sync_method/"><span class="fa fa-cloud-arrow-down"></span> Sync from Method</a>
                 <a class="btn btn-success ms-2" href="add/"><span class="fa fa-add"></span> Add</a>
+                <a class="btn btn-success ms-2" href="multi_add/"><span class="fa fa-add"></span> Multi Add</a>
             </div>
           </div>
       </form>
@@ -146,62 +147,62 @@
             {% endfor %}
           </tbody>
         </table>
-        <div class="d-flex flex-row justify-content-end gap-3">
-          <form method="get">
-            <input type="hidden" name="search" value="{{ request.GET.search }}">
-            <select class="form-select form-select" name="size" aria-label=".form-select-sm example" onchange="this.form.submit()">
-              <option value="10" {% if request.GET.size == "10" %}selected{% endif %}>10</option>
-              <option value="25" {% if request.GET.size == "25" %}selected{% endif %}>25</option>
-              <option value="50" {% if request.GET.size == "50" %}selected{% endif %}>50</option>
-            </select>
-          </form>
-          <nav aria-label="...">
-            <ul class="pagination">
-              {% if not dids.has_previous %}
-                <li class="page-item disabled"><a class="page-link" href="#"> << </a></li>
-                <li class="page-item disabled"><a class="page-link" href="#"> < </a></li>
-              {% else %}
-                {% if not request.GET.search %}
-                  <li class="page-item">
-                    <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page=1"{% else %}href="?page=1"{% endif %}> << </a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page={{ dids.previous_page_number }}"{% else %}href="?page={{ dids.previous_page_number }}"{% endif %}> < </a>
-                  </li>
-                {% else %}
-                  <li class="page-item">
-                    <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}&size={{ request.GET.size }}&page=1"{% else %}href="?search={{request.GET.search}}&page=1"{% endif %}> << </a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}size={{ request.GET.size }}&page={{ dids.previous_page_number }}"{% else %}href="?search={{request.GET.search}}&page={{ dids.previous_page_number }}"{% endif %}> < </a>
-                  </li>
-                {% endif %}
-              {% endif %}
-              <li class="page-item">
-                <span class="page-link">{{ dids.number }} / {{ dids.paginator.num_pages }}</span>
-              </li>
-              {% if not dids.has_next %}
-                <li class="page-item disabled"><a class="page-link" href="#"> > </a></li>
-                <li class="page-item disabled"><a class="page-link" href="#"> >> </a></li>
-              {% else %}
-                {% if request.GET.search %}
-                <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}&size={{ request.GET.size }}&page={{ dids.next_page_number }}"{% else %}href="?search={{request.GET.search}}&page={{ dids.next_page_number }}"{% endif %}> > </a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}&size={{ request.GET.size }}&page={{ dids.paginator.num_pages }}"{% else %}href="?search={{request.GET.search}}&page={{ dids.paginator.num_pages }}"{% endif %}> >> </a>
-                  </li>
-                {% else %}
+      </div>
+      <div class="d-flex flex-row justify-content-end gap-3 mt-3">
+        <form method="get">
+          <input type="hidden" name="search" value="{{ request.GET.search }}">
+          <select class="form-select form-select" name="size" aria-label=".form-select-sm example" onchange="this.form.submit()">
+            <option value="10" {% if request.GET.size == "10" %}selected{% endif %}>10</option>
+            <option value="25" {% if request.GET.size == "25" %}selected{% endif %}>25</option>
+            <option value="50" {% if request.GET.size == "50" %}selected{% endif %}>50</option>
+          </select>
+        </form>
+        <nav aria-label="...">
+          <ul class="pagination">
+            {% if not dids.has_previous %}
+              <li class="page-item disabled"><a class="page-link" href="#"> << </a></li>
+              <li class="page-item disabled"><a class="page-link" href="#"> < </a></li>
+            {% else %}
+              {% if not request.GET.search %}
                 <li class="page-item">
-                    <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page={{ dids.next_page_number }}"{% else %}href="?page={{ dids.next_page_number }}"{% endif %}> > </a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page={{ dids.paginator.num_pages }}"{% else %}href="?page={{ dids.paginator.num_pages }}"{% endif %}> >> </a>
-                  </li>
-                {% endif %}
+                  <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page=1"{% else %}href="?page=1"{% endif %}> << </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page={{ dids.previous_page_number }}"{% else %}href="?page={{ dids.previous_page_number }}"{% endif %}> < </a>
+                </li>
+              {% else %}
+                <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}&size={{ request.GET.size }}&page=1"{% else %}href="?search={{request.GET.search}}&page=1"{% endif %}> << </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}size={{ request.GET.size }}&page={{ dids.previous_page_number }}"{% else %}href="?search={{request.GET.search}}&page={{ dids.previous_page_number }}"{% endif %}> < </a>
+                </li>
               {% endif %}
-            </ul>
-          </nav>
-        </div>
+            {% endif %}
+            <li class="page-item">
+              <span class="page-link">{{ dids.number }} / {{ dids.paginator.num_pages }}</span>
+            </li>
+            {% if not dids.has_next %}
+              <li class="page-item disabled"><a class="page-link" href="#"> > </a></li>
+              <li class="page-item disabled"><a class="page-link" href="#"> >> </a></li>
+            {% else %}
+              {% if request.GET.search %}
+              <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}&size={{ request.GET.size }}&page={{ dids.next_page_number }}"{% else %}href="?search={{request.GET.search}}&page={{ dids.next_page_number }}"{% endif %}> > </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?search={{request.GET.search}}&size={{ request.GET.size }}&page={{ dids.paginator.num_pages }}"{% else %}href="?search={{request.GET.search}}&page={{ dids.paginator.num_pages }}"{% endif %}> >> </a>
+                </li>
+              {% else %}
+              <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page={{ dids.next_page_number }}"{% else %}href="?page={{ dids.next_page_number }}"{% endif %}> > </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" {% if request.GET.size %}href="?size={{ request.GET.size }}&page={{ dids.paginator.num_pages }}"{% else %}href="?page={{ dids.paginator.num_pages }}"{% endif %}> >> </a>
+                </li>
+              {% endif %}
+            {% endif %}
+          </ul>
+        </nav>
       </div>
     </div>
   </div>

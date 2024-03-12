@@ -1,0 +1,228 @@
+{% extends 'layout/app.html' %} {% load static %}
+{% block stylesheet %}
+  <style>
+    /* .error-input::placeholder { */
+      /* Firefox, Chrome, Opera */ 
+      /* color: #DC3545;
+      opacity: 0.7;
+    } 
+    .error-input:-ms-input-placeholder {  */
+      /* Internet Explorer 10-11 */ 
+      /* color: #DC3545; 
+      opacity: 0.7;
+    } 
+    .error-input::-ms-input-placeholder {  */
+      /* Microsoft Edge */ 
+      /* color: #DC3545; 
+      opacity: 0.7;
+    }  */
+    .error {
+      color: #DC3545 !important;
+    }
+  </style>
+{% endblock %}
+{% block body %}
+<div class="container-fluid px-4">
+  <h1 class="mt-4">DIDs Multi Create</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+    <li class="breadcrumb-item active">DIDs Multi Create</li>
+  </ol>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <i class="fas fa-table me-1"></i>
+      DIDs Multi Create
+    </div>
+    <div class="card-body">
+      {% for message in messages %}
+      <div
+        class="alert alert-{{ message.tags }} alert-dismissible"
+        role="alert"
+      >
+        {{ message }}
+      </div>
+      {% endfor %}
+      <div class="table-container">
+        <table
+          class="table table-bordered"
+          id="dataTable"
+          width="100%"
+          cellspacing="0"
+        >
+          <thead>
+            <tr>
+              <th>DID</th>
+              <th>Customer</th>
+              <th>Reseller</th>
+              <th>In Method</th>
+              <th>Voice Carrier</th>
+              <th>Status</th>
+              <th>SMS Enabled</th>
+              <th>SMS Carrier</th>
+              <th>SMS Type</th>
+              <th>SMS Campaign</th>
+              <th>Term Location</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Extension</th>
+              <th>Email</th>
+              <th>Onboard Date</th>
+              <th>Note</th>
+              <th>E911 Enabled_Billed</th>
+              <th>E911 CID</th>
+              <th>E911 Address</th>
+              <th>Service 1</th>
+              <th>Service 2</th>
+              <th>Service 3</th>
+              <th>Service 4</th>
+            </tr>
+          </thead>
+          <tbody id="multi_did_item">
+            <tr id="multi_did_create_1">
+              <td>
+                <input id="did_1" type="text" name="did" class="form-control" value="" style="min-width: 150px;" required oninput="change_num('did_', '1')">
+              </td>
+              <td>
+                <select name="customer" class="form-select" id="customer_1" style="min-width: 180px;" required>
+                  <option value=""></option>
+                  {% for customer in customers %}
+                    <option value="{{ customer.id }}" class="text-dark">{{ customer.full_name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <input type="text" class="form-control" id="reseller_1" name="reseller" style="min-width: 150px;" value="">
+              </td>
+              <td>
+                <select name="in_method" id="in_method_1" class="form-select" style="min-width: 80px;">
+                  <option value=""></option>
+                  <option value="Yes" class="text-dark">Yes</option>
+                  <option value="No" class="text-dark">No</option>
+                </select>
+              </td>
+              <td>
+                <select name="voice_carrier" id="voice_carrier_1"  class="form-select" style="min-width: 100px;">
+                  <option value=""></option>
+                  {% for item in voice_carrier %}
+                    <option value="{{ item.id }}" class="text-dark">{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="status" id="status_1" class="form-select" style="min-width: 130px;">
+                  <option value=""></option>
+                  {% for item in status %}
+                    <option value="{{ item.id }}" class="text-dark">{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="sms_enabled" id="sms_enabled_1" class="form-select" style="min-width: 80px;">
+                  <option value=""></option>
+                  <option value="Yes" class="text-dark">Yes</option>
+                  <option value="No" class="text-dark">No</option>
+                </select>
+              </td>
+              <td>
+                <select name="sms_carrier" id="sms_carrier_1" class="form-select" style="min-width: 120px;">
+                  <option value=""></option>
+                  {% for item in sms_carrier %}
+                    <option value="{{ item.id }}" class="text-dark">{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="sms_type" id="sms_type_1" class="form-select" style="min-width: 120px;">
+                  <option value=""></option>
+                  {% for item in sms_type %}
+                    <option value="{{ item.id }}" class="text-dark">{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <input type="text" class="form-control" id="sms_campaign_1" name="sms_campaign" style="min-width: 120px;" value="">
+              </td>
+              <td>
+                <select name="term_location" id="term_location_1" class="form-select" style="min-width: 120px;">
+                  <option value=""></option>
+                  {% for item in term_location %}
+                    <option value="{{ item.id }}" class="text-dark">{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <input type="text" id="user_first_name_1" name="user_first_name" class="form-control" style="min-width: 150px;" value="">
+              </td>
+              <td>
+                <input type="text" id="user_last_name_1" name="user_last_name" class="form-control" style="min-width: 150px;" value="">
+              </td>
+              <td>
+                <input type="text" id="extension_1" name="extension" value="" class="form-control" style="min-width: 150px;" oninput="change_num('extension_', '1')">
+              </td>
+              <td>
+                <input type="text" id="email_1" name="email" class="form-control" style="min-width: 180px;" value="" oninput="change_email('1')">
+              </td>
+              <td>
+                <input type="text" id="onboard_date_1" name="onboard_date" class="form-control" style="min-width: 130px;" value="" oninput="change_date('1')">
+              </td>
+              <td>
+                <input type="text" class="form-control" id="note_1" name="note" style="min-width: 150px;" value="">
+              </td>
+              <td>
+                <select name="e911_enabled_billed" id="e911_enabled_billed_1" class="form-select" style="min-width: 80px;">
+                  <option value=""></option>
+                  <option value="Yes" class="text-dark">Yes</option>
+                  <option value="No" class="text-dark">No</option>
+                </select>
+              </td>
+              <td>
+                <input type="text" id="e911_cid_1" name="e911_cid" class="form-control" style="min-width: 150px;" value="" oninput="change_num('e911_cid_', '1')">
+              </td>
+              <td>
+                <input type="text" class="form-control" id="e911_address_1" name="e911_address" style="min-width: 200px;" value="">
+              </td>
+              <td>
+                <select name="service_1" id="service_1_1" class="form-select" style="min-width: 180px;" onchange="change_select('service_1_', '1')">
+                  <option value=""></option>
+                  {% for item in services %}
+                    <option value="{{ item.id }}" class="text-dark">{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="service_2" id="service_2_1" class="form-select" style="min-width: 180px;" onchange="change_select('service_2_', '1')">
+                  <option value=""></option>
+                  {% for item in services %}
+                    <option value="{{ item.id }}" class="text-dark">{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="service_3" id="service_3_1" class="form-select" style="min-width: 180px;" onchange="change_select('service_3_', '1')">
+                  <option value=""></option>
+                  {% for item in services %}
+                    <option value="{{ item.id }}" class="text-dark">{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="service_4" id="service_4_1" class="form-select" style="min-width: 180px;" onchange="change_select('service_4_', '1')">
+                  <option value=""></option>
+                  {% for item in services %}
+                    <option value="{{ item.id }}" class="text-dark">{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="d-flex justify-content-end gap-3 mt-3">
+        <button id="multi_add" class="btn btn-primary btn-block" type="button" onclick="check_add_item()"><i class="fa fa-add"></i> Add new item</button>
+        <button id="multi_submit" class="btn btn-primary btn-block" type="button" onclick="multi_add_submit()"><i class="fa fa-save"></i> Submit all items</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block javascript %} {% endblock %}

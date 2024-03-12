@@ -49,9 +49,9 @@
           <thead>
             <tr>
               <th>Action</th>
+              <th>Number</th>
               <th>Username</th>
               <th>Email</th>
-              <th>Number</th>
               <th>Texting</th>
               <th>Request Port Date</th>
               <th>E911 Number</th>
@@ -66,12 +66,15 @@
               <td style="display: flex; justify-content: space-between;">
                 {% if item.status != "Deleted" %}
                   <a class="btn btn-sm btn-warning" href="edit/{{ item.id }}"><span class="fa fa-edit"></span> Edit</a>
-                  <a class="btn btn-sm btn-danger" href="delete/{{ item.id }}"><span class="fa fa-trash"></span> Delete</a>
+                  {% if item.status != "Submitted" %}
+                    <a class="btn btn-sm btn-info" href="submit/{{ item.id }}"><span class="fa fa-paper-plane"></span> Submit</a>
+                  {% endif %}
+                <a class="btn btn-sm btn-danger" href="delete/{{ item.id }}"><span class="fa fa-trash"></span> Delete</a>
                 {% endif %}
               </td>
+              <td>{{ item.number }}</td>
               <td>{{ item.username }}</td>
               <td>{{ item.email }}</td>
-              <td>{{ item.number }}</td>
               <td>{{ item.texting }}</td>
               <td>{{ item.requested_port_date }}</td>
               <td>{{ item.e911_number }}</td>

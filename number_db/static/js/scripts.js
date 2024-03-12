@@ -39,7 +39,6 @@ window.addEventListener('DOMContentLoaded', event => {
         document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0 ? true : false;
     }
 
-    
     document.getElementById('service_order_detail_less')?.addEventListener('click', () => {
         $('#service_order_detail_show').fadeToggle(300)
         if (document.getElementById('show_hide_text').innerText === 'Show more detail') {
@@ -234,7 +233,9 @@ document.getElementById("edit_term_location_form")?.addEventListener('submit', (
 
 function change_num(input_type ,id) {
     select_input = document.getElementById(input_type + id)
-    if (/^\d+$/.test(select_input.value)) {
+    if (!select_input.value) {
+        select_input.classList.remove('error');
+    } else if (/^\d+$/.test(select_input.value)) {
         select_input.classList.remove('error');
     } else {
         select_input.classList.add('error');
@@ -334,7 +335,6 @@ function multi_submit() {
             service_2: document.getElementById('service_2_' + id).value,
             service_3: document.getElementById('service_3_' + id).value,
             service_4: document.getElementById('service_4_' + id).value,
-            updated_by: document.getElementById('updated_by_' + id).value,
         })
     }
 
@@ -346,8 +346,90 @@ function multi_submit() {
             'X-CSRFToken': document.cookie.split('=')[1],
         },
         data: JSON.stringify(request_data),
+        success: function (response) {
+            location.reload();
+        },
+        error: function(xhr, status, error) {
+            location.reload();
+        }
     });
-    setTimeout(() => {
-        location.reload();
-    }, 300);
+}
+
+function check_add_item() {
+    let tbody = document.getElementById("multi_did_item"); // Reference to the tbody
+    let rowCount = tbody.querySelectorAll('tr').length; // Current number of rows
+    let newRowIndex = rowCount + 1; // Index for the new row
+
+    let trElement = document.getElementById("multi_did_create_1");
+    let trElementClone = trElement.cloneNode(true); // Deep clone the row
+    trElementClone.id = "multi_did_create_" + newRowIndex; // Update the id of the cloned tr element
+
+    // Get all first child elements of td tags within the cloned tr and update their IDs
+    let firstChildElements = trElementClone.querySelectorAll("td > :first-child");
+    firstChildElements.forEach((element) => {
+        let baseId = element.id.substring(0, element.id.lastIndexOf("_") + 1); // Extract base ID without the numeric part
+        element.id = baseId + newRowIndex; // Update ID with new index
+        if (element.name) {
+            let baseName = element.name.substring(0, element.name.lastIndexOf("_") + 1); // Extract base name without the numeric part
+            element.name = baseName + newRowIndex; // Update name with new index
+        }
+        // Reset input/select values for the cloned row
+        if (element.tagName === "INPUT") {
+            element.value = ""; // Reset text input value
+        } else if (element.tagName === "SELECT") {
+            element.selectedIndex = 0; // Reset select to the first option
+        }
+    });
+    tbody.appendChild(trElementClone);
+}
+
+function multi_add_submit() {
+    data = document.querySelectorAll('tr')
+    var request_data = []
+    for (let i = 1; i < data.length; i++) {
+        console.log(data[i].id.split('_')[3]);
+        id = data[i].id.split('_')[3];
+        request_data.push({
+            did: document.getElementById('did_' + id).value,
+            customer: document.getElementById('customer_' + id).value,
+            reseller: document.getElementById('reseller_' + id).value,
+            in_method: document.getElementById('in_method_' + id).value,
+            voice_carrier: document.getElementById('voice_carrier_' + id).value,
+            status: document.getElementById('status_' + id).value,
+            sms_enabled: document.getElementById('sms_enabled_' + id).value,
+            sms_carrier: document.getElementById('sms_carrier_' + id).value,
+            sms_type: document.getElementById('sms_type_' + id).value,
+            sms_campaign: document.getElementById('sms_campaign_' + id).value,
+            term_location: document.getElementById('term_location_' + id).value,
+            user_first_name: document.getElementById('user_first_name_' + id).value,
+            user_last_name: document.getElementById('user_last_name_' + id).value,
+            extension: document.getElementById('extension_' + id).value,
+            email: document.getElementById('email_' + id).value,
+            onboard_date: document.getElementById('onboard_date_' + id).value,
+            note: document.getElementById('note_' + id).value,
+            e911_enabled_billed: document.getElementById('e911_enabled_billed_' + id).value,
+            e911_cid: document.getElementById('e911_cid_' + id).value,
+            e911_address: document.getElementById('e911_address_' + id).value,
+            service_1: document.getElementById('service_1_' + id).value,
+            service_2: document.getElementById('service_2_' + id).value,
+            service_3: document.getElementById('service_3_' + id).value,
+            service_4: document.getElementById('service_4_' + id).value,
+        })
+    }
+
+    $.ajax({
+        url: `${window.location.origin}/did/multi_add/`,
+        method: 'POST',
+        contentType: 'application/json', 
+        headers: {
+            'X-CSRFToken': document.cookie.split('=')[1],
+        },
+        data: JSON.stringify(request_data),
+        success: function (response) {
+            location.reload();
+        },
+        error: function(xhr, status, error) {
+            location.reload();
+        }
+    });
 }
