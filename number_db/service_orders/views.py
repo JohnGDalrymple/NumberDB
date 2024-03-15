@@ -197,7 +197,9 @@ def service_order_update(request, id):
             messages.warning(request, e)
         return redirect('/service_order')
     else:
-        service_order = Service_Order.objects.filter(id=int(id)).values()[0]
+        service_order = Service_Order.objects.get(id=int(id))
+        number_email_date = service_order.number_email_dates.all().values()
+
         customers_data = Customer.objects.values_list('record_id', 'full_name')
         status_data = Status.objects.all()
         voice_carrier_data = Voice_Carrier.objects.all()
@@ -211,6 +213,7 @@ def service_order_update(request, id):
         sms_type = []
         term_location = []
         services = []
+        number_email_date_data = []
 
         for item in customers_data:
             if str(item[0]).isdigit():
@@ -237,32 +240,39 @@ def service_order_update(request, id):
                 services.append({'id': item.record_id, 'name': item.name})
 
         service_order_data = {
-            'id': service_order['id'],
-            'username': service_order['username'],
-            'email': service_order['email'],
-            'number': service_order['number'],
-            'requested_port_date': service_order['requested_port_date'].strftime('%Y-%m-%d'),
-            'e911_number': service_order['e911_number'],
-            'e911_address': service_order['e911_address'],
-            'customer': service_order['customer_id'],
-            'reseller': service_order['reseller'],
-            'status': service_order['service_status_id'],
-            'voice_carrier': service_order['voice_carrier_id'],
-            'sms_carrier': service_order['sms_carrier_id'],
-            'sms_type': service_order['sms_type_id'],
-            'term_location': service_order['term_location_id'],
-            'sms_enabled': service_order['sms_enabled'],
-            'sms_campaign': service_order['sms_campaign'],
-            'user_first_name': service_order['user_first_name'],
-            'user_last_name': service_order['user_last_name'],
-            'extension': service_order['extension'],
-            'onboard_date': service_order['onboard_date'].strftime('%Y-%m-%d') if service_order['onboard_date'] else None,
-            'e911_enabled_billed': service_order['e911_enabled_billed'],
-            'service_1': service_order['service_1_id'],
-            'service_2': service_order['service_2_id'],
-            'service_3': service_order['service_3_id'],
-            'service_4': service_order['service_4_id'],
+            'username': service_order.username if not service_order.username else '',
+            'customer': service_order.customer.record_id if not service_order.customer is None or '' else '',
+            'texting': service_order.texting if not service_order.texting else '',
+            'term_location': service_order.term_location_id if not service_order.term_location_id else '',
         }
+
+        # service_order_data = {
+        #     'id': service_order['id'],
+        #     'username': service_order['username'],
+        #     'email': service_order['email'],
+        #     'number': service_order['number'],
+        #     'requested_port_date': service_order['requested_port_date'].strftime('%Y-%m-%d'),
+        #     'e911_number': service_order['e911_number'],
+        #     'e911_address': service_order['e911_address'],
+        #     'customer': service_order['customer_id'],
+        #     'reseller': service_order['reseller'],
+        #     'status': service_order['service_status_id'],
+        #     'voice_carrier': service_order['voice_carrier_id'],
+        #     'sms_carrier': service_order['sms_carrier_id'],
+        #     'sms_type': service_order['sms_type_id'],
+        #     'term_location': service_order['term_location_id'],
+        #     'sms_enabled': service_order['sms_enabled'],
+        #     'sms_campaign': service_order['sms_campaign'],
+        #     'user_first_name': service_order['user_first_name'],
+        #     'user_last_name': service_order['user_last_name'],
+        #     'extension': service_order['extension'],
+        #     'onboard_date': service_order['onboard_date'].strftime('%Y-%m-%d') if service_order['onboard_date'] else None,
+        #     'e911_enabled_billed': service_order['e911_enabled_billed'],
+        #     'service_1': service_order['service_1_id'],
+        #     'service_2': service_order['service_2_id'],
+        #     'service_3': service_order['service_3_id'],
+        #     'service_4': service_order['service_4_id'],
+        # }
 
         return render(request, 'service_order_edit.html', {'service_order': service_order_data, 'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'sms_carrier': voice_carrier, 'sms_type': sms_type, 'term_location': term_location, 'services': services})
     
@@ -274,13 +284,23 @@ def service_order_submit(request, id):
         service_order.status = 2
         service_order.save()
 
+        i = 1
+
         post_create_msg = pymsteams.connectorcard(os.getenv('TEAMS_WEBHOOK_URL'))
         post_create_msg.title("A new service order was submitted.")
-        msg_temp = [f"Here is the detailed information.\n", f"- Requested username: {service_order.username}\n", f"- Requested email: {service_order.email}\n", f"- Requested number: {service_order.number}\n"]
-        msg_temp.append(f"- Requested port date: {service_order.requested_port_date}\n" if service_order.requested_port_date else '')
-        msg_temp.append(f"- Requested E911 number: {service_order.e911_number}\n" if service_order.e911_number else '')
-        msg_temp.append(f"- Requested E911 address: {service_order.e911_address}\n" if service_order.e911_address else '')
+        msg_temp = [f"Here is the detailed information.\n"]
+        msg_temp.append(f"- Requested username: {service_order.username}\n" if service_order.username else '')
         msg_temp.append(f"- Requested description: {service_order.texting}\n" if service_order.texting else '')
+        msg_temp.append("\n")
+
+        for item in service_order.number_email_dates.all():
+            msg_temp.append(f"{i}. Requested number: {item.number}\n" if item.number else '')
+            msg_temp.append(f" - Requested email: {item.email}\n" if item.email else '')
+            msg_temp.append(f" - Requested port date: {item.requested_port_date}\n" if item.requested_port_date else '')
+            msg_temp.append(f" - Requested E911 number: {item.e911_number}\n" if item.e911_number else '')
+            msg_temp.append(f" - Requested E911 address: {item.e911_address}\n" if item.e911_address else '')
+            i = i + 1
+
         post_create_msg.text('\n'.join(msg_temp))
         post_create_msg.send()
         

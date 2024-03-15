@@ -13,8 +13,8 @@ var selectCount = 0;
 var id;
 
 function fullCheck() {
-    for(let i in selectList) 
-        selectList[i].checked = fullCheckAction.checked
+    for(let i in selectList)
+        selectList[i].checked = fullCheckAction.checked;
 
     if (fullCheckAction.checked === true) {
         selectCount = selectList.length;
@@ -36,7 +36,7 @@ window.addEventListener('DOMContentLoaded', event => {
     }
 
     if (document.getElementById('multi_standard')) {
-        document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0
+        document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0;
     }
 
     document.getElementById('input_multi_number')?.addEventListener('input', () => {
@@ -55,16 +55,16 @@ window.addEventListener('DOMContentLoaded', event => {
 });
 
 window.document.getElementById("selectDownloadButton")?.addEventListener("click", () => {
-    const selectIds = []
+    const selectIds = [];
     for(var i in selectList) {
         if(selectList[i].checked && selectList[i].id) {
             if(selectList[i].id.includes("select_")) {
-                selectIds.push(selectList[i].id.replace("select_", ""))
+                selectIds.push(selectList[i].id.replace("select_", ""));
             }
         }
     }
 
-    document.getElementById("selectDownloadButton").href = `${window.location.origin}/export-csv/?pk=${selectIds}`
+    document.getElementById("selectDownloadButton").href = `${window.location.origin}/export-csv/?pk=${selectIds}`;
 
     for(let i in selectList) 
         selectList[i].checked = false;
@@ -84,7 +84,7 @@ window.document.getElementById("selectCustomerDownloadButton")?.addEventListener
     for(var i in selectList) {
         if(selectList[i].checked && selectList[i].id) {
             if(selectList[i].id.includes("select_")) {
-                selectIds.push(selectList[i].id.replace("select_", ""))
+                selectIds.push(selectList[i].id.replace("select_", ""));
             }
         }
     }
@@ -134,126 +134,142 @@ function editStatus(id) {
         url: `${window.location.origin}/assist_did/service_status_read/${id}`,
         method: 'GET',
         success: function(response) {
-            document.getElementById("edit_status_name").value = response.name
-            document.getElementById("edit_status_button").name = response.id
+            document.getElementById("edit_status_name").value = response.name;
+            document.getElementById("edit_status_button").name = response.id;
         }
     });
 }
 
-document.getElementById("edit_status_form")?.addEventListener('submit', ()=>[
-    document.getElementById("edit_status_form").action = `${window.location.origin}/assist_did/service_status_update/${document.getElementById("edit_status_button").name}`
-])
+document.getElementById("edit_status_form")?.addEventListener('submit', ()=>{
+    document.getElementById("edit_status_form").action = `${window.location.origin}/assist_did/service_status_update/${document.getElementById("edit_status_button").name}`;
+})
 
 function editService(id) {
     $.ajax({
         url: `${window.location.origin}/assist_did/service_item_read/${id}`,
         method: 'GET',
         success: function(response) {
-            document.getElementById("edit_service_item_name").value = response.name
-            document.getElementById("edit_service_item_description").value = response.description
-            document.getElementById("edit_service_item_button").name = response.id
+            document.getElementById("edit_service_item_name").value = response.name;
+            document.getElementById("edit_service_item_description").value = response.description;
+            document.getElementById("edit_service_item_button").name = response.id;
         }
     });
 }
 
-document.getElementById("edit_service_item_form")?.addEventListener('submit', ()=>[
-    document.getElementById("edit_service_item_form").action = `${window.location.origin}/assist_did/service_item_update/${document.getElementById("edit_service_item_button").name}`
-])
+document.getElementById("edit_service_item_form")?.addEventListener('submit', ()=>{
+    document.getElementById("edit_service_item_form").action = `${window.location.origin}/assist_did/service_item_update/${document.getElementById("edit_service_item_button").name}`;
+})
 
 function editVoiceCarrier(id) {
     $.ajax({
         url: `${window.location.origin}/assist_did/voice_carrier_read/${id}`,
         method: 'GET',
         success: function(response) {
-            document.getElementById("edit_voice_carrier_name").value = response.name
-            document.getElementById("edit_voice_carrier_button").name = response.id
+            document.getElementById("edit_voice_carrier_name").value = response.name;
+            document.getElementById("edit_voice_carrier_button").name = response.id;
         }
     });
 }
 
-document.getElementById("edit_voice_carrier_form")?.addEventListener('submit', ()=>[
-    document.getElementById("edit_voice_carrier_form").action = `${window.location.origin}/assist_did/voice_carrier_update/${document.getElementById("edit_voice_carrier_button").name}`
-])
+document.getElementById("edit_voice_carrier_form")?.addEventListener('submit', ()=>{
+    document.getElementById("edit_voice_carrier_form").action = `${window.location.origin}/assist_did/voice_carrier_update/${document.getElementById("edit_voice_carrier_button").name}`;
+})
 
 function editSMSCarrier(id) {
     $.ajax({
         url: `${window.location.origin}/assist_did/sms_carrier_read/${id}`,
         method: 'GET',
         success: function(response) {
-            document.getElementById("edit_sms_carrier_name").value = response.name
-            document.getElementById("edit_sms_carrier_button").name = response.id
+            document.getElementById("edit_sms_carrier_name").value = response.name;
+            document.getElementById("edit_sms_carrier_button").name = response.id;
         }
     });
 }
 
-document.getElementById("edit_sms_carrier_form")?.addEventListener('submit', ()=>[
-    document.getElementById("edit_sms_carrier_form").action = `${window.location.origin}/assist_did/sms_carrier_update/${document.getElementById("edit_sms_carrier_button").name}`
-])
+document.getElementById("edit_sms_carrier_form")?.addEventListener('submit', ()=>{
+    document.getElementById("edit_sms_carrier_form").action = `${window.location.origin}/assist_did/sms_carrier_update/${document.getElementById("edit_sms_carrier_button").name}`;
+})
 
 function editCustomerType(id) {
     $.ajax({
         url: `${window.location.origin}/assist_did/customer_type_read/${id}`,
         method: 'GET',
         success: function(response) {
-            document.getElementById("edit_customer_type_name").value = response.name
-            document.getElementById("edit_customer_type_button").name = response.id
+            document.getElementById("edit_customer_type_name").value = response.name;
+            document.getElementById("edit_customer_type_button").name = response.id;
         }
     });
 }
 
-document.getElementById("edit_customer_type_form")?.addEventListener('submit', ()=>[
-    document.getElementById("edit_customer_type_form").action = `${window.location.origin}/assist_did/customer_type_update/${document.getElementById("edit_customer_type_button").name}`
-])
+document.getElementById("edit_customer_type_form")?.addEventListener('submit', ()=>{
+    document.getElementById("edit_customer_type_form").action = `${window.location.origin}/assist_did/customer_type_update/${document.getElementById("edit_customer_type_button").name}`;
+})
 
 function editSMSType(id) {
     $.ajax({
         url: `${window.location.origin}/assist_did/sms_type_read/${id}`,
         method: 'GET',
         success: function(response) {
-            document.getElementById("edit_sms_type_name").value = response.name
-            document.getElementById("edit_sms_type_button").name = response.id
+            document.getElementById("edit_sms_type_name").value = response.name;
+            document.getElementById("edit_sms_type_button").name = response.id;
         }
     });
 }
 
-document.getElementById("edit_sms_type_form")?.addEventListener('submit', ()=>[
-    document.getElementById("edit_sms_type_form").action = `${window.location.origin}/assist_did/sms_type_update/${document.getElementById("edit_sms_type_button").name}`
-])
+document.getElementById("edit_sms_type_form")?.addEventListener('submit', ()=>{
+    document.getElementById("edit_sms_type_form").action = `${window.location.origin}/assist_did/sms_type_update/${document.getElementById("edit_sms_type_button").name}`;
+})
 
 function editTermLocation(id) {
     $.ajax({
         url: `${window.location.origin}/assist_did/term_location_read/${id}`,
         method: 'GET',
         success: function(response) {
-            document.getElementById("edit_term_location_name").value = response.name
-            document.getElementById("edit_term_location_button").name = response.id
+            document.getElementById("edit_term_location_name").value = response.name;
+            document.getElementById("edit_term_location_button").name = response.id;
         }
     });
 }
 
-document.getElementById("edit_term_location_form")?.addEventListener('submit', ()=>[
-    document.getElementById("edit_term_location_form").action = `${window.location.origin}/assist_did/term_location_update/${document.getElementById("edit_term_location_button").name}`
-])
+document.getElementById("edit_term_location_form")?.addEventListener('submit', ()=>{
+    document.getElementById("edit_term_location_form").action = `${window.location.origin}/assist_did/term_location_update/${document.getElementById("edit_term_location_button").name}`;
+})
 
 function multi_did_add_check() {
     if (document.getElementById('multi_add')) {
-        var currentStatus = true
+        var currentStatus = true;
         const didElements = document.querySelectorAll('[name="did"]');
         const customerElements = document.querySelectorAll('[name="customer"]');
 
         didElements.forEach(item => {
             if (!item.value) {
-                currentStatus = false
+                currentStatus = false;
             }
         })
 
         customerElements.forEach(item => {
             if (!item.value) {
-                currentStatus = false
+                currentStatus = false;
             }
         })
 
-        document.getElementById('multi_add').disabled = !(document.querySelectorAll('.error').length == 0 && currentStatus)
+        document.getElementById('multi_add').disabled = !(document.querySelectorAll('.error').length == 0 && currentStatus);
+    }
+}
+
+function service_order_value_check() {
+    if (document.getElementById('service_order_create_2')) {
+        var currentStatus = true;
+        const numberElements = document.querySelectorAll('[name="number"]');
+        currentStatus = !!document.getElementById('customer').value && currentStatus;
+
+        numberElements.forEach(item => {
+            if (!item.value) {
+                currentStatus = false;
+            }
+        })
+
+        document.getElementById('service_order_create_2').disabled = !(document.querySelectorAll('.error').length == 0 && currentStatus);
     }
 }
 
@@ -268,10 +284,11 @@ function change_num(input_type ,id) {
     }
 
     if (document.getElementById('multi_standard')) {
-        document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0
+        document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0;
     }
 
-    multi_did_add_check()
+    multi_did_add_check();
+    service_order_value_check();
 }
 
 function change_select(select_type, id) {
@@ -283,14 +300,15 @@ function change_select(select_type, id) {
     }
 
     if (document.getElementById('multi_standard')) {
-        document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0
+        document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0;
     }
 
-    multi_did_add_check()
+    multi_did_add_check();
+    service_order_value_check();
 }
 
 function change_email(id) {
-    email_input = document.getElementById('email_' + id)
+    email_input = document.getElementById('email_' + id);
     var regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     email_input.value.split(',').map(item => {
         if (regex.test(String(item.trim()).toLowerCase()) || email_input.value === '') {
@@ -303,6 +321,9 @@ function change_email(id) {
     if (document.getElementById('multi_standard')) {
         document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0
     }
+
+    multi_did_add_check();
+    service_order_value_check();
 }
 
 $(function () {
@@ -533,6 +554,7 @@ function service_order_create() {
             document.open();
             document.write(response);
             document.close();
+            window.location.href = '/service_order/'
         },
         error: function(xhr, status, error) {
             location.reload();

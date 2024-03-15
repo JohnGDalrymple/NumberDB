@@ -21,7 +21,7 @@
 {% endblock %}
 {% block body %}
 <div class="container-fluid px-4">
-  <h1 class="mt-4">Service Order Create Step 2</h1>
+  <h1 class="mt-4">Service Order</h1>
   <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
     <li class="breadcrumb-item active">Service Order Create Step 2</li>
@@ -50,10 +50,10 @@
             </div>
           </div>
           <div class="col-2">
-            <select name="customer" id="customer" class="form-select p-3">
+            <select name="customer" id="customer" class="form-select p-3" onchange="change_select('customer', '')">
               <option value="" {% if customer == '' %}selected{% endif %}></option>
               {% for item in customers %}
-                <option value="{{ item.id }}" {% if customer == item.id %}selected{% endif %}>{{ item.full_name }}</option>
+                <option value="{{ item.id }}" class="text-dark" {% if customer == item.id %}selected{% endif %}>{{ item.full_name }}</option>
               {% endfor %}
             </select>
           </div>
