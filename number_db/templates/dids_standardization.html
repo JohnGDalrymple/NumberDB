@@ -17,9 +17,6 @@
       /* color: #DC3545; 
       opacity: 0.7;
     }  */
-    .error {
-      color: #DC3545 !important;
-    }
   </style>
 {% endblock %}
 {% block body %}
@@ -98,7 +95,7 @@
                 <a class="btn btn-sm btn-danger" href="delete/{{ did.id }}"><span class="fa fa-trash"></span> Delete</a>
               </td>
               <td {% if not did.did_status %}class="text-danger"{% endif %}>
-                <input type="text" id="did_{{ did.id }}" name="did" class="form-control" value="{{did.did}}" {% if not did.did_status %} style="min-width: 150px; color: #DC3545;" data-toggle="tooltip" data-placement="top" title="Invalid DID Format - only number" {% else %} style="min-width: 150px;" {% endif %} required oninput="change_num('did_', '{{ did.id }}')">
+                <input type="text" id="did_{{ did.id }}" name="did" value="{{did.did}}" {% if not did.did_status %} class="form-control error" data-toggle="tooltip" data-placement="top" title="Invalid DID Format - only number" {% else %} class="form-control" {% endif %} style="min-width: 150px;" required oninput="change_num('did_', '{{ did.id }}')">
               </td>
               <td>
                 <select name="customer" id="customer_{{ did.id }}" {% if not did.customer_status %} class="form-select error" data-toggle="tooltip" data-placement="top" title="Unregistered customer or Empty" {% else %} class="form-select" {% endif %} style="min-width: 180px;" required onchange="change_select('customer_', '{{ did.id }}')">
@@ -181,7 +178,7 @@
                 <input type="text" id="email_{{ did.id }}" name="email" {% if not did.email_status %} class="form-control error" {% else %} class="form-control" {% endif %} style="min-width: 180px;" value="{{ did.email }}" oninput="change_email('{{ did.id }}')">
               </td>
               <td>
-                <input type="text" id="onboard_date_{{ did.id }}" name="onboard_date" {% if not did.onboard_date_status %} class="form-control error" data-toggle="tooltip" data-placement="top" title="Invalid Date Format - (MM/DD/YYYY)" {% else %} class="form-control" {% endif %} style="min-width: 130px;" value="{{ did.onboard_date }}" oninput="change_date('{{ did.id }}')">
+                <input type="text" id="onboard_date_{{ did.id }}" name="onboard_date" {% if not did.onboard_date_status %} class="form-control error" data-toggle="tooltip" data-placement="top" title="Invalid Date Format - (MM/DD/YYYY)" {% else %} class="form-control" {% endif %} style="min-width: 130px;" value="{{ did.onboard_date }}" oninput="change_date('onboard_date_', '{{ did.id }}')">
               </td>
               <td>
                 <input type="text" class="form-control" id="note_{{ did.id }}" name="note" style="min-width: 150px;" value="{{ did.note }}">

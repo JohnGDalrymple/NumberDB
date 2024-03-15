@@ -4,7 +4,9 @@ from django.urls import path
 urlpatterns = [
     path('', views.service_order_list, name='service_order'),
     path('delete/<int:id>', views.service_order_delete, name='service_order_delete'),
-    path('add/', views.service_order_add, name='service_order_add'),
+    path('add_step_1/', views.service_order_add_step_1, name='service_order_add_step_1'),
+    path('add_step_2/', views.service_order_add_step_2, name='service_order_add_step_2'),
+    path('create/', views.service_order_create, name='service_order_create'),
     path('edit/<int:id>', views.service_order_update, name='service_order_update'),
     path('submit/<int:id>', views.service_order_submit, name='service_order_submit'),
     # path('did/', views.did, name='did'),

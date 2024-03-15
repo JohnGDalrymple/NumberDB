@@ -12240,3 +12240,7 @@ body {
   width: 100%;
   overflow-x: auto;
 }
+
+.error {
+  color: #DC3545 !important;
+}

@@ -84,7 +84,7 @@
                 <input id="did_1" type="text" name="did" class="form-control" value="" style="min-width: 150px;" required oninput="change_num('did_', '1')">
               </td>
               <td>
-                <select name="customer" class="form-select" id="customer_1" style="min-width: 180px;" required>
+                <select name="customer" class="form-select" id="customer_1" style="min-width: 180px;" required onchange="change_select('customer_', '1')">
                   <option value=""></option>
                   {% for customer in customers %}
                     <option value="{{ customer.id }}" class="text-dark">{{ customer.full_name }}</option>
@@ -164,7 +164,7 @@
                 <input type="text" id="email_1" name="email" class="form-control" style="min-width: 180px;" value="" oninput="change_email('1')">
               </td>
               <td>
-                <input type="text" id="onboard_date_1" name="onboard_date" class="form-control" style="min-width: 130px;" value="" oninput="change_date('1')">
+                <input type="text" id="onboard_date_1" name="onboard_date" class="form-control" style="min-width: 130px;" value="" oninput="change_date('onboard_date', '1')">
               </td>
               <td>
                 <input type="text" class="form-control" id="note_1" name="note" style="min-width: 150px;" value="">
@@ -183,7 +183,7 @@
                 <input type="text" class="form-control" id="e911_address_1" name="e911_address" style="min-width: 200px;" value="">
               </td>
               <td>
-                <select name="service_1" id="service_1_1" class="form-select" style="min-width: 180px;" onchange="change_select('service_1_', '1')">
+                <select name="service_1" id="service_1_1" class="form-select" style="min-width: 180px;">
                   <option value=""></option>
                   {% for item in services %}
                     <option value="{{ item.id }}" class="text-dark">{{ item.name }}</option>
@@ -191,7 +191,7 @@
                 </select>
               </td>
               <td>
-                <select name="service_2" id="service_2_1" class="form-select" style="min-width: 180px;" onchange="change_select('service_2_', '1')">
+                <select name="service_2" id="service_2_1" class="form-select" style="min-width: 180px;">
                   <option value=""></option>
                   {% for item in services %}
                     <option value="{{ item.id }}" class="text-dark">{{ item.name }}</option>
@@ -199,7 +199,7 @@
                 </select>
               </td>
               <td>
-                <select name="service_3" id="service_3_1" class="form-select" style="min-width: 180px;" onchange="change_select('service_3_', '1')">
+                <select name="service_3" id="service_3_1" class="form-select" style="min-width: 180px;">
                   <option value=""></option>
                   {% for item in services %}
                     <option value="{{ item.id }}" class="text-dark">{{ item.name }}</option>
@@ -207,7 +207,7 @@
                 </select>
               </td>
               <td>
-                <select name="service_4" id="service_4_1" class="form-select" style="min-width: 180px;" onchange="change_select('service_4_', '1')">
+                <select name="service_4" id="service_4_1" class="form-select" style="min-width: 180px;">
                   <option value=""></option>
                   {% for item in services %}
                     <option value="{{ item.id }}" class="text-dark">{{ item.name }}</option>
@@ -219,7 +219,7 @@
         </table>
       </div>
       <div class="d-flex justify-content-end gap-3 mt-3">
-        <button id="multi_add" class="btn btn-primary btn-block" type="button" onclick="check_add_item()"><i class="fa fa-add"></i> Add new item</button>
+        <button id="multi_add" class="btn btn-primary btn-block" type="button" onclick="check_add_item()" disabled><i class="fa fa-add"></i> Add new item</button>
         <button id="multi_submit" class="btn btn-primary btn-block" type="button" onclick="multi_add_submit()"><i class="fa fa-save"></i> Submit all items</button>
       </div>
     </div>
