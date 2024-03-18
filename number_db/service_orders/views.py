@@ -161,39 +161,52 @@ def service_order_create(request):
 @login_required
 def service_order_update(request, id):
     if request.method == "POST":
-        service_order = Service_Order.objects.get(id=int(id))
         try:
-            service_order.username = request.POST['username']
-            service_order.email = request.POST['email']
-            service_order.number = request.POST['number']
-            service_order.requested_port_date= parse_date(request.POST['requested_port_date'])
-            service_order.texting = request.POST['texting']
-            service_order.e911_address = request.POST['e911_address']
-            service_order.e911_number = int(request.POST['e911_number']) if request.POST['e911_number'] else None
-            service_order.customer = Customer.objects.get(record_id = int(request.POST['customer'])) if request.POST['customer'] else None
-            service_order.reseller = request.POST['reseller']
-            service_order.service_status = Status.objects.get(record_id = int(request.POST['status'])) if request.POST['status'] else None
-            service_order.voice_carrier = Voice_Carrier.objects.get(record_id = int(request.POST['voice_carrier'])) if request.POST['voice_carrier'] else None
-            service_order.sms_carrier = Voice_Carrier.objects.get(record_id = int(request.POST['sms_carrier'])) if request.POST['sms_carrier'] else None
-            service_order.sms_type = SMS_Type.objects.get(record_id = int(request.POST['sms_type'])) if request.POST['sms_type'] else None
-            service_order.term_location = Term_Location.objects.get(record_id = int(request.POST['term_location'])) if request.POST['term_location'] else None
-            service_order.sms_enabled = request.POST['sms_enabled'] if request.POST['sms_enabled'] else None
-            service_order.user_first_name = request.POST['user_first_name']
-            service_order.user_last_name = request.POST['user_last_name']
-            service_order.extension = int(request.POST['extension']) if request.POST['extension'] else None
-            service_order.onboard_date = parse_date(request.POST['onboard_date'])
-            service_order.e911_enabled_billed = request.POST['e911_enabled_billed'] if request.POST['e911_enabled_billed'] else None
-            service_order.service_1 = Service.objects.get(record_id = int(request.POST['service_1'])) if request.POST['service_1'] else None
-            service_order.service_2 = Service.objects.get(record_id = int(request.POST['service_2'])) if request.POST['service_2'] else None
-            service_order.service_3 = Service.objects.get(record_id = int(request.POST['service_3'])) if request.POST['service_3'] else None
-            service_order.service_4 = Service.objects.get(record_id = int(request.POST['service_4'])) if request.POST['service_4'] else None
+            request_data = json.loads(request.body)
+            print(request_data)
+
+            service_order = Service_Order.objects.get(id=int(id))
+
+            service_order.username = request_data['username']
+            service_order.texting = request_data['texting']
+            service_order.customer = Customer.objects.get(record_id = int(request_data['customer'])) if request_data['customer'] else None
+            service_order.term_location = Term_Location.objects.get(record_id = int(request_data['term_location'])) if request_data['term_location'] else None
             service_order.updated_by = str(request.user)
             service_order.updated_at = datetime.datetime.now()
             service_order.status = 1
+
+            for item in request_data['number_email_date']:
+                service_order_number_email_date_data = Number_Email_Date.objects.get(id=item['id'])
+                service_order_number_email_date_data.number = int(item['number'])
+                service_order_number_email_date_data.email = item['email']
+                service_order_number_email_date_data.reseller = item['reseller']
+                service_order_number_email_date_data.requested_port_date = parse_date(item['requested_port_date']) if item['requested_port_date'] else None
+                service_order_number_email_date_data.e911_number = int(item['e911_number']) if item['e911_number'] else None
+                service_order_number_email_date_data.e911_address = item['e911_address']
+                service_order_number_email_date_data.service_status = Status.objects.get(record_id=item['service_status']) if item['service_status'] else None
+                service_order_number_email_date_data.voice_carrier = Voice_Carrier.objects.get(record_id=item['voice_carrier']) if item['voice_carrier'] else None
+                service_order_number_email_date_data.sms_carrier = Voice_Carrier.objects.get(record_id=item['sms_carrier']) if item['sms_carrier'] else None
+                service_order_number_email_date_data.sms_type = SMS_Type.objects.get(record_id=item['sms_type']) if item['sms_type'] else None
+                service_order_number_email_date_data.sms_enabled = item['sms_enabled']
+                service_order_number_email_date_data.sms_campaign = item['sms_campaign']
+                service_order_number_email_date_data.user_first_name = item['user_first_name']
+                service_order_number_email_date_data.user_last_name = item['user_last_name']
+                service_order_number_email_date_data.extension = int(item['extension']) if item['extension'] else None
+                service_order_number_email_date_data.onboard_date = parse_date(item['onboard_date']) if item['onboard_date'] else None
+                service_order_number_email_date_data.e911_enabled_billed = item['e911_enabled_billed']
+                service_order_number_email_date_data.service_1 = Service.objects.get(record_id=item['service_1']) if item['service_1'] else None
+                service_order_number_email_date_data.service_2 = Service.objects.get(record_id=item['service_2']) if item['service_2'] else None
+                service_order_number_email_date_data.service_3 = Service.objects.get(record_id=item['service_3']) if item['service_3'] else None
+                service_order_number_email_date_data.service_4 = Service.objects.get(record_id=item['service_4']) if item['service_4'] else None
+
+                service_order_number_email_date_data.save()
+
             service_order.full_clean()
             service_order.save()
+
             messages.success(request, 'The service order was updated successfully!')
         except Exception as e:
+            print(e)
             messages.warning(request, e)
         return redirect('/service_order')
     else:
@@ -240,41 +253,39 @@ def service_order_update(request, id):
                 services.append({'id': item.record_id, 'name': item.name})
 
         service_order_data = {
-            'username': service_order.username if not service_order.username else '',
+            'username': service_order.username if service_order.username else '',
             'customer': service_order.customer.record_id if not service_order.customer is None or '' else '',
-            'texting': service_order.texting if not service_order.texting else '',
-            'term_location': service_order.term_location_id if not service_order.term_location_id else '',
+            'texting': service_order.texting if service_order.texting else '',
+            'term_location': service_order.term_location.record_id if not service_order.term_location is None or '' else '',
         }
 
-        # service_order_data = {
-        #     'id': service_order['id'],
-        #     'username': service_order['username'],
-        #     'email': service_order['email'],
-        #     'number': service_order['number'],
-        #     'requested_port_date': service_order['requested_port_date'].strftime('%Y-%m-%d'),
-        #     'e911_number': service_order['e911_number'],
-        #     'e911_address': service_order['e911_address'],
-        #     'customer': service_order['customer_id'],
-        #     'reseller': service_order['reseller'],
-        #     'status': service_order['service_status_id'],
-        #     'voice_carrier': service_order['voice_carrier_id'],
-        #     'sms_carrier': service_order['sms_carrier_id'],
-        #     'sms_type': service_order['sms_type_id'],
-        #     'term_location': service_order['term_location_id'],
-        #     'sms_enabled': service_order['sms_enabled'],
-        #     'sms_campaign': service_order['sms_campaign'],
-        #     'user_first_name': service_order['user_first_name'],
-        #     'user_last_name': service_order['user_last_name'],
-        #     'extension': service_order['extension'],
-        #     'onboard_date': service_order['onboard_date'].strftime('%Y-%m-%d') if service_order['onboard_date'] else None,
-        #     'e911_enabled_billed': service_order['e911_enabled_billed'],
-        #     'service_1': service_order['service_1_id'],
-        #     'service_2': service_order['service_2_id'],
-        #     'service_3': service_order['service_3_id'],
-        #     'service_4': service_order['service_4_id'],
-        # }
+        for item in number_email_date:
+            number_email_date_data.append({
+                'id': item['id'],
+                'email': item['email'] if item['email'] else '',
+                'number': item['number'] if item['number'] else '',
+                'requested_port_date': item['requested_port_date'].strftime('%Y-%m-%d') if item['requested_port_date'] else '',
+                'e911_number': item['e911_number'] if item['e911_number'] else '',
+                'e911_address': item['e911_address'] if item['e911_address'] else '',
+                'reseller': item['reseller'] if item['reseller'] else '',
+                'service_status': item['service_status_id'] if item['service_status_id'] else '',
+                'voice_carrier': item['voice_carrier_id'] if item['voice_carrier_id'] else '',
+                'sms_carrier': item['sms_carrier_id'] if item['sms_carrier_id'] else '',
+                'sms_type': item['sms_type_id'] if item['sms_type_id'] else '',
+                'sms_enabled': item['sms_enabled'] if item['sms_enabled'] else '',
+                'sms_campaign': item['sms_campaign'] if item['sms_campaign'] else '',
+                'user_first_name': item['user_first_name'] if item['user_first_name'] else '',
+                'user_last_name': item['user_last_name'] if item['user_last_name'] else '',
+                'extension': item['extension'] if item['extension'] else '',
+                'onboard_date': item['onboard_date'].strftime('%Y-%m-%d') if item['onboard_date'] else '',
+                'e911_enabled_billed': item['e911_enabled_billed'] if item['e911_enabled_billed'] else '',
+                'service_1': item['service_1_id'] if item['service_1_id'] else '',
+                'service_2': item['service_2_id'] if item['service_2_id'] else '',
+                'service_3': item['service_3_id'] if item['service_3_id'] else '',
+                'service_4': item['service_4_id'] if item['service_4_id'] else '',
+            })
 
-        return render(request, 'service_order_edit.html', {'service_order': service_order_data, 'customers': customers, 'status': status, 'voice_carrier': voice_carrier, 'sms_carrier': voice_carrier, 'sms_type': sms_type, 'term_location': term_location, 'services': services})
+        return render(request, 'service_order_edit.html', {'service_order': service_order_data, 'number_email_date_data': number_email_date_data, 'customers': customers, 'status': status, 'voice_carriers': voice_carrier, 'sms_carriers': voice_carrier, 'sms_types': sms_type, 'term_locations': term_location, 'services': services})
     
 
 @login_required

@@ -505,6 +505,10 @@ function multi_number_check() {
     })
 }
 
+function username_validator() {
+    document.getElementById('service_order_create_2').disabled = !document.getElementById('input_username').value
+}
+
 function service_order_create() {
     let number_email_date = []
 
@@ -560,5 +564,62 @@ function service_order_create() {
             location.reload();
         }
     });
+}
 
+function service_order_update() {
+    let number_email_date = []
+
+    for (let i = 0; i < document.querySelectorAll('[name="number"]').length; i++) {
+        number_email_date.push({
+            id: document.querySelectorAll('[name="number"]')[i].id.split('number_')[1],
+            number: document.querySelectorAll('[name="number"]')[i].value,
+            reseller: document.querySelectorAll('[name="reseller"]')[i].value,
+            email: document.querySelectorAll('[name="email"]')[i].value,
+            requested_port_date: document.querySelectorAll('[name="requested_port_date"]')[i].value,
+            e911_number: document.querySelectorAll('[name="e911_number"]')[i].value,
+            e911_address: document.querySelectorAll('[name="e911_address"]')[i].value,
+            service_status: document.querySelectorAll('[name="service_status"]')[i].value,
+            voice_carrier: document.querySelectorAll('[name="voice_carrier"]')[i].value,
+            sms_carrier: document.querySelectorAll('[name="sms_carrier"]')[i].value,
+            sms_type: document.querySelectorAll('[name="sms_type"]')[i].value,
+            sms_enabled: document.querySelectorAll('[name="sms_enabled"]')[i].value,
+            sms_campaign: document.querySelectorAll('[name="sms_campaign"]')[i].value,
+            user_first_name: document.querySelectorAll('[name="user_first_name"]')[i].value,
+            user_last_name: document.querySelectorAll('[name="user_last_name"]')[i].value,
+            extension: document.querySelectorAll('[name="extension"]')[i].value,
+            onboard_date: document.querySelectorAll('[name="onboard_date"]')[i].value,
+            e911_enabled_billed: document.querySelectorAll('[name="e911_enabled_billed"]')[i].value,
+            service_1: document.querySelectorAll('[name="service_1"]')[i].value,
+            service_2: document.querySelectorAll('[name="service_2"]')[i].value,
+            service_3: document.querySelectorAll('[name="service_3"]')[i].value,
+            service_4: document.querySelectorAll('[name="service_4"]')[i].value,
+        })
+    }
+
+    const request_data = {
+        username: document.getElementById('input_username').value,
+        customer: document.getElementById('customer').value,
+        term_location: document.getElementById('term_location').value,
+        texting: document.getElementById('input_texting').value,
+        number_email_date: number_email_date
+    }
+
+    $.ajax({
+        url: `${window.location.origin}/service_order/edit/${window.location.href.split('/')[window.location.href.split('/').length - 1]}`,
+        method: 'POST',
+        contentType: 'application/json', 
+        headers: {
+            'X-CSRFToken': document.cookie.split('=')[1],
+        },
+        data: JSON.stringify(request_data),
+        success: function (response) {
+            document.open();
+            document.write(response);
+            document.close();
+            window.location.href = '/service_order/'
+        },
+        error: function(xhr, status, error) {
+            location.reload();
+        }
+    });
 }
