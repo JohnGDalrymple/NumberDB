@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from .models import *
 from django.db.models import Q
 import datetime
+from functools import reduce
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
@@ -51,27 +52,46 @@ def switchStatus(value):
 
 @login_required
 def service_order_list(request):
-    service_orders = []
-    convert_service_orders = []
     if request.GET.get('search'):
+        service_orders = []
         query = request.GET['search']
-        q_objects = Q()
-        for field in default_data_header:
-            q_objects |= Q(**{field + '__icontains': query})
 
-        service_orders = Service_Order.objects.filter(q_objects)
+        q_objects = []
+        q_objects.append((Q(username__icontains = query)))
+        q_objects.append((Q(customer__full_name__icontains = query)))
+        q_objects.append((Q(texting__icontains = query)))
+        q_objects.append((Q(updated_by__icontains = query)))
+        q_objects.append((Q(term_location__name__icontains = query)))
+        q_objects.append((Q(number_email_dates__number__icontains = query)))
+        q_objects.append((Q(number_email_dates__email__icontains = query)))
+        q_objects.append((Q(number_email_dates__e911_number__icontains = query)))
+        q_objects.append((Q(number_email_dates__e911_address__icontains = query)))
+        q_objects.append((Q(number_email_dates__reseller__icontains = query)))
+        q_objects.append((Q(number_email_dates__service_status__name__icontains = query)))
+        q_objects.append((Q(number_email_dates__voice_carrier__name__icontains = query)))
+        q_objects.append((Q(number_email_dates__sms_carrier__name__icontains = query)))
+        q_objects.append((Q(number_email_dates__sms_type__name__icontains = query)))
+        q_objects.append((Q(number_email_dates__sms_enabled__icontains = query)))
+        q_objects.append((Q(number_email_dates__sms_campaign__icontains = query)))
+        q_objects.append((Q(number_email_dates__user_first_name__icontains = query)))
+        q_objects.append((Q(number_email_dates__user_last_name__icontains = query)))
+        q_objects.append((Q(number_email_dates__extension__icontains = query)))
+        q_objects.append((Q(number_email_dates__e911_enabled_billed__icontains = query)))
+        q_objects.append((Q(number_email_dates__service_1__name__icontains = query)))
+        q_objects.append((Q(number_email_dates__service_2__name__icontains = query)))
+        q_objects.append((Q(number_email_dates__service_3__name__icontains = query)))
+        q_objects.append((Q(number_email_dates__service_4__name__icontains = query)))
+
+        service_orders = Service_Order.objects.filter(reduce(or_, q_objects))
 
         for item in service_orders:
-            item.username = "" if(item.username == None) else item.username
-            item.email = "" if(item.email == None) else item.email
-            item.requested_port_date = "" if(item.requested_port_date == None) else item.requested_port_date.strftime('%Y-%m-%d')
-            item.number = "" if(item.number == None) else item.number
-            item.texting = "" if(item.texting == None) else item.texting
+            item.texting = "" if item.texting is None else item.texting
             item.status = switchStatus(item.status)
-            item.e911_address = "" if(item.e911_address == None) else item.e911_address
-            item.updated_by = "" if(item.updated_by == None) else item.updated_by
-            item.e911_number = "" if(item.e911_number == None) else item.e911_number
-
+            item.updated_by = "" if item.updated_by is None else item.updated_by
+            item.number = item.number_email_dates.all().order_by('id')[0].number if item.number_email_dates.all().order_by('id')[0].number else ""
+            item.email = item.number_email_dates.all().order_by('id')[0].email if item.number_email_dates.all().order_by('id')[0].email else ""
+            item.requested_port_date = item.number_email_dates.all().order_by('id')[0].requested_port_date if item.number_email_dates.all().order_by('id')[0].requested_port_date else ""
+        
         size = request.GET.get('size', 10)
         page_number = request.GET.get('page')
         paginator = Paginator(service_orders, size)
