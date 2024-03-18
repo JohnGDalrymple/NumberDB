@@ -13,8 +13,8 @@ var selectCount = 0;
 var id;
 
 function fullCheck() {
-    for(let i in selectList) 
-        selectList[i].checked = fullCheckAction.checked ? true : false;
+    for(let i in selectList)
+        selectList[i].checked = fullCheckAction.checked;
 
     if (fullCheckAction.checked === true) {
         selectCount = selectList.length;
@@ -36,31 +36,35 @@ window.addEventListener('DOMContentLoaded', event => {
     }
 
     if (document.getElementById('multi_standard')) {
-        document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0 ? true : false;
+        document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0;
     }
 
-    document.getElementById('service_order_detail_less')?.addEventListener('click', () => {
-        $('#service_order_detail_show').fadeToggle(300)
-        if (document.getElementById('show_hide_text').innerText === 'Show more detail') {
-            document.getElementById('show_hide_text').innerText = 'Show less'
-        } else {
-            document.getElementById('show_hide_text').innerText = 'Show more detail'
-        }
+    document.getElementById('input_multi_number')?.addEventListener('input', () => {
+        inputMultiNumber = document.getElementById('input_multi_number');
+        inputMultiNumber.value.split('\n').forEach(item => {
+            if (isNaN(item)) {
+                inputMultiNumber.classList.add('error');
+                document.getElementById('service_order_step_2').disabled = true;
+            } else {
+                inputMultiNumber.classList.remove('error');
+                document.getElementById('service_order_step_2').disabled = false;
+            }
+        })
     })
 
 });
 
 window.document.getElementById("selectDownloadButton")?.addEventListener("click", () => {
-    const selectIds = []
+    const selectIds = [];
     for(var i in selectList) {
         if(selectList[i].checked && selectList[i].id) {
             if(selectList[i].id.includes("select_")) {
-                selectIds.push(selectList[i].id.replace("select_", ""))
+                selectIds.push(selectList[i].id.replace("select_", ""));
             }
         }
     }
 
-    document.getElementById("selectDownloadButton").href = `${window.location.origin}/export-csv/?pk=${selectIds}`
+    document.getElementById("selectDownloadButton").href = `${window.location.origin}/export-csv/?pk=${selectIds}`;
 
     for(let i in selectList) 
         selectList[i].checked = false;
@@ -80,7 +84,7 @@ window.document.getElementById("selectCustomerDownloadButton")?.addEventListener
     for(var i in selectList) {
         if(selectList[i].checked && selectList[i].id) {
             if(selectList[i].id.includes("select_")) {
-                selectIds.push(selectList[i].id.replace("select_", ""))
+                selectIds.push(selectList[i].id.replace("select_", ""));
             }
         }
     }
@@ -130,106 +134,144 @@ function editStatus(id) {
         url: `${window.location.origin}/assist_did/service_status_read/${id}`,
         method: 'GET',
         success: function(response) {
-            document.getElementById("edit_status_name").value = response.name
-            document.getElementById("edit_status_button").name = response.id
+            document.getElementById("edit_status_name").value = response.name;
+            document.getElementById("edit_status_button").name = response.id;
         }
     });
 }
 
-document.getElementById("edit_status_form")?.addEventListener('submit', ()=>[
-    document.getElementById("edit_status_form").action = `${window.location.origin}/assist_did/service_status_update/${document.getElementById("edit_status_button").name}`
-])
+document.getElementById("edit_status_form")?.addEventListener('submit', ()=>{
+    document.getElementById("edit_status_form").action = `${window.location.origin}/assist_did/service_status_update/${document.getElementById("edit_status_button").name}`;
+})
 
 function editService(id) {
     $.ajax({
         url: `${window.location.origin}/assist_did/service_item_read/${id}`,
         method: 'GET',
         success: function(response) {
-            document.getElementById("edit_service_item_name").value = response.name
-            document.getElementById("edit_service_item_description").value = response.description
-            document.getElementById("edit_service_item_button").name = response.id
+            document.getElementById("edit_service_item_name").value = response.name;
+            document.getElementById("edit_service_item_description").value = response.description;
+            document.getElementById("edit_service_item_button").name = response.id;
         }
     });
 }
 
-document.getElementById("edit_service_item_form")?.addEventListener('submit', ()=>[
-    document.getElementById("edit_service_item_form").action = `${window.location.origin}/assist_did/service_item_update/${document.getElementById("edit_service_item_button").name}`
-])
+document.getElementById("edit_service_item_form")?.addEventListener('submit', ()=>{
+    document.getElementById("edit_service_item_form").action = `${window.location.origin}/assist_did/service_item_update/${document.getElementById("edit_service_item_button").name}`;
+})
 
 function editVoiceCarrier(id) {
     $.ajax({
         url: `${window.location.origin}/assist_did/voice_carrier_read/${id}`,
         method: 'GET',
         success: function(response) {
-            document.getElementById("edit_voice_carrier_name").value = response.name
-            document.getElementById("edit_voice_carrier_button").name = response.id
+            document.getElementById("edit_voice_carrier_name").value = response.name;
+            document.getElementById("edit_voice_carrier_button").name = response.id;
         }
     });
 }
 
-document.getElementById("edit_voice_carrier_form")?.addEventListener('submit', ()=>[
-    document.getElementById("edit_voice_carrier_form").action = `${window.location.origin}/assist_did/voice_carrier_update/${document.getElementById("edit_voice_carrier_button").name}`
-])
+document.getElementById("edit_voice_carrier_form")?.addEventListener('submit', ()=>{
+    document.getElementById("edit_voice_carrier_form").action = `${window.location.origin}/assist_did/voice_carrier_update/${document.getElementById("edit_voice_carrier_button").name}`;
+})
 
 function editSMSCarrier(id) {
     $.ajax({
         url: `${window.location.origin}/assist_did/sms_carrier_read/${id}`,
         method: 'GET',
         success: function(response) {
-            document.getElementById("edit_sms_carrier_name").value = response.name
-            document.getElementById("edit_sms_carrier_button").name = response.id
+            document.getElementById("edit_sms_carrier_name").value = response.name;
+            document.getElementById("edit_sms_carrier_button").name = response.id;
         }
     });
 }
 
-document.getElementById("edit_sms_carrier_form")?.addEventListener('submit', ()=>[
-    document.getElementById("edit_sms_carrier_form").action = `${window.location.origin}/assist_did/sms_carrier_update/${document.getElementById("edit_sms_carrier_button").name}`
-])
+document.getElementById("edit_sms_carrier_form")?.addEventListener('submit', ()=>{
+    document.getElementById("edit_sms_carrier_form").action = `${window.location.origin}/assist_did/sms_carrier_update/${document.getElementById("edit_sms_carrier_button").name}`;
+})
 
 function editCustomerType(id) {
     $.ajax({
         url: `${window.location.origin}/assist_did/customer_type_read/${id}`,
         method: 'GET',
         success: function(response) {
-            document.getElementById("edit_customer_type_name").value = response.name
-            document.getElementById("edit_customer_type_button").name = response.id
+            document.getElementById("edit_customer_type_name").value = response.name;
+            document.getElementById("edit_customer_type_button").name = response.id;
         }
     });
 }
 
-document.getElementById("edit_customer_type_form")?.addEventListener('submit', ()=>[
-    document.getElementById("edit_customer_type_form").action = `${window.location.origin}/assist_did/customer_type_update/${document.getElementById("edit_customer_type_button").name}`
-])
+document.getElementById("edit_customer_type_form")?.addEventListener('submit', ()=>{
+    document.getElementById("edit_customer_type_form").action = `${window.location.origin}/assist_did/customer_type_update/${document.getElementById("edit_customer_type_button").name}`;
+})
 
 function editSMSType(id) {
     $.ajax({
         url: `${window.location.origin}/assist_did/sms_type_read/${id}`,
         method: 'GET',
         success: function(response) {
-            document.getElementById("edit_sms_type_name").value = response.name
-            document.getElementById("edit_sms_type_button").name = response.id
+            document.getElementById("edit_sms_type_name").value = response.name;
+            document.getElementById("edit_sms_type_button").name = response.id;
         }
     });
 }
 
-document.getElementById("edit_sms_type_form")?.addEventListener('submit', ()=>[
-    document.getElementById("edit_sms_type_form").action = `${window.location.origin}/assist_did/sms_type_update/${document.getElementById("edit_sms_type_button").name}`
-])
+document.getElementById("edit_sms_type_form")?.addEventListener('submit', ()=>{
+    document.getElementById("edit_sms_type_form").action = `${window.location.origin}/assist_did/sms_type_update/${document.getElementById("edit_sms_type_button").name}`;
+})
 
 function editTermLocation(id) {
     $.ajax({
         url: `${window.location.origin}/assist_did/term_location_read/${id}`,
         method: 'GET',
         success: function(response) {
-            document.getElementById("edit_term_location_name").value = response.name
-            document.getElementById("edit_term_location_button").name = response.id
+            document.getElementById("edit_term_location_name").value = response.name;
+            document.getElementById("edit_term_location_button").name = response.id;
         }
     });
 }
 
-document.getElementById("edit_term_location_form")?.addEventListener('submit', ()=>[
-    document.getElementById("edit_term_location_form").action = `${window.location.origin}/assist_did/term_location_update/${document.getElementById("edit_term_location_button").name}`
-])
+document.getElementById("edit_term_location_form")?.addEventListener('submit', ()=>{
+    document.getElementById("edit_term_location_form").action = `${window.location.origin}/assist_did/term_location_update/${document.getElementById("edit_term_location_button").name}`;
+})
+
+function multi_did_add_check() {
+    if (document.getElementById('multi_add')) {
+        var currentStatus = true;
+        const didElements = document.querySelectorAll('[name="did"]');
+        const customerElements = document.querySelectorAll('[name="customer"]');
+
+        didElements.forEach(item => {
+            if (!item.value) {
+                currentStatus = false;
+            }
+        })
+
+        customerElements.forEach(item => {
+            if (!item.value) {
+                currentStatus = false;
+            }
+        })
+
+        document.getElementById('multi_add').disabled = !(document.querySelectorAll('.error').length == 0 && currentStatus);
+    }
+}
+
+function service_order_value_check() {
+    if (document.getElementById('service_order_create_2')) {
+        var currentStatus = true;
+        const numberElements = document.querySelectorAll('[name="number"]');
+        currentStatus = !!document.getElementById('customer').value && currentStatus;
+
+        numberElements.forEach(item => {
+            if (!item.value) {
+                currentStatus = false;
+            }
+        })
+
+        document.getElementById('service_order_create_2').disabled = !(document.querySelectorAll('.error').length == 0 && currentStatus);
+    }
+}
 
 function change_num(input_type ,id) {
     select_input = document.getElementById(input_type + id)
@@ -242,8 +284,11 @@ function change_num(input_type ,id) {
     }
 
     if (document.getElementById('multi_standard')) {
-        document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0 ? true : false;
+        document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0;
     }
+
+    multi_did_add_check();
+    service_order_value_check();
 }
 
 function change_select(select_type, id) {
@@ -255,12 +300,15 @@ function change_select(select_type, id) {
     }
 
     if (document.getElementById('multi_standard')) {
-        document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0 ? true : false;
+        document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0;
     }
+
+    multi_did_add_check();
+    service_order_value_check();
 }
 
 function change_email(id) {
-    email_input = document.getElementById('email_' + id)
+    email_input = document.getElementById('email_' + id);
     var regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     email_input.value.split(',').map(item => {
         if (regex.test(String(item.trim()).toLowerCase()) || email_input.value === '') {
@@ -271,16 +319,19 @@ function change_email(id) {
     })
 
     if (document.getElementById('multi_standard')) {
-        document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0 ? true : false;
+        document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0
     }
+
+    multi_did_add_check();
+    service_order_value_check();
 }
 
 $(function () {
     $('[data-toggle="tooltip"]').tooltip()
 })
 
-function change_date(id) {
-    date_input = document.getElementById('onboard_date_' + id)
+function change_date(date_input_type, id) {
+    date_input = document.getElementById(date_input_type + id)
     const regex = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/(\d{4})$/;
     const match = date_input.value.match(regex);
 
@@ -300,16 +351,16 @@ function change_date(id) {
     }
 
     if (document.getElementById('multi_standard')) {
-        document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0 ? true : false;
+        document.getElementById('multi_standard').disabled = document.querySelectorAll('.error').length > 0
     }
 }
 
 function multi_submit() {
     data = document.querySelectorAll('tr')
-    var request_data = []
+    var data = []
     for (let i = 1; i < data.length; i++) {
         id = data[i].id;
-        request_data.push({
+        data.push({
             id: id,
             did: document.getElementById('did_' + id).value,
             customer: document.getElementById('customer_' + id).value,
@@ -338,6 +389,8 @@ function multi_submit() {
         })
     }
 
+    let searchQuery = window.location.href.split('?')[1];
+
     $.ajax({
         url: `${window.location.origin}/did_standardization/multi_standardization`,
         method: 'POST',
@@ -345,9 +398,11 @@ function multi_submit() {
         headers: {
             'X-CSRFToken': document.cookie.split('=')[1],
         },
-        data: JSON.stringify(request_data),
+        data: JSON.stringify({data: data, searchQuery: searchQuery}),
         success: function (response) {
-            location.reload();
+            document.open();
+            document.write(response);
+            document.close();
         },
         error: function(xhr, status, error) {
             location.reload();
@@ -369,18 +424,21 @@ function check_add_item() {
     firstChildElements.forEach((element) => {
         let baseId = element.id.substring(0, element.id.lastIndexOf("_") + 1); // Extract base ID without the numeric part
         element.id = baseId + newRowIndex; // Update ID with new index
-        if (element.name) {
-            let baseName = element.name.substring(0, element.name.lastIndexOf("_") + 1); // Extract base name without the numeric part
-            element.name = baseName + newRowIndex; // Update name with new index
-        }
-        // Reset input/select values for the cloned row
         if (element.tagName === "INPUT") {
             element.value = ""; // Reset text input value
         } else if (element.tagName === "SELECT") {
             element.selectedIndex = 0; // Reset select to the first option
         }
     });
+
     tbody.appendChild(trElementClone);
+    
+    document.getElementById('did_'+newRowIndex).oninput = () => change_num('did_', newRowIndex)
+    document.getElementById('customer_'+newRowIndex).oninput = () => change_select('customer_', newRowIndex)
+    document.getElementById('extension_'+newRowIndex).oninput = () => change_num('extension_', newRowIndex)
+    document.getElementById('email_'+newRowIndex).oninput = () => change_email(newRowIndex)
+    document.getElementById('onboard_date_'+newRowIndex).oninput = () => change_date('onboard_date_', newRowIndex)
+    document.getElementById('multi_add').disabled = true
 }
 
 function multi_add_submit() {
@@ -427,6 +485,138 @@ function multi_add_submit() {
         data: JSON.stringify(request_data),
         success: function (response) {
             location.reload();
+        },
+        error: function(xhr, status, error) {
+            location.reload();
+        }
+    });
+}
+
+function multi_number_check() {
+    inputMultiNumber = document.getElementById('input_multi_number');
+    inputMultiNumber.value.split('\n').forEach(item => {
+        if (isNaN(item)) {
+            inputMultiNumber.classList.add('error');
+            document.getElementById('service_order_step_2').disabled = false;
+        } else {
+            inputMultiNumber.classList.remove('error');
+            document.getElementById('service_order_step_2').disabled = true;
+        }
+    })
+}
+
+function username_validator() {
+    document.getElementById('service_order_create_2').disabled = !document.getElementById('input_username').value
+}
+
+function service_order_create() {
+    let number_email_date = []
+
+    for (let i = 0; i < document.querySelectorAll('[name="number"]').length; i++) {
+        number_email_date.push({
+            number: document.querySelectorAll('[name="number"]')[i].value,
+            reseller: document.querySelectorAll('[name="reseller"]')[i].value,
+            email: document.querySelectorAll('[name="email"]')[i].value,
+            requested_port_date: document.querySelectorAll('[name="requested_port_date"]')[i].value,
+            e911_number: document.querySelectorAll('[name="e911_number"]')[i].value,
+            e911_address: document.querySelectorAll('[name="e911_address"]')[i].value,
+            service_status: document.querySelectorAll('[name="service_status"]')[i].value,
+            voice_carrier: document.querySelectorAll('[name="voice_carrier"]')[i].value,
+            sms_carrier: document.querySelectorAll('[name="sms_carrier"]')[i].value,
+            sms_type: document.querySelectorAll('[name="sms_type"]')[i].value,
+            sms_enabled: document.querySelectorAll('[name="sms_enabled"]')[i].value,
+            sms_campaign: document.querySelectorAll('[name="sms_campaign"]')[i].value,
+            user_first_name: document.querySelectorAll('[name="user_first_name"]')[i].value,
+            user_last_name: document.querySelectorAll('[name="user_last_name"]')[i].value,
+            extension: document.querySelectorAll('[name="extension"]')[i].value,
+            onboard_date: document.querySelectorAll('[name="onboard_date"]')[i].value,
+            e911_enabled_billed: document.querySelectorAll('[name="e911_enabled_billed"]')[i].value,
+            service_1: document.querySelectorAll('[name="service_1"]')[i].value,
+            service_2: document.querySelectorAll('[name="service_2"]')[i].value,
+            service_3: document.querySelectorAll('[name="service_3"]')[i].value,
+            service_4: document.querySelectorAll('[name="service_4"]')[i].value,
+        })
+    }
+
+    const request_data = {
+        username: document.getElementById('input_username').value,
+        customer: document.getElementById('customer').value,
+        term_location: document.getElementById('term_location').value,
+        texting: document.getElementById('input_texting').value,
+        number_email_date: number_email_date
+    }
+
+    $.ajax({
+        url: `${window.location.origin}/service_order/create/`,
+        method: 'POST',
+        contentType: 'application/json', 
+        headers: {
+            'X-CSRFToken': document.cookie.split('=')[1],
+        },
+        data: JSON.stringify(request_data),
+        success: function (response) {
+            document.open();
+            document.write(response);
+            document.close();
+            window.location.href = '/service_order/'
+        },
+        error: function(xhr, status, error) {
+            location.reload();
+        }
+    });
+}
+
+function service_order_update() {
+    let number_email_date = []
+
+    for (let i = 0; i < document.querySelectorAll('[name="number"]').length; i++) {
+        number_email_date.push({
+            id: document.querySelectorAll('[name="number"]')[i].id.split('number_')[1],
+            number: document.querySelectorAll('[name="number"]')[i].value,
+            reseller: document.querySelectorAll('[name="reseller"]')[i].value,
+            email: document.querySelectorAll('[name="email"]')[i].value,
+            requested_port_date: document.querySelectorAll('[name="requested_port_date"]')[i].value,
+            e911_number: document.querySelectorAll('[name="e911_number"]')[i].value,
+            e911_address: document.querySelectorAll('[name="e911_address"]')[i].value,
+            service_status: document.querySelectorAll('[name="service_status"]')[i].value,
+            voice_carrier: document.querySelectorAll('[name="voice_carrier"]')[i].value,
+            sms_carrier: document.querySelectorAll('[name="sms_carrier"]')[i].value,
+            sms_type: document.querySelectorAll('[name="sms_type"]')[i].value,
+            sms_enabled: document.querySelectorAll('[name="sms_enabled"]')[i].value,
+            sms_campaign: document.querySelectorAll('[name="sms_campaign"]')[i].value,
+            user_first_name: document.querySelectorAll('[name="user_first_name"]')[i].value,
+            user_last_name: document.querySelectorAll('[name="user_last_name"]')[i].value,
+            extension: document.querySelectorAll('[name="extension"]')[i].value,
+            onboard_date: document.querySelectorAll('[name="onboard_date"]')[i].value,
+            e911_enabled_billed: document.querySelectorAll('[name="e911_enabled_billed"]')[i].value,
+            service_1: document.querySelectorAll('[name="service_1"]')[i].value,
+            service_2: document.querySelectorAll('[name="service_2"]')[i].value,
+            service_3: document.querySelectorAll('[name="service_3"]')[i].value,
+            service_4: document.querySelectorAll('[name="service_4"]')[i].value,
+        })
+    }
+
+    const request_data = {
+        username: document.getElementById('input_username').value,
+        customer: document.getElementById('customer').value,
+        term_location: document.getElementById('term_location').value,
+        texting: document.getElementById('input_texting').value,
+        number_email_date: number_email_date
+    }
+
+    $.ajax({
+        url: `${window.location.origin}/service_order/edit/${window.location.href.split('/')[window.location.href.split('/').length - 1]}`,
+        method: 'POST',
+        contentType: 'application/json', 
+        headers: {
+            'X-CSRFToken': document.cookie.split('=')[1],
+        },
+        data: JSON.stringify(request_data),
+        success: function (response) {
+            document.open();
+            document.write(response);
+            document.close();
+            window.location.href = '/service_order/'
         },
         error: function(xhr, status, error) {
             location.reload();

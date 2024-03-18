@@ -1,244 +1,232 @@
 {% extends 'layout/app.html' %}
-
 {% load static %}
 {% block stylesheet %}
-    <style>
-        .bd-example {
-            /* padding: 1.5rem; */
-            margin-right: 0;
-            margin-left: 0;
-            border-width: 1px;
-            border-top-left-radius: .25rem;
-            border-top-right-radius: .25rem;
-        }
-        .bd-example {
-            position: relative;
-            padding: 1rem;
-            margin: 1rem -.75rem 0;
-            border: solid #dee2e6;
-            border-width: 1px;
-        }
-    </style>
+  <style>
+    /* .error-input::placeholder { */
+      /* Firefox, Chrome, Opera */ 
+      /* color: #DC3545;
+      opacity: 0.7;
+    } 
+    .error-input:-ms-input-placeholder {  */
+      /* Internet Explorer 10-11 */ 
+      /* color: #DC3545; 
+      opacity: 0.7;
+    } 
+    .error-input::-ms-input-placeholder {  */
+      /* Microsoft Edge */ 
+      /* color: #DC3545; 
+      opacity: 0.7;
+    }  */
+  </style>
 {% endblock %}
 {% block body %}
-    <div class="container-fluid px-4">
-        <h1 class="mt-4">Service Orders</h1>
-        <ol class="breadcrumb mb-4">
-            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-            <li class="breadcrumb-item active">Edit Service Order</li>
-        </ol>
-        <div class="bd-example">
-            <form action="/service_order/edit/{{ service_order.id }}" method="POST">
-                {% csrf_token %}
-                <div class="row mb-3">
-                    <div class="col">
-                        <div class="form-floating mb-3 mb-md-0 ">
-                            <input class="form-control" id="input_username" type="text" name="username" placeholder="Enter username" value="{{ service_order.username }}" required/>
-                            <label for="input_username">Enter username</label>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating">
-                            <input class="form-control" id="input_email" type="email" name="email" value="{{ service_order.email }}" placeholder="Enter email" required/>
-                            <label for="input_email">Enter email</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col">
-                        <div class="form-floating">
-                            <input class="form-control" id="input_number" type="number" name="number" value="{{ service_order.number }}" placeholder="Enter number"/>
-                            <label for="input_number">Enter number</label>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="requested_port_date" type="date"  placeholder="Select the requested port date" value="{{ service_order.requested_port_date }}" id="input_requested_port_date" required>
-                            <label for="input_requested_port_date">Select the requested port date</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col">
-                      <div class="form-floating">
-                          <input class="form-control" id="input_e911_number" type="number" name="e911_number" placeholder="Enter e911 number"/>
-                          <label for="input_e911_number">Enter E911 number</label>
-                      </div>
-                    </div>
-                    <div class="col">
-                      <div class="form-floating">
-                          <input class="form-control" id="input_e911_address" type="text" name="e911_address" placeholder="Enter e911 address"/>
-                          <label for="input_e911_address">Enter E911 address</label>
-                      </div>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col">
-                        <div class="form-floating">
-                            <input class="form-control" name="texting" type="text" placeholder="Enter billing city" id="input_texting">
-                            <label for="input_texting">Enter the description</label>
-                        </div>
-                    </div>
-                </div>
-                <div id="service_order_detail_show" style="display: none;">
-                    <div class="row mb-3">
-                        <div class="col">
-                            <select name="customer" class="form-select p-3" aria-label="Choose Customer">
-                                <option value="" selected>Select customer</option>
-                                {% for customer in customers %}
-                                <option value="{{ customer.id }}" {% if service_order.customer == customer.id %}selected{% endif %}>{{ customer.full_name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col">
-                            <div class="form-floating mb-3 mb-md-0">
-                                <input class="form-control" name="reseller" type="text" value="{{ service_order.reseller }}" placeholder="Enter your reseller" id="reseller">
-                                <label for="service_order">Enter your reseller</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <select name="status" class="form-select p-3" aria-label="Choose status">
-                                <option value="" selected>Select status</option>
-                                {% for item in status %}
-                                <option value="{{ item.id }}" {% if service_order.status == item.id %}selected{% endif %}>{{ item.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col">
-                            <select name="voice_carrier" class="form-select p-3" aria-label="Choose voice carrier">
-                                <option value="" selected>Select voice carrier</option>
-                                {% for item in voice_carrier %}
-                                <option value="{{ item.id }}" {% if service_order.voice_carrier == item.id %}selected{% endif %}>{{ item.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <select name="sms_enabled" class="form-select p-3" aria-label="Choose sms enable">
-                                <option value="" selected>Select SMS activation</option>
-                                <option value="Yes" {% if service_order.sms_enabled == "Yes" %}selected{% endif %}>Yes</option>
-                                <option value="No" {% if service_order.sms_enabled == "No" %}selected{% endif %}>No</option>
-                            </select>
-                        </div>
-                        <div class="col">
-                            <select name="sms_carrier" class="form-select p-3" aria-label="Choose sms carrier">
-                                <option value="" selected>Select SMS carrier</option>
-                                {% for item in sms_carrier %}
-                                <option value="{{ item.id }}" {% if service_order.sms_carrier == item.id %}selected{% endif %}>{{ item.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col">
-                            <div class="form-floating mb-3 mb-md-0">
-                                <input class="form-control" name="onboard_date" type="date" value="{{ service_order.onboard_date }}" placeholder="onboard_date" id="onboard_date">
-                                <label for="onboard_date">Enter onboard date</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <select name="sms_type" class="form-select p-3" aria-label="Choose sms type">
-                                <option value="" selected>Select SMS type</option>
-                                {% for item in sms_type %}
-                                <option value="{{ item.id }}" {% if service_order.sms_type == item.id %}selected{% endif %}>{{ item.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col">
-                            <div class="form-floating">
-                                <input class="form-control" name="sms_campaign" type="text" value="{{ service_order.sms_campaign }}" placeholder="sms_campaign" id="sms_campaign">
-                                <label for="sms_campaign">Enter SMS campagin</label>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <select name="term_location" class="form-select p-3" aria-label="Choose term location">
-                                <option value="" selected>Select term location</option>
-                                {% for item in term_location %}
-                                <option value="{{ item.id }}" {% if service_order.term_location == item.id %}selected{% endif %}>{{ item.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <div class="form-floating mb-3 mb-md-0">
-                                <input class="form-control" name="user_first_name" type="text" value="{{ service_order.user_first_name }}" placeholder="user_first_name" id="user_first_name">
-                                <label for="user_first_name">Enter first name</label>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="form-floating mb-3 mb-md-0">
-                                <input class="form-control" name="user_last_name" type="text" value="{{ service_order.user_last_name }}" placeholder="user_last_name" id="user_last_name">
-                                <label for="user_last_name">Enter last name</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <select name="e911_enabled_billed" class="form-select p-3" aria-label="Choose e911 enable and billed">
-                                <option value="" selected>Select E911 enable and billed</option>
-                                <option value="Yes" {% if service_order.e911_enabled_billed == "Yes" %}selected{% endif %}>Yes</option>
-                                <option value="No" {% if service_order.e911_enabled_billed == "No" %}selected{% endif %}>No</option>
-                            </select>
-                        </div>
-                        <div class="col">
-                            <div class="form-floating mb-3 mb-md-0">
-                                <input class="form-control" name="extension" type="number" value="{{ service_order.extension }}" placeholder="extension" id="extension">
-                                <label for="extension">Enter extension</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <select name="service_1" class="form-select p-3" aria-label="Choose service 1">
-                                <option value="" selected>Select service 1</option>
-                                {% for item in services %}
-                                <option value="{{ item.id }}" {% if service_order.service_1 == item.id %}selected{% endif %}>{{ item.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col">
-                            <select name="service_2" class="form-select p-3" aria-label="Choose service 2">
-                                <option value="" selected>Select service 2</option>
-                                {% for item in services %}
-                                <option value="{{ item.id }}" {% if service_order.service_2 == item.id %}selected{% endif %}>{{ item.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col">
-                            <select name="service_3" class="form-select p-3" aria-label="Choose service 3">
-                                <option value="" selected>Select service 3</option>
-                                {% for item in services %}
-                                <option value="{{ item.id }}" {% if service_order.service_3 == item.id %}selected{% endif %}>{{ item.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col">
-                            <select name="service_4" class="form-select p-3" aria-label="Choose service 4">
-                                <option value="" selected>Select service 4</option>
-                                {% for item in services %}
-                                <option value="{{ item.id }}" {% if service_order.service_4 == item.id %}selected{% endif %}>{{ item.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div id="service_order_detail_less" class="d-flex align-items-center text-center">
-                    <i class="fas fa-fw fa-chevron-left"></i>
-                    <hr class="w-50">
-                    <span id="show_hide_text" style="min-width: 140px; cursor: pointer;">Show more detail</span>
-                    <hr class="w-50">
-                    <i class="fas fa-fw fa-chevron-right"></i>
-                </div>
-                <div class="mt-4 mb-0">
-                    <div class="d-grid"><button class="btn btn-primary btn-block" type="submit">Submit</button></div>
-                </div>
-            </form>
+<div class="container-fluid px-4">
+  <h1 class="mt-4">Service Order</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+    <li class="breadcrumb-item active">Edit Service Order</li>
+  </ol>
+  <div class="card mb-4">
+    <div class="card-header">
+      <i class="fas fa-table me-1"></i>
+      Service Order ({{ service_order.username }})
+      </div>
+    <div class="card-body">
+      <hr>
+      {% for message in messages %}
+      <div
+        class="alert alert-{{ message.tags }} alert-dismissible"
+        role="alert"
+      >
+        {{ message }}
+      </div>
+      {% endfor %}
+      <div class="row mb-3">
+        <div class="col-2">
+          <div class="form-floating mb-3 mb-md-0 ">
+            <input class="form-control" id="input_username" type="text" name="username" placeholder="Enter username" value="{{service_order.username}}" oninput="username_validator()"/>
+            <label for="input_username">Enter name</label>
+          </div>
         </div>
+        <div class="col-2">
+          <select name="customer" id="customer" class="form-select p-3" onchange="change_select('customer', '')">
+            <option value="" {% if customer == '' %}selected{% endif %}></option>
+            {% for item in customers %}
+              <option value="{{ item.id }}" class="text-dark" {% if service_order.customer == item.id %}selected{% endif %}>{{ item.full_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-2">
+          <select name="term_location" id="term_location" class="form-select p-3">
+            <option value="" {% if service_order.term_location == '' %}selected{% endif %}>Select term location</option>
+            {% for item in term_locations %}
+              <option value="{{ item.id }}" {% if service_order.term_location == item.id %} selected {% endif %}>{{ item.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-6">
+          <div class="form-floating mb-3 mb-md-0 ">
+            <input class="form-control" id="input_texting" type="text" name="texting" placeholder="Enter the description" value="{{service_order.texting}}"/>
+            <label for="input_texting">Enter the description</label>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="table-container">
+        <table
+          class="table table-bordered"
+          id="dataTable"
+          width="100%"
+          cellspacing="0"
+        >
+          <thead>
+            <tr>
+              <th>Number</th>
+              <th>Reseller</th>
+              <th>Email</th>
+              <th>Requested Port Date</th>
+              <th>E911 Number</th>
+              <th>E911 Address</th>
+              <th>Service Status</th>
+              <th>Voice Carrier</th>
+              <th>SMS Carrier</th>
+              <th>SMS Type</th>
+              <th>SMS Enabled</th>
+              <th>SMS Campaign</th>
+              <th>User First Name</th>
+              <th>User Last Name</th>
+              <th>Extension</th>
+              <th>Onboard Date</th>
+              <th>E911 Enabled_Billed</th>
+              <th>Service 1</th>
+              <th>Service 2</th>
+              <th>Service 3</th>
+              <th>Service 4</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for number_related_data in number_email_date_data %}
+            <tr>
+              <td>
+                <input id="number_{{ number_related_data.id }}" name="number" value="{{ number_related_data.number }}" class="form-control" style="min-width: 150px;" oninput="change_num('number_', '{{ number_related_data.id }}')">
+              </td>
+              <td>
+                <input type="text" class="form-control" id="reseller_{{ number_related_data.id }}" name="reseller" style="min-width: 150px;" value="{{ number_related_data.reseller }}">
+              </td>
+              <td>
+                <input type="text" id="email_{{ number_related_data.id }}" name="email" class="form-control" style="min-width: 180px;" value="{{ number_related_data.email }}" oninput="change_email('{{ number_related_data.id }}')">
+              </td>
+              <td>
+                <input type="date" id="requested_port_date_{{ number_related_data.id }}" name="requested_port_date" class="form-control" style="min-width: 130px;" value="{{ number_related_data.requested_port_date }}">
+              </td>
+              <td>
+                <input type="text" id="e911_number_{{ number_related_data.id }}" name="e911_number" class="form-control" style="min-width: 150px;" value="{{ number_related_data.e911_number }}" oninput="change_num('e911_number_', '{{ number_related_data.id }}')">
+              </td>
+              <td>
+                <input type="text" class="form-control" id="e911_address_{{ number_related_data.id }}" name="e911_address" style="min-width: 200px;" value="{{ number_related_data.e911_address }}">
+              </td>
+              <td>
+                <select name="service_status" id="service_status_{{ number_related_data.id }}" class="form-select" style="min-width: 130px;">
+                  <option value="" {% if number_related_data.service_status == '' %} selected {% endif %}></option>
+                  {% for item in status %}
+                    <option value="{{ item.id }}" {% if number_related_data.service_status == item.id %}selected{% endif %}>{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="voice_carrier" id="voice_carrier_{{ number_related_data.id }}" class="form-select" style="min-width: 130px;">
+                  <option value="" {% if number_related_data.voice_carrier == '' %} selected {% endif %}></option>
+                  {% for item in voice_carriers %}
+                    <option value="{{ item.id }}" {% if number_related_data.voice_carrier == item.id %}selected{% endif %}>{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="sms_carrier" id="sms_carrier_{{ number_related_data.id }}" class="form-select" style="min-width: 130px;">
+                  <option value="" {% if number_related_data.sms_carrier == '' %} selected {% endif %}></option>
+                  {% for item in sms_carriers %}
+                    <option value="{{ item.id }}" {% if number_related_data.sms_carrier == item.id %}selected{% endif %}>{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="sms_type" id="sms_type_{{ number_related_data.id }}" class="form-select" style="min-width: 150px;">
+                  <option value="" {% if number_related_data.sms_type == '' %} selected {% endif %}></option>
+                  {% for item in sms_types %}
+                    <option value="{{ item.id }}" {% if number_related_data.sms_type == item.id %}selected{% endif %}>{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="sms_enabled" id="sms_enabled_{{ number_related_data.id }}" class="form-select" style="min-width: 80px;">
+                  <option value="" {% if number_related_data.sms_enabled == '' %} selected {% endif %}></option> 
+                  <option value="Yes" {% if number_related_data.sms_enabled == "Yes" %}selected{% endif %}>Yes</option>
+                  <option value="No" {% if number_related_data.sms_enabled == "No" %}selected{% endif %}>No</option>
+                </select>
+              </td>
+              <td>
+                <input type="text" class="form-control" id="sms_campaign_{{ number_related_data.id }}" name="sms_campaign" style="min-width: 120px;" value="{{ number_related_data.sms_campaign }}">
+              </td>
+              <td>
+                <input type="text" class="form-control" id="user_first_name_{{ number_related_data.id }}" name="user_first_name" style="min-width: 150px;" value="{{ number_related_data.user_first_name }}">
+              </td>
+              <td>
+                <input type="text" class="form-control" id="user_last_name_{{ number_related_data.id }}" name="user_last_name" style="min-width: 150px;" value="{{ number_related_data.user_last_name }}">
+              </td>
+              <td>
+                <input type="text" id="extension_{{ number_related_data.id }}" name="extension" value="{{ number_related_data.extension }}" class="form-control" style="min-width: 150px;" oninput="change_num('extension_', '{{ number_related_data.id }}')">
+              </td>
+              <td>
+                <input type="date" id="onboard_date_{{ number_related_data.id }}" name="onboard_date" class="form-control" style="min-width: 130px;" value="{{ number_related_data.onboard_date }}">
+              </td>
+              <td>
+                <select name="e911_enabled_billed" id="e911_enabled_billed_{{ number_related_data.id }}" class="form-select" style="min-width: 80px;">
+                  <option value="" {% if number_related_data.e911_enabled_billed == '' %} selected {% endif %}></option>
+                  <option value="Yes" {% if number_related_data.e911_enabled_billed == "Yes" %}selected{% endif %}>Yes</option>
+                  <option value="No" {% if number_related_data.e911_enabled_billed == "No" %}selected{% endif %}>No</option>
+                </select>
+              </td>
+              <td>
+                <select name="service_1" id="service_1_{{ number_related_data.id }}" class="form-select" style="min-width: 180px;">
+                  <option value="" {% if number_related_data.service_1 == '' %} selected {% endif %}></option> 
+                  {% for item in services %}
+                    <option value="{{ item.id }}" {% if number_related_data.service_1 == item.id %}selected{% endif %}>{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="service_2" id="service_2_{{ number_related_data.id }}" class="form-select" style="min-width: 180px;">
+                  <option value="" {% if number_related_data.service_2 == '' %} selected {% endif %}></option> 
+                  {% for item in services %}
+                    <option value="{{ item.id }}" {% if number_related_data.service_2 == item.id %}selected{% endif %}>{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="service_3" id="service_3_{{ number_related_data.id }}" class="form-select" style="min-width: 180px;">
+                  <option value="" {% if number_related_data.service_3 == '' %} selected {% endif %}></option> 
+                  {% for item in services %}
+                    <option value="{{ item.id }}" {% if number_related_data.service_3 == item.id %}selected{% endif %}>{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="service_4" id="service_4_{{ number_related_data.id }}" class="form-select" style="min-width: 180px;">
+                  <option value="" {% if number_related_data.service_4 == '' %} selected {% endif %}></option> 
+                  {% for item in services %}
+                    <option value="{{ item.id }}" {% if number_related_data.service_4 == item.id %}selected{% endif %}>{{ item.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="d-flex flex-row justify-content-end mt-3 gap-3">
+        <button id="service_order_create_2" type="button" class="btn btn-primary" onclick="service_order_update()">Update Service Order</button>
+      </div>
     </div>
-{% endblock %}
-{% block javascript %}
-{% endblock %}
+  </div>
+</div>
+{% endblock %} {% block javascript %} {% endblock %}

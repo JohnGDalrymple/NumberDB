@@ -22,14 +22,64 @@
 {% endblock %}
 {% block body %}
     <div class="container-fluid px-4">
-        <h1 class="mt-4">DIDs</h1>
+        <h1 class="mt-4">Service Orders</h1>
         <ol class="breadcrumb mb-4">
             <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-            <li class="breadcrumb-item active">Create DID</li>
+            <li class="breadcrumb-item active">Create Service Order</li>
         </ol>
         <div class="bd-example">
-            <form action="/did/add/" method="POST">
+            <form action="/service_order/add_step_2/" method="POST">
                 {% csrf_token %}
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating mb-3 mb-md-0 ">
+                            <input class="form-control" id="input_username" type="text" name="username" placeholder="Enter username" required/>
+                            <label for="input_username">Enter username</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <input class="form-control" id="input_email" type="email" name="email" placeholder="Enter email" required/>
+                            <label for="input_email">Enter email</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating mb-3 mb-md-0">
+                            <input class="form-control" name="requested_port_date" type="date"  placeholder="Select the requested port date" id="input_requested_port_date" required>
+                            <label for="input_requested_port_date">Select the requested port date</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                      <div class="form-floating">
+                          <input class="form-control" id="input_e911_number" type="number" name="e911_number" placeholder="Enter e911 number"/>
+                          <label for="input_e911_number">Enter E911 number</label>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="form-floating">
+                          <input class="form-control" id="input_e911_address" type="text" name="e911_address" placeholder="Enter e911 address"/>
+                          <label for="input_e911_address">Enter E911 address</label>
+                      </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <textarea class="form-control" id="input_multi_number" type="text" name="number" rows="3" placeholder="Enter number" required></textarea>
+                        <div class="form-floating">
+                            <label for="input_multi_number">Enter number</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating">
+                            <input class="form-control" name="texting" type="text" placeholder="Enter the description" id="input_texting">
+                            <label for="input_texting">Enter the description</label>
+                        </div>
+                    </div>
+                </div>
                 <div class="row mb-3">
                     <div class="col">
                         <select name="customer" class="form-select p-3" aria-label="Choose Customer">
@@ -44,21 +94,6 @@
                             <input class="form-control" name="reseller" type="text" placeholder="Enter your reseller" id="reseller">
                             <label for="did">Enter your reseller</label>
                         </div>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="did" type="number" placeholder="DID" id="did" required>
-                            <label for="did">Enter your DID</label>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <select name="in_method" class="form-select p-3" aria-label="Choose in method">
-                            <option value="" selected>Select in method</option>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                        </select>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -81,26 +116,6 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="email" type="email"  placeholder="email" id="email">
-                            <label for="email">Enter email</label>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="onboard_date" type="date"  placeholder="onboard_date" id="onboard_date">
-                            <label for="onboard_date">Enter onboard date</label>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="change_date" type="date" placeholder="Change Date" id="change_date">
-                            <label for="change_date">Change Date</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col">
                         <select name="sms_enabled" class="form-select p-3" aria-label="Choose sms enable">
                             <option value="" selected>Select SMS activation</option>
                             <option value="Yes">Yes</option>
@@ -114,6 +129,12 @@
                             <option value="{{ item.id }}">{{ item.name }}</option>
                             {% endfor %}
                         </select>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating mb-3 mb-md-0">
+                            <input class="form-control" name="onboard_date" type="date"  placeholder="onboard_date" id="onboard_date">
+                            <label for="onboard_date">Enter onboard date</label>
+                        </div>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -153,31 +174,19 @@
                             <label for="user_last_name">Enter last name</label>
                         </div>
                     </div>
-                    <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="extension" type="number"  placeholder="extension" id="extension">
-                            <label for="extension">Enter extension</label>
-                        </div>
-                    </div>
                 </div>
                 <div class="row mb-3">
-                    <div class="col-3">
+                    <div class="col">
                         <select name="e911_enabled_billed" class="form-select p-3" aria-label="Choose e911 enable and billed">
                             <option value="" selected>Select E911 enable and billed</option>
                             <option value="Yes">Yes</option>
                             <option value="No">No</option>
                         </select>
                     </div>
-                    <div class="col-3">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="e911_cid" type="number"  placeholder="e911_cid" id="e911_cid">
-                            <label for="e911_cid">Enter E911 cid</label>
-                        </div>
-                    </div>
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="e911_address" type="text"  placeholder="e911_address" id="e911_address">
-                            <label for="e911_address">Enter E911 Address</label>
+                            <input class="form-control" name="extension" type="number"  placeholder="extension" id="extension">
+                            <label for="extension">Enter extension</label>
                         </div>
                     </div>
                 </div>
@@ -215,16 +224,8 @@
                         </select>
                     </div>
                 </div>
-                <div class="row mb-3">
-                    <div class="col">
-                        <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="note" type="text"  placeholder="note" id="note">
-                            <label for="note">Enter note</label>
-                        </div>
-                    </div>
-                </div>
                 <div class="mt-4 mb-0">
-                    <div class="d-grid"><button class="btn btn-primary btn-block" type="submit">Submit</button></div>
+                    <div class="d-grid"><button id="service_order_step_2" class="btn btn-primary btn-block" type="submit" disabled>Next</button></div>
                 </div>
             </form>
         </div>

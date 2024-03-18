@@ -1309,7 +1309,7 @@ def multi_standardization(request):
     if request.method == 'POST':
         request_data = json.loads(request.body)
 
-        for item in request_data:
+        for item in request_data['data']:
             try:
                 new_did = Did(
                     did_uuid = uuid.uuid4(), 
@@ -1350,7 +1350,7 @@ def multi_standardization(request):
                 messages.warning(request, e)
 
         messages.success(request, 'Multi Standardization was successflly.')
-        return redirect('/did_standardization')
+        return redirect(f'/did_standardization/?{request_data["searchQuery"]}')
 
 
 @login_required
