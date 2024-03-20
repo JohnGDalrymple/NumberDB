@@ -82,7 +82,7 @@ def service_order_list(request):
         q_objects.append((Q(number_email_dates__service_3__name__icontains = query)))
         q_objects.append((Q(number_email_dates__service_4__name__icontains = query)))
 
-        service_orders = Service_Order.objects.filter(reduce(or_, q_objects))
+        service_orders = Service_Order.objects.filter(reduce(or_, q_objects)).distinct()
 
         for item in service_orders:
             item.texting = "" if item.texting is None else item.texting
@@ -258,7 +258,6 @@ def service_order_update(request, id):
 
             messages.success(request, 'The service order was updated successfully!')
         except Exception as e:
-            print(e)
             messages.warning(request, e)
         return redirect('/service_order')
     else:
@@ -459,7 +458,7 @@ def service_order_add_step_2(request):
 
     if request.method == 'POST':
         context_data = {
-                'numbers': [num.strip('\r') for num in request.POST['number'].split('\n')],
+                'numbers': [num.strip('\r') for num in request.POST['number'].split('\n') if num.strip('\r')],
                 'service_order_name': request.POST['username'],
                 'texting': request.POST['texting'],
                 'customer': int(request.POST['customer']) if str(request.POST['customer']).isdigit() else '',
@@ -468,7 +467,7 @@ def service_order_add_step_2(request):
                 'e911_number': request.POST['e911_number'],
                 'e911_address': request.POST['e911_address'],
                 'reseller': request.POST['reseller'],
-                'term_location': int(request.POST['term_location'])  if str(request.POST['term_location']).isdigit() else '',
+                'term_location': int(request.POST['term_location']) if str(request.POST['term_location']).isdigit() else '',
                 'service_status': int(request.POST['status'])  if str(request.POST['status']).isdigit() else '',
                 'voice_carrier': int(request.POST['voice_carrier']) if str(request.POST['voice_carrier']).isdigit() else '',
                 'sms_carrier': int(request.POST['sms_carrier']) if str(request.POST['sms_carrier']).isdigit() else '',

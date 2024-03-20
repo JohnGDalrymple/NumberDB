@@ -63,8 +63,8 @@
             <tr class="table-row" id="tr_{{item.id}}">
               <td style="display: flex; justify-content: space-between;">
                 {% if item.status != "Deleted" %}
-                <a class="btn btn-sm btn-warning" href="edit/{{ item.id }}"><span class="fa fa-edit"></span> Edit</a>
                   {% if item.status != "Submitted" %}
+                    <a class="btn btn-sm btn-warning" href="edit/{{ item.id }}"><span class="fa fa-edit"></span> Edit</a>
                     <a class="btn btn-sm btn-info" href="submit/{{ item.id }}"><span class="fa fa-paper-plane"></span> Submit</a>
                   {% endif %}
                 <a class="btn btn-sm btn-danger" href="delete/{{ item.id }}"><span class="fa fa-trash"></span> Delete</a>
