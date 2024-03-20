@@ -263,8 +263,8 @@ function service_order_value_check() {
         const numberElements = document.querySelectorAll('[name="number"]');
         currentStatus = !!document.getElementById('customer').value && currentStatus;
 
-        numberElements.forEach(item => {
-            if (!item.value) {
+        numberElements.forEach((item, i)=> {
+            if (!item.value && i != 0) {
                 currentStatus = false;
             }
         })
@@ -568,8 +568,9 @@ function service_order_create() {
 
 function service_order_update() {
     let number_email_date = []
+    let remove_numbers = []
 
-    for (let i = 0; i < document.querySelectorAll('[name="number"]').length; i++) {
+    for (let i = 1; i < document.querySelectorAll('[name="number"]').length; i++) {
         number_email_date.push({
             id: document.querySelectorAll('[name="number"]')[i].id.split('number_')[1],
             number: document.querySelectorAll('[name="number"]')[i].value,
@@ -596,13 +597,20 @@ function service_order_update() {
         })
     }
 
+    for (let i = 2; i < document.querySelectorAll('tr').length; i++) {
+        document.querySelectorAll('tr')[i].id && document.querySelectorAll('tr')[i].hidden == true ? remove_numbers.push(document.querySelectorAll('tr')[i].id) : '';
+    }
+
     const request_data = {
         username: document.getElementById('input_username').value,
         customer: document.getElementById('customer').value,
         term_location: document.getElementById('term_location').value,
         texting: document.getElementById('input_texting').value,
-        number_email_date: number_email_date
+        number_email_date: number_email_date,
+        remove_numbers: remove_numbers
     }
+
+    console.log(request_data);
 
     $.ajax({
         url: `${window.location.origin}/service_order/edit/${window.location.href.split('/')[window.location.href.split('/').length - 1]}`,
@@ -622,4 +630,44 @@ function service_order_update() {
             location.reload();
         }
     });
+}
+
+function remove_number(remove_number_id) {
+    remove_number_id.includes('_') ? document.getElementById(remove_number_id).remove() : document.getElementById(remove_number_id).hidden = true
+    document.querySelectorAll('tr').length > 1 ? '' : document.getElementById('service_order_create_2').disabled = true;
+}
+
+function add_number() {
+    let tbody = document.querySelector('tbody')
+    let trElements = document.querySelectorAll('tr')
+    if(trElements.length > 1) {
+        let new_id = 'new_1';
+        trElements.forEach(item => {
+            item.id.includes('_') ? new_id = `new_${(Number(item.id.split('_')[1]) + 1)}` : '';
+        })
+        let trElementClone = trElements[1].cloneNode(true);
+        trElementClone.hidden = false
+        trElementClone.id = new_id; // Update the id of the cloned tr element
+
+        // Get all first child elements of td tags within the cloned tr and update their IDs
+        let firstChildElements = trElementClone.querySelectorAll("td > :first-child");
+        firstChildElements.forEach((element) => {
+            let baseId = element.id.substring(0, element.id.lastIndexOf("_") + 1); // Extract base ID without the numeric part
+            element.id = baseId + new_id; // Update ID with new index
+            if (element.tagName === "INPUT") {
+                element.value = ""; // Reset text input value
+            } else if (element.tagName === "SELECT") {
+                element.selectedIndex = 0; // Reset select to the first option
+            } else if (element.tagName === "BUTTON") {
+                element.onclick = () => remove_number(new_id);
+            }
+        });
+
+        tbody.appendChild(trElementClone);
+        document.getElementById('service_order_create_2').disabled = true
+        document.getElementById('number_'+new_id).oninput = () => change_num('number_', new_id);
+        document.getElementById('email_'+new_id).oninput = () => change_email(new_id);
+        document.getElementById('e911_number_'+new_id).oninput = () => change_num('e911_number_', new_id);
+        document.getElementById('extension_'+new_id).oninput = () => change_num('extension_', new_id);
+    } 
 }
