@@ -1311,8 +1311,40 @@ def multi_standardization(request):
 
         for item in request_data['data']:
             try:
+                current_did = Did.objects.get(did = int(item['did']))
+
+                current_did.in_method = switch(item['in_method'])
+                current_did.voice_carrier = Voice_Carrier.objects.get(record_id = int(item['voice_carrier'])) if item['voice_carrier'].isdigit() else None
+                current_did.status = Status.objects.get(record_id = int(item['status'])) if item['status'].isdigit() else None
+                current_did.change_date =  datetime.datetime.now()
+                current_did.sms_enabled = switch(item['in_method'])
+                current_did.sms_carrier = Voice_Carrier.objects.get(record_id = int(item['sms_carrier'])) if item['sms_carrier'].isdigit() else None
+                current_did.sms_type = SMS_Type.objects.get(record_id = int(item['sms_type'])) if item['sms_type'].isdigit() else None
+                current_did.sms_campaign = item['sms_campaign']
+                current_did.term_location = Term_Location.objects.get(record_id = int(item['term_location'])) if item['term_location'].isdigit() else None
+                current_did.customer = Customer.objects.get(record_id = int(item['customer'])) if item['customer'].isdigit() else None
+                current_did.reseller = item['reseller']
+                current_did.user_first_name = item['user_first_name']
+                current_did.user_last_name = item['user_last_name']
+                current_did.extension = int(item['extension']) if item['extension'].isdigit() else None
+                current_did.email = item['email']
+                current_did.onboard_date = parse_date(item['onboard_date'])
+                current_did.note = item['note']
+                current_did.e911_enabled_billed = switch(item['e911_enabled_billed'])
+                current_did.e911_cid = int(item['e911_cid']) if item['e911_cid'].isdigit() else None
+                current_did.e911_address = item['e911_address']
+                current_did.service_1 = Service.objects.get(record_id = int(item['service_1'])) if item['service_1'].isdigit() else None
+                current_did.service_2 = Service.objects.get(record_id = int(item['service_2'])) if item['service_2'].isdigit() else None
+                current_did.service_3 = Service.objects.get(record_id = int(item['service_3'])) if item['service_3'].isdigit() else None
+                current_did.service_4 = Service.objects.get(record_id = int(item['service_4'])) if item['service_4'].isdigit() else None
+                current_did.updated_date_time = datetime.datetime.now()
+                current_did.updated_by = str(request.user)
+
+                current_did.save()
+                
+            except Exception as e:
                 new_did = Did(
-                    did_uuid = uuid.uuid4(), 
+                    did_uuid = uuid.uuid4(),
                     did = int(item['did']) if item['did'] else None, 
                     in_method = switch(item['in_method']), 
                     voice_carrier = Voice_Carrier.objects.get(record_id = int(item['voice_carrier'])) if item['voice_carrier'].isdigit() else None, 
@@ -1343,11 +1375,8 @@ def multi_standardization(request):
                 )
                 new_did.save()
 
-                error_did = Did_Error(id = int(item['id']))
-                error_did.delete()
-                
-            except Exception as e:
-                messages.warning(request, e)
+            error_did = Did_Error(id = int(item['id']))
+            error_did.delete()
 
         messages.success(request, 'Multi Standardization was successflly.')
         return redirect(f'/did_standardization/?{request_data["searchQuery"]}')
