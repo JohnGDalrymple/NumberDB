@@ -356,10 +356,10 @@ function change_date(date_input_type, id) {
 }
 
 function multi_submit() {
-    data = document.querySelectorAll('tr')
+    standardData = document.querySelectorAll('tr')
     var data = []
-    for (let i = 1; i < data.length; i++) {
-        id = data[i].id;
+    for (let i = 1; i < standardData.length; i++) {
+        id = standardData[i].id;
         data.push({
             id: id,
             did: document.getElementById('did_' + id).value,
