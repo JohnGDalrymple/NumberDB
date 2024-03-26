@@ -25,6 +25,8 @@ from email.mime.text import MIMEText
 import jwt
 from dateutil import parser
 import json
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail, Email, To, From
 
 email_regex = r"(^[a-zA-Z0-9_.+\-']+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
 
@@ -414,7 +416,7 @@ def users(request):
 def user_delete(request, id):
     user = User.objects.get(id=id)
     user.delete()
-    messages.warning(request, 'User was deleted successfully!')
+    messages.success(request, 'User was deleted successfully!')
     return redirect('/user')
 
 
@@ -449,35 +451,23 @@ def user_add(request):
             )
             users.full_clean()
             users.save()
-            s = smtplib.SMTP(os.getenv('SMTP_SERVICE'), os.getenv('EMAIL_PORT'))
-            s.starttls()
-            s.login(os.getenv('EMAIL_SERVER'), os.getenv('EMAIL_PASSWORD'))
 
-            client_message_html = f"""\
-            <html>
-                <body>
-                    <p style="font-size:16px">Hello <strong>{request.POST['first_name']}</strong>.</p>
-                    <br>
-                    <p><strong>Congratulations🎉,</strong> You have been invited to become an administrator of the Mobex server.</p>
-                    <p>You can access <a href="{os.getenv('BASE_URL')}" style="text-decoration:none"><strong>Mobex admin panel</strong></a> using below credential</p>
-                    <p>Username: <strong>{request.POST['username']}</strong></p>
-                    <p>Password: <strong>{request.POST['password1']}</strong></p>
-                    <br>
-                    <p>Thank you.</p>
-                    <p style="font-size:16px"><strong>Mobex.</strong></p>
-                </body>
-            </html>
-            """
-
-            client_message = MIMEMultipart('alternative')
-            client_message.attach(MIMEText(client_message_html, _subtype='html'))
+            admin_invite_message = Mail()
             
-            client_message["Subject"] = 'Welcome to Mobex!'
-            client_message["From"] = os.getenv('EMAIL_SERVER')
-            client_message["To"] = request.POST['email']
+            admin_invite_message.from_email = From(email=os.getenv('EMAIL_SERVER'), name="Mobex", p=1)
+            admin_invite_message.to = [To(email=request.POST['email'], name=request.POST['username'], p=1)]
+            admin_invite_message.template_id = os.getenv('SENDGRID_TEMPLATE_ADMIN_INVITE')
+            admin_invite_message.dynamic_template_data = {
+                'name': request.POST['username'],
+                'email': request.POST['email'],
+                'first_name': request.POST['first_name'],
+                'username': request.POST['username'],
+                'password': request.POST['password1'],
+                'server_link': os.getenv('BASE_URL'),
+            }
 
-            s.sendmail(os.getenv('EMAIL_SERVER'), request.POST['email'], client_message.as_string())
-            s.quit()
+            sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
+            sg.send(admin_invite_message)
 
         except Exception as e:
             messages.warning(request, e)
@@ -630,7 +620,7 @@ def did_delete(request, id):
         did = Did.objects.get(id=id)
         did.is_active = False
         did.save()
-        messages.warning(request, 'DID was deleted successfully!')
+        messages.success(request, 'DID was deleted successfully!')
     except Exception as e:
         messages.warning(request, e)
 
@@ -894,64 +884,49 @@ def export_error_csv(request):
 
 
 @login_required
-def did_sync_method(request):
-    skip = 0
-    top = 100
+def did_sync_to_method(request):
+    # dids_data = Did.objects.filter(is_active=True, is_synced=False)
+    dids_data = Did.objects.filter(did=5875707770)
+
     headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
-    while True:
-        params = {'skip': skip, 'top': top, 'select':'Number,MIEntityFullName_RecordID,MIResellerMSP,MISMSType_RecordID,MISMSCarrier_RecordID,MISMSCarrier_RecordID,MITermLocation_RecordID,IsDuplicated,LastModifiedDate,MISMSEnabled,MISMSCampaign,MIUserFirstName,MIUserLastName,MIExtension,MIEmail,MIStartDate,MIItemFullName_RecordID,MIItemFullName2_RecordID,MIItemFullName3_RecordID,MIItemFullName4_RecordID,LastModifiedDate,ImportBy,RecordID,MIType_RecordID'}
-
-        response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MICustomerNumberRelationshipTable", headers=headers, params=params)
-
-        if response.status_code != 200:
-            messages.warning(request, f"Error {response.status_code} when getting data from API.")
-            break
-
+    i = 1
+    for item in dids_data:
+        if(i > 5): break
+        i = i + 1
+        print(item.did)
+        
+        params = {'filter': f"Number eq '{item.did}'", 'IsDuplicated': False}
+        response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MICustomerNumberRelationshipTable/", headers=headers, params=params)
         response_json = response.json()
 
         if 'value' not in response_json:
             messages.warning(request, "Unexpected response structure from API.")
-            break
+            continue
 
-        if(len(response_json['value']) == 0):
-            break
+        headers = {'Content-Type': 'application/json', 'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
 
-        for item in response_json['value']:
-            save_data = Did(
-                did = item["Number"],
-                customer_id = item["MIEntityFullName_RecordID"],
-                reseller = item["MIResellerMSP"],
-                status_id = item["MIType_RecordID"],
-                voice_carrier_id = item["MISMSCarrier_RecordID"],
-                sms_carrier_id = item["MISMSCarrier_RecordID"],
-                sms_type_id = item["MISMSType_RecordID"],
-                term_location_id = item["MITermLocation_RecordID"],
-                in_method = "Yes",
-                change_date = parse_date_sync(item["LastModifiedDate"]),
-                sms_enabled = "Yes" if item["MISMSEnabled"] else "No",
-                sms_campaign = item["MISMSCampaign"],
-                user_first_name = item["MIUserFirstName"],
-                user_last_name = item["MIUserLastName"],
-                extension = item["MIExtension"],
-                email = is_valid_email(item["MIEmail"]),
-                onboard_date = parse_date_sync(item["MIStartDate"]),
-                service_1_id = item["MIItemFullName_RecordID"],
-                service_2_id = item["MIItemFullName2_RecordID"],
-                service_3_id = item["MIItemFullName3_RecordID"],
-                service_4_id = item["MIItemFullName4_RecordID"],
-                updated_date_time = parse_date_sync(item["LastModifiedDate"]),
-                updated_by = item["ImportBy"],
-                record_id = item["RecordID"],
-                did_uuid = uuid.uuid4(),
-                is_synced = True,
-            )
-            try:
-                save_data.save()
-            except Exception as e:
-                messages.warning(request, e)
+        if(response_json['count'] == 0):
+            payload = '{\r\n    "MISMSEnabled": "'+ ('TRUE' if item.sms_enabled == 'Yes' else 'FALSE') +'",\r\n    "MISMSCampaign": "'+ item.sms_campaign + '",\r\n    "MIResellerMSP": "'+ item.reseller + '",\r\n    "MIUserFirstName": "'+ item.user_first_name + '",\r\n    "MIUserLastName": "'+ item.user_last_name + '",\r\n    "MIExtension": "'+ str(item.extension if item.extension else '') + '",\r\n    "MIEmail": "'+ item.email + '",\r\n    "ImportBy": "'+ str(request.user) + '",\r\n    "MIEntityFullName": "'+ (item.customer.full_name if item.customer else '') + '",\r\n    "MIEntityFullName_RecordID": "'+ str(item.customer.record_id if item.customer else '') + '",\r\n    "MIItemFullName": "'+ (item.service_1.name if item.service_1 else '') + '",\r\n    "MIItemFullName_RecordID": "'+ str(item.service_1.record_id if item.service_1 else '') + '",\r\n    "MIItemFullName2": "'+ (item.service_2.name if item.service_2 else '') + '",\r\n    "MIItemFullName2_RecordID": "'+ str(item.service_2.record_id if item.service_2 else '') +  '",\r\n    "MIItemFullName3": "'+ (item.service_3.name if item.service_3 else '') + '",\r\n    "MIItemFullName3_RecordID": "'+ str(item.service_3.record_id if item.service_3 else '') + '",\r\n    "MIItemFullName4": "'+ (item.service_4.name if item.service_4 else '') + '",\r\n    "MIItemFullName4_RecordID": "'+ str(item.service_4.record_id if item.service_4 else '') + '",\r\n    "MISMSType": "'+ (item.sms_type.name if item.sms_type else '') + '",\r\n    "MISMSType_RecordID": "'+ str(item.sms_type.record_id if item.sms_type else '') + '",\r\n    "MITermLocation": "'+ (item.term_location.name if item.term_location else '') + '",\r\n    "MITermLocation_RecordID": "'+ str(item.term_location.record_id if item.term_location else '') + '",\r\n    "MIType": "'+ (item.status.name if item.status else '') + '",\r\n    "MIType_RecordID": "'+ str(item.status.record_id if item.status else '') + '",\r\n    "MIVoiceCarrier": "'+ (item.voice_carrier.name if item.voice_carrier else '') + '",\r\n    "MIVoiceCarrier_RecordID": "'+ str(item.voice_carrier.record_id if item.voice_carrier else '') + '",\r\n    "MISMSCarrier": "'+ (item.sms_carrier.name if item.sms_carrier else '') + '",\r\n    "MISMSCarrier_RecordID": "'+ str(item.sms_carrier.record_id if item.sms_carrier else '') + '",\r\n    "Number": "'+ str(item.did) + '"\r\n}'
 
-        skip += 100
-    
+            create_response = requests.post(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MICustomerNumberRelationshipTable",  headers=headers, data=payload)
+            
+            if (create_response.status_code == 201):
+                item.record_id = int(create_response.json())
+                item.is_synced = True
+                item.in_method = 'Yes'
+                item.save()
+        else:
+            update_id = response_json['value'][0]['RecordID']
+
+            payload = '{\r\n    "MISMSEnabled": "'+ ('TRUE' if item.sms_enabled == 'Yes' else 'FALSE') +'",\r\n    "MISMSCampaign": "'+ item.sms_campaign + '",\r\n    "MIResellerMSP": "'+ item.reseller + '",\r\n    "MIUserFirstName": "'+ item.user_first_name + '",\r\n    "MIUserLastName": "'+ item.user_last_name + '",\r\n    "MIExtension": "'+ str(item.extension if item.extension else '') + '",\r\n    "MIEmail": "'+ item.email + '",\r\n    "ImportBy": "'+ str(request.user) + '",\r\n    "MIEntityFullName": "'+ (item.customer.full_name if item.customer else '') + '",\r\n    "MIEntityFullName_RecordID": "'+ str(item.customer.record_id if item.customer else '') + '",\r\n    "MIItemFullName": "'+ (item.service_1.name if item.service_1 else '') + '",\r\n    "MIItemFullName_RecordID": "'+ str(item.service_1.record_id if item.service_1 else '') + '",\r\n    "MIItemFullName2": "'+ (item.service_2.name if item.service_2 else '') + '",\r\n    "MIItemFullName2_RecordID": "'+ str(item.service_2.record_id if item.service_2 else '') +  '",\r\n    "MIItemFullName3": "'+ (item.service_3.name if item.service_3 else '') + '",\r\n    "MIItemFullName3_RecordID": "'+ str(item.service_3.record_id if item.service_3 else '') + '",\r\n    "MIItemFullName4": "'+ (item.service_4.name if item.service_4 else '') + '",\r\n    "MIItemFullName4_RecordID": "'+ str(item.service_4.record_id if item.service_4 else '') + '",\r\n    "MISMSType": "'+ (item.sms_type.name if item.sms_type else '') + '",\r\n    "MISMSType_RecordID": "'+ str(item.sms_type.record_id if item.sms_type else '') + '",\r\n    "MITermLocation": "'+ (item.term_location.name if item.term_location else '') + '",\r\n    "MITermLocation_RecordID": "'+ str(item.term_location.record_id if item.term_location else '') + '",\r\n    "MIType": "'+ (item.status.name if item.status else '') + '",\r\n    "MIType_RecordID": "'+ str(item.status.record_id if item.status else '') + '",\r\n    "MIVoiceCarrier": "'+ (item.voice_carrier.name if item.voice_carrier else '') + '",\r\n    "MIVoiceCarrier_RecordID": "'+ str(item.voice_carrier.record_id if item.voice_carrier else '') + '",\r\n    "MISMSCarrier": "'+ (item.sms_carrier.name if item.sms_carrier else '') + '",\r\n    "MISMSCarrier_RecordID": "'+ str(item.sms_carrier.record_id if item.sms_carrier else '') + '"\r\n}'
+
+            update_response = requests.patch(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MICustomerNumberRelationshipTable/{update_id}",  headers=headers, data=payload)
+
+            if update_response.status_code == 204:
+                item.is_synced = True
+                item.in_method = 'Yes'
+                item.save()
+
     messages.success(request, "DID data has been synchronized with Method.")
     return redirect('/did')
 
@@ -972,33 +947,24 @@ def user_verify(request):
             payload["exp"] = expiration
             token = jwt.encode(payload, os.getenv('JWT_SECRET_KEY'), algorithm='HS256')
 
-            s = smtplib.SMTP(os.getenv('SMTP_SERVICE'), os.getenv('EMAIL_PORT'))
-            s.starttls()
-            s.login(os.getenv('EMAIL_SERVER'), os.getenv('EMAIL_PASSWORD'))
-
-            verify_message_html = f"""\
-            <html>
-                <body>
-                    <p style="font-size:16px">Hello <strong>{user.username}</strong>.</p>
-                    <br>
-                    <p><strong>Mobex Server</strong> had verified your account, so you can reset your password using <a href="http://localhost:8000/reset/password/?verify={token}" style="text-decoration:none"><strong>here link</strong></a> in three hours</p>
-                    <p>After reseting your password, you can access <a href="http://localhost:8000/" style="text-decoration:none"><strong>here</strong></a> using new password</p>
-                    <br>
-                    <p>Thank you.</p>
-                    <p style="font-size:16px"><strong>Mobex.</strong></p>
-                </body>
-            </html>
-            """
-
-            verify_message = MIMEMultipart('alternative')
-            verify_message.attach(MIMEText(verify_message_html, _subtype='html'))
+            admin_verify_message = Mail(
+                from_email=os.getenv('EMAIL_SERVER'),
+                to_emails=To(user.email, request.POST['username'])
+                )
             
-            verify_message["Subject"] = 'Verify User'
-            verify_message["From"] = os.getenv('EMAIL_SERVER')
-            verify_message["To"] = user.email
+            admin_verify_message.template_id = os.getenv('SENDGRID_TEMPLATE_ADMIN_VERIFY')
 
-            s.sendmail(os.getenv('EMAIL_SERVER'), user.email, verify_message.as_string())
-            s.quit()
+            admin_verify_message.dynamic_template_data = {
+                # 'name': request.POST['username'],
+                'username': request.POST['username'],
+                # 'email': user.email,
+                'server_link': os.getenv('BASE_URL'),
+                'reset_link': f"{os.getenv('BASE_URL')}reset/password/?verify={token}",
+            }
+
+            sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
+            sg.send(admin_verify_message)
+
             messages.success(request, f"Please check your email inbox({user.email}).")
         except Exception as e:
             messages.warning(request, e)

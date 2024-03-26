@@ -340,7 +340,7 @@ def sync_method(request):
     while True:
         params = {'skip': skip, 'top': top, 'select':'RecordID,FullName,Phone,Fax,Mobile,Email,BillAddressAddr1,BillAddressCity,BillAddressState,BillAddressPostalCode,BillAddressCountry,ShipAddressAddr1,ShipAddressCity,ShipAddressCountry,ShipAddressPostalCode,ShipAddressState,CustomerType_RecordID,CompanyName,Notes,Balance', 'filter': "IsActive eq true and Sublevel eq 0 and not (CompanyName eq '')"}
 
-        response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}Entity", headers=headers, params=params)
+        response = requests.get(f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}Entity/", headers=headers, params=params)
 
         if response.status_code != 200:
             messages.warning(request, f"Error {response.status_code} when getting data from API.")
@@ -352,7 +352,7 @@ def sync_method(request):
             messages.warning(request, "Unexpected response structure from API.")
             break
 
-        if(len(response_json['value']) == 0):
+        if(response_json['count'] == 0):
             break
         for item in response_json['value']:
             save_data = Customer(
@@ -382,7 +382,7 @@ def sync_method(request):
                 save_data.save()
             except Exception as e:
                 messages.warning(request, e)
-        print("here is the one length", len(response_json['value']))
+        print("here is the one length", response_json['count'])
         skip += 100
     
     messages.success(request, "Customer data has been synchronized with Method.")

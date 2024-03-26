@@ -11,9 +11,6 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.hashers import make_password
 import pandas as pd
 from operator import or_
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 import pymsteams
 import os
 from django.db import transaction

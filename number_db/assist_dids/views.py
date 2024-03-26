@@ -391,7 +391,7 @@ def did_sync_status_method(request):
             messages.warning(request, "Unexpected response structure from API.")
             break
 
-        if(len(response_json['value']) == 0):
+        if(response_json['count'] == 0):
             break
         for item in response_json['value']:
             try:
@@ -438,7 +438,7 @@ def did_sync_service_item_method(request):
             messages.warning(request, "Unexpected response structure from API.")
             break
 
-        if(len(response_json['value']) == 0):
+        if(response_json['count'] == 0):
             break
         for item in response_json['value']:
             try:
@@ -487,7 +487,7 @@ def did_sync_sms_type_method(request):
             messages.warning(request, "Unexpected response structure from API.")
             break
 
-        if(len(response_json['value']) == 0):
+        if(response_json['count'] == 0):
             break
         for item in response_json['value']:
             try:
@@ -534,7 +534,7 @@ def did_sync_term_location_method(request):
             messages.warning(request, "Unexpected response structure from API.")
             break
 
-        if(len(response_json['value']) == 0):
+        if(response_json['count'] == 0):
             break
         for item in response_json['value']:
             try:
@@ -581,7 +581,7 @@ def did_sync_voice_carrier_method(request):
             messages.warning(request, "Unexpected response structure from API.")
             break
 
-        if(len(response_json['value']) == 0):
+        if(response_json['count'] == 0):
             break
         for item in response_json['value']:
             try:
@@ -628,7 +628,7 @@ def did_sync_customer_type_method(request):
             messages.warning(request, "Unexpected response structure from API.")
             break
 
-        if(len(response_json['value']) == 0):
+        if(response_json['count'] == 0):
             break
         for item in response_json['value']:
             try:
