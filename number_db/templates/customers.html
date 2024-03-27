@@ -17,7 +17,7 @@
         </a>
     </div>
     <div class="card-body">
-      <form class="form-horizontal mb-3" method="POST" enctype="multipart/form-data">
+      <!-- <form class="form-horizontal mb-3" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="d-flex align-items-sm-start align-items-stretch  flex-column flex-sm-row gap-2">
               <div class="flex-grow-1">
@@ -31,7 +31,10 @@
                   <a class="btn btn-success ms-2" href="add/"><span class="fa fa-add"></span> Add</a>
               </div>
           </div>
-      </form>
+      </form> -->
+      <div class="d-flex justify-content-end">
+        <a class="btn btn-info ms-2" href="sync_method/"><span class="fa fa-cloud-arrow-down"></span> Sync from Method</a>
+      </div>
       <hr>
       <div class="d-flex mb-3">
           <form class="form-inline ms-auto w-100">

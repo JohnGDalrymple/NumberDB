@@ -57,10 +57,10 @@
           </select>
         </div>
         <div class="col-2">
-          <select name="term_location" id="term_location" class="form-select p-3">
+          <select name="term_location" id="term_location" class="form-select p-3" onchange="change_select('term_location', '')">
             <option value="" {% if service_order.term_location == '' %}selected{% endif %}>Select term location</option>
             {% for item in term_locations %}
-              <option value="{{ item.id }}" {% if service_order.term_location == item.id %} selected {% endif %}>{{ item.name }}</option>
+              <option class="text-dark" value="{{ item.id }}" {% if service_order.term_location == item.id %} selected {% endif %}>{{ item.name }}</option>
             {% endfor %}
           </select>
         </div>
@@ -82,6 +82,7 @@
           <thead>
             <tr>
               <th>Action</th>
+              <th>Name</th>
               <th>Number</th>
               <th>Reseller</th>
               <th>Email</th>
@@ -94,11 +95,10 @@
               <th>SMS Type</th>
               <th>SMS Enabled</th>
               <th>SMS Campaign</th>
-              <th>User First Name</th>
-              <th>User Last Name</th>
               <th>Extension</th>
               <th>Onboard Date</th>
               <th>E911 Enabled_Billed</th>
+              <th>Note</th>
               <th>Service 1</th>
               <th>Service 2</th>
               <th>Service 3</th>
@@ -109,6 +109,9 @@
             <tr hidden>
               <td>
                 <button class="btn btn-sm btn-danger"><span class="fa fa-trash"></span> Delete</button>
+              </td>
+              <td>
+                <input id="name_" name="name" class="form-control" style="min-width: 150px;">
               </td>
               <td>
                 <input id="number_" name="number" class="form-control" style="min-width: 150px;" oninput="change_num('number_', '')">
@@ -171,12 +174,6 @@
                 <input type="text" class="form-control" id="sms_campaign_" name="sms_campaign" style="min-width: 120px;">
               </td>
               <td>
-                <input type="text" class="form-control" id="user_first_name_" name="user_first_name" style="min-width: 150px;">
-              </td>
-              <td>
-                <input type="text" class="form-control" id="user_last_name_" name="user_last_name" style="min-width: 150px;">
-              </td>
-              <td>
                 <input type="text" id="extension_" name="extension" class="form-control" style="min-width: 150px;" oninput="change_num('extension_', '')">
               </td>
               <td>
@@ -188,6 +185,9 @@
                   <option value="Yes">Yes</option>
                   <option value="No">No</option>
                 </select>
+              </td>
+              <td>
+                <input id="note_" name="note" class="form-control" style="min-width: 150px;">
               </td>
               <td>
                 <select name="service_1" id="service_1_" class="form-select" style="min-width: 180px;">
@@ -226,6 +226,9 @@
             <tr id="{{ number_related_data.id }}">
               <td>
                 <button class="btn btn-sm btn-danger" onclick="remove_number('{{ number_related_data.id }}')"><span class="fa fa-trash"></span> Delete</button>
+              </td>
+              <td>
+                <input id="name_{{ number_related_data.id }}" name="name" value="{{ number_related_data.name }}" class="form-control" style="min-width: 150px;"/>
               </td>
               <td>
                 <input id="number_{{ number_related_data.id }}" name="number" value="{{ number_related_data.number }}" class="form-control" style="min-width: 150px;" oninput="change_num('number_', '{{ number_related_data.id }}')">
@@ -288,12 +291,6 @@
                 <input type="text" class="form-control" id="sms_campaign_{{ number_related_data.id }}" name="sms_campaign" style="min-width: 120px;" value="{{ number_related_data.sms_campaign }}">
               </td>
               <td>
-                <input type="text" class="form-control" id="user_first_name_{{ number_related_data.id }}" name="user_first_name" style="min-width: 150px;" value="{{ number_related_data.user_first_name }}">
-              </td>
-              <td>
-                <input type="text" class="form-control" id="user_last_name_{{ number_related_data.id }}" name="user_last_name" style="min-width: 150px;" value="{{ number_related_data.user_last_name }}">
-              </td>
-              <td>
                 <input type="text" id="extension_{{ number_related_data.id }}" name="extension" value="{{ number_related_data.extension }}" class="form-control" style="min-width: 150px;" oninput="change_num('extension_', '{{ number_related_data.id }}')">
               </td>
               <td>
@@ -305,6 +302,9 @@
                   <option value="Yes" {% if number_related_data.e911_enabled_billed == "Yes" %}selected{% endif %}>Yes</option>
                   <option value="No" {% if number_related_data.e911_enabled_billed == "No" %}selected{% endif %}>No</option>
                 </select>
+              </td>
+              <td>
+                <input id="note_{{ number_related_data.id }}" name="note" value="{{ number_related_data.note }}" class="form-control" style="min-width: 150px;">
               </td>
               <td>
                 <select name="service_1" id="service_1_{{ number_related_data.id }}" class="form-select" style="min-width: 180px;">

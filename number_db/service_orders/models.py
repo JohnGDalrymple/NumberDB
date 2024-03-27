@@ -14,6 +14,7 @@ class SwitchValues(models.TextChoices):
     NO = 'No', _('No')
 
 class Number_Email_Date(models.Model):
+    name = models.CharField(max_length=200, null=True, blank=True)
     number = models.BigIntegerField(unique=True, null=True, blank=True)
     email = models.EmailField(max_length=100, null=True, blank=True)
     requested_port_date = models.DateField('%m/%d/%Y', null=True, blank=True)
@@ -26,11 +27,10 @@ class Number_Email_Date(models.Model):
     sms_type = models.ForeignKey(SMS_Type, on_delete=models.CASCADE, null=True, blank=True, to_field='record_id')
     sms_enabled = models.CharField(max_length=3, choices=SwitchValues.choices, null=True, blank=True)
     sms_campaign = models.CharField(max_length=100, null=True, blank=True)
-    user_first_name = models.CharField(max_length=100, null=True, blank=True)
-    user_last_name = models.CharField(max_length=100, null=True, blank=True)
     extension = models.BigIntegerField(null=True, blank=True)
     onboard_date = models.DateField('%m/%d/%Y', null=True, blank=True)
     e911_enabled_billed = models.CharField(max_length=3, choices=SwitchValues.choices, null=True, blank=True)
+    note = models.TextField(max_length=255, null=True, blank=True)
     service_1 = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, related_name='service_order_1', blank=True, to_field='record_id')
     service_2 = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, related_name='service_order_2', blank=True, to_field='record_id')
     service_3 = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, related_name='service_order_3', blank=True, to_field='record_id')

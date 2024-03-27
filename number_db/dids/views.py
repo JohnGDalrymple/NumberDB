@@ -19,9 +19,6 @@ from operator import or_
 import requests
 import os
 import re
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 import jwt
 from dateutil import parser
 import json
@@ -195,7 +192,7 @@ def did(request):
             q_objects.append((Q(service_4__name__icontains = query)))
             
             # Use Q object to query the database with OR condition
-            dids_list = Did.objects.filter(reduce(or_, q_objects))
+            dids_list = Did.objects.filter(reduce(or_, q_objects), is_active=True)
 
             for item in dids_list:
                 item.note =  "" if(item.note == None) else item.note
@@ -216,7 +213,7 @@ def did(request):
             return render(request, 'dids.html', {'dids': dids, 'search': query, 'error': did_error})
 
         else:
-            dids_list = Did.objects.all().select_related('customer', 'status', 'voice_carrier', 'sms_carrier', 'sms_type', 'term_location', 'service_1', 'service_2', 'service_3', 'service_4')
+            dids_list = Did.objects.filter(is_active=True).select_related('customer', 'status', 'voice_carrier', 'sms_carrier', 'sms_type', 'term_location', 'service_1', 'service_2', 'service_3', 'service_4')
             for item in dids_list:
                 item.note =  "" if(item.note == None) else item.note
                 item.e911_enabled_billed =  "" if(item.e911_enabled_billed == None) else item.e911_enabled_billed
@@ -803,7 +800,7 @@ def did_download_all(request):
     writer = csv.writer(response)
     writer.writerow(default_header)
 
-    data = Did.objects.all()
+    data = Did.objects.filter(is_active=True)
     for item in data:
         writer.writerow([
             item.did,
@@ -885,8 +882,7 @@ def export_error_csv(request):
 
 @login_required
 def did_sync_to_method(request):
-    # dids_data = Did.objects.filter(is_active=True, is_synced=False)
-    dids_data = Did.objects.filter(did=5875707770)
+    dids_data = Did.objects.filter(is_active=True, is_synced=False)
 
     headers = {'Authorization': 'APIKey ' +  os.getenv('METHOD_API_KEY')}
     i = 1
