@@ -261,7 +261,7 @@ function service_order_value_check() {
     if (document.getElementById('service_order_create_2')) {
         var currentStatus = true;
         const numberElements = document.querySelectorAll('[name="number"]');
-        currentStatus = !!document.getElementById('customer').value && currentStatus;
+        currentStatus = !!document.getElementById('customer').value && !!document.getElementById('term_location').value && currentStatus;
 
         numberElements.forEach((item, i)=> {
             if (!item.value && i != 0) {
@@ -270,6 +270,7 @@ function service_order_value_check() {
         })
 
         document.getElementById('service_order_create_2').disabled = !(document.querySelectorAll('.error').length == 0 && currentStatus);
+        console.log(document.getElementById('service_order_create_2').disabled)
     }
 }
 
@@ -512,8 +513,9 @@ function username_validator() {
 function service_order_create() {
     let number_email_date = []
 
-    for (let i = 0; i < document.querySelectorAll('[name="number"]').length; i++) {
+    for (let i = 1; i < document.querySelectorAll('[name="number"]').length; i++) {
         number_email_date.push({
+            name: document.querySelectorAll('[name="name"]')[i].value,
             number: document.querySelectorAll('[name="number"]')[i].value,
             reseller: document.querySelectorAll('[name="reseller"]')[i].value,
             email: document.querySelectorAll('[name="email"]')[i].value,
@@ -526,8 +528,6 @@ function service_order_create() {
             sms_type: document.querySelectorAll('[name="sms_type"]')[i].value,
             sms_enabled: document.querySelectorAll('[name="sms_enabled"]')[i].value,
             sms_campaign: document.querySelectorAll('[name="sms_campaign"]')[i].value,
-            user_first_name: document.querySelectorAll('[name="user_first_name"]')[i].value,
-            user_last_name: document.querySelectorAll('[name="user_last_name"]')[i].value,
             extension: document.querySelectorAll('[name="extension"]')[i].value,
             onboard_date: document.querySelectorAll('[name="onboard_date"]')[i].value,
             e911_enabled_billed: document.querySelectorAll('[name="e911_enabled_billed"]')[i].value,
@@ -573,6 +573,7 @@ function service_order_update() {
     for (let i = 1; i < document.querySelectorAll('[name="number"]').length; i++) {
         number_email_date.push({
             id: document.querySelectorAll('[name="number"]')[i].id.split('number_')[1],
+            name: document.querySelectorAll('[name="name"]')[i].value,
             number: document.querySelectorAll('[name="number"]')[i].value,
             reseller: document.querySelectorAll('[name="reseller"]')[i].value,
             email: document.querySelectorAll('[name="email"]')[i].value,
@@ -585,8 +586,6 @@ function service_order_update() {
             sms_type: document.querySelectorAll('[name="sms_type"]')[i].value,
             sms_enabled: document.querySelectorAll('[name="sms_enabled"]')[i].value,
             sms_campaign: document.querySelectorAll('[name="sms_campaign"]')[i].value,
-            user_first_name: document.querySelectorAll('[name="user_first_name"]')[i].value,
-            user_last_name: document.querySelectorAll('[name="user_last_name"]')[i].value,
             extension: document.querySelectorAll('[name="extension"]')[i].value,
             onboard_date: document.querySelectorAll('[name="onboard_date"]')[i].value,
             e911_enabled_billed: document.querySelectorAll('[name="e911_enabled_billed"]')[i].value,

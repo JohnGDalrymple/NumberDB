@@ -59,6 +59,7 @@ def service_order_list(request):
         q_objects.append((Q(texting__icontains = query)))
         q_objects.append((Q(updated_by__icontains = query)))
         q_objects.append((Q(term_location__name__icontains = query)))
+        q_objects.append((Q(number_email_dates__name__icontains = query)))
         q_objects.append((Q(number_email_dates__number__icontains = query)))
         q_objects.append((Q(number_email_dates__email__icontains = query)))
         q_objects.append((Q(number_email_dates__e911_number__icontains = query)))
@@ -70,8 +71,6 @@ def service_order_list(request):
         q_objects.append((Q(number_email_dates__sms_type__name__icontains = query)))
         q_objects.append((Q(number_email_dates__sms_enabled__icontains = query)))
         q_objects.append((Q(number_email_dates__sms_campaign__icontains = query)))
-        q_objects.append((Q(number_email_dates__user_first_name__icontains = query)))
-        q_objects.append((Q(number_email_dates__user_last_name__icontains = query)))
         q_objects.append((Q(number_email_dates__extension__icontains = query)))
         q_objects.append((Q(number_email_dates__e911_enabled_billed__icontains = query)))
         q_objects.append((Q(number_email_dates__service_1__name__icontains = query)))
@@ -102,6 +101,9 @@ def service_order_list(request):
             item.texting = "" if item.texting is None else item.texting
             item.status = switchStatus(item.status)
             item.updated_by = "" if item.updated_by is None else item.updated_by
+
+            print(item.number_email_dates.all())
+
             item.number = item.number_email_dates.all().order_by('id')[0].number if item.number_email_dates.all().order_by('id')[0].number else ""
             item.email = item.number_email_dates.all().order_by('id')[0].email if item.number_email_dates.all().order_by('id')[0].email else ""
             item.requested_port_date = item.number_email_dates.all().order_by('id')[0].requested_port_date if item.number_email_dates.all().order_by('id')[0].requested_port_date else ""
@@ -144,6 +146,7 @@ def service_order_create(request):
 
             for item in request_data['number_email_date']:
                 number_email_date_dict = {
+                    'name' : item['name'],
                     'number' : int(item['number']),
                     'email' : item['email'],
                     'reseller' : item['reseller'],
@@ -156,8 +159,6 @@ def service_order_create(request):
                     'sms_type' : SMS_Type.objects.get(record_id=int(item['sms_type'])) if item['sms_type'] else None,
                     'sms_enabled' : item['sms_enabled'],
                     'sms_campaign' : item['sms_campaign'],
-                    'user_first_name' : item['user_first_name'],
-                    'user_last_name' : item['user_last_name'],
                     'extension' : int(item['extension']) if item['extension'] else None,
                     'onboard_date' : parse_date(item['onboard_date']),
                     'e911_enabled_billed' : item['e911_enabled_billed'],
@@ -198,6 +199,7 @@ def service_order_update(request, id):
             for item in request_data['number_email_date']:
                 if '_' in item['id']:
                     number_email_date_dict = {
+                    'name' : item['name'],
                     'number' : int(item['number']),
                     'email' : item['email'],
                     'reseller' : item['reseller'],
@@ -210,8 +212,6 @@ def service_order_update(request, id):
                     'sms_type' : SMS_Type.objects.get(record_id=int(item['sms_type'])) if item['sms_type'] else None,
                     'sms_enabled' : item['sms_enabled'],
                     'sms_campaign' : item['sms_campaign'],
-                    'user_first_name' : item['user_first_name'],
-                    'user_last_name' : item['user_last_name'],
                     'extension' : int(item['extension']) if item['extension'] else None,
                     'onboard_date' : parse_date(item['onboard_date']),
                     'e911_enabled_billed' : item['e911_enabled_billed'],
@@ -224,6 +224,7 @@ def service_order_update(request, id):
                     service_order.number_email_dates.add(number_email_date)
                 else:
                     service_order_number_email_date_data = Number_Email_Date.objects.get(id=item['id'])
+                    service_order_number_email_date_data.name = item['name']
                     service_order_number_email_date_data.number = int(item['number'])
                     service_order_number_email_date_data.email = item['email']
                     service_order_number_email_date_data.reseller = item['reseller']
@@ -236,8 +237,6 @@ def service_order_update(request, id):
                     service_order_number_email_date_data.sms_type = SMS_Type.objects.get(record_id=item['sms_type']) if item['sms_type'] else None
                     service_order_number_email_date_data.sms_enabled = item['sms_enabled']
                     service_order_number_email_date_data.sms_campaign = item['sms_campaign']
-                    service_order_number_email_date_data.user_first_name = item['user_first_name']
-                    service_order_number_email_date_data.user_last_name = item['user_last_name']
                     service_order_number_email_date_data.extension = int(item['extension']) if item['extension'] else None
                     service_order_number_email_date_data.onboard_date = parse_date(item['onboard_date']) if item['onboard_date'] else None
                     service_order_number_email_date_data.e911_enabled_billed = item['e911_enabled_billed']
@@ -310,6 +309,7 @@ def service_order_update(request, id):
         for item in number_email_date:
             number_email_date_data.append({
                 'id': item['id'],
+                'name': item['name'] if item['name'] else '',
                 'email': item['email'] if item['email'] else '',
                 'number': item['number'] if item['number'] else '',
                 'requested_port_date': item['requested_port_date'].strftime('%Y-%m-%d') if item['requested_port_date'] else '',
@@ -322,8 +322,6 @@ def service_order_update(request, id):
                 'sms_type': item['sms_type_id'] if item['sms_type_id'] else '',
                 'sms_enabled': item['sms_enabled'] if item['sms_enabled'] else '',
                 'sms_campaign': item['sms_campaign'] if item['sms_campaign'] else '',
-                'user_first_name': item['user_first_name'] if item['user_first_name'] else '',
-                'user_last_name': item['user_last_name'] if item['user_last_name'] else '',
                 'extension': item['extension'] if item['extension'] else '',
                 'onboard_date': item['onboard_date'].strftime('%Y-%m-%d') if item['onboard_date'] else '',
                 'e911_enabled_billed': item['e911_enabled_billed'] if item['e911_enabled_billed'] else '',
@@ -455,6 +453,7 @@ def service_order_add_step_2(request):
 
     if request.method == 'POST':
         context_data = {
+                'name': '',
                 'numbers': [num.strip('\r') for num in request.POST['number'].split('\n') if num.strip('\r')],
                 'service_order_name': request.POST['username'],
                 'texting': request.POST['texting'],
@@ -471,8 +470,6 @@ def service_order_add_step_2(request):
                 'sms_type': int(request.POST['sms_type']) if str(request.POST['sms_type']).isdigit() else '',
                 'sms_enabled': request.POST['sms_enabled'],
                 'sms_campaign': request.POST['sms_campaign'],
-                'user_first_name': request.POST['user_first_name'],
-                'user_last_name': request.POST['user_last_name'],
                 'extension': request.POST['extension'],
                 'onboard_date': request.POST['onboard_date'],
                 'e911_enabled_billed': request.POST['e911_enabled_billed'],
