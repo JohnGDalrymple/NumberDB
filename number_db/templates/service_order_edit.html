@@ -98,6 +98,7 @@
               <th>Extension</th>
               <th>Onboard Date</th>
               <th>E911 Enabled_Billed</th>
+              <th>Note</th>
               <th>Service 1</th>
               <th>Service 2</th>
               <th>Service 3</th>
@@ -186,6 +187,9 @@
                 </select>
               </td>
               <td>
+                <input id="note_" name="note" class="form-control" style="min-width: 150px;">
+              </td>
+              <td>
                 <select name="service_1" id="service_1_" class="form-select" style="min-width: 180px;">
                   <option value="" selected></option> 
                   {% for item in services %}
@@ -224,7 +228,7 @@
                 <button class="btn btn-sm btn-danger" onclick="remove_number('{{ number_related_data.id }}')"><span class="fa fa-trash"></span> Delete</button>
               </td>
               <td>
-                <input id="name_{{ number_related_data.id }}" name="name" value="{{ number_related_data.name }}" class="form-control" style="min-width: 150px;"<td>
+                <input id="name_{{ number_related_data.id }}" name="name" value="{{ number_related_data.name }}" class="form-control" style="min-width: 150px;"/>
               </td>
               <td>
                 <input id="number_{{ number_related_data.id }}" name="number" value="{{ number_related_data.number }}" class="form-control" style="min-width: 150px;" oninput="change_num('number_', '{{ number_related_data.id }}')">
@@ -298,6 +302,9 @@
                   <option value="Yes" {% if number_related_data.e911_enabled_billed == "Yes" %}selected{% endif %}>Yes</option>
                   <option value="No" {% if number_related_data.e911_enabled_billed == "No" %}selected{% endif %}>No</option>
                 </select>
+              </td>
+              <td>
+                <input id="note_{{ number_related_data.id }}" name="note" value="{{ number_related_data.note }}" class="form-control" style="min-width: 150px;">
               </td>
               <td>
                 <select name="service_1" id="service_1_{{ number_related_data.id }}" class="form-select" style="min-width: 180px;">

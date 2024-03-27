@@ -19,9 +19,6 @@ from operator import or_
 import requests
 import os
 import re
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 import jwt
 from dateutil import parser
 import json
@@ -195,7 +192,7 @@ def did(request):
             q_objects.append((Q(service_4__name__icontains = query)))
             
             # Use Q object to query the database with OR condition
-            dids_list = Did.objects.filter(reduce(or_, q_objects))
+            dids_list = Did.objects.filter(reduce(or_, q_objects), is_active=True)
 
             for item in dids_list:
                 item.note =  "" if(item.note == None) else item.note

@@ -30,6 +30,7 @@ class Number_Email_Date(models.Model):
     extension = models.BigIntegerField(null=True, blank=True)
     onboard_date = models.DateField('%m/%d/%Y', null=True, blank=True)
     e911_enabled_billed = models.CharField(max_length=3, choices=SwitchValues.choices, null=True, blank=True)
+    note = models.TextField(max_length=255, null=True, blank=True)
     service_1 = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, related_name='service_order_1', blank=True, to_field='record_id')
     service_2 = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, related_name='service_order_2', blank=True, to_field='record_id')
     service_3 = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, related_name='service_order_3', blank=True, to_field='record_id')

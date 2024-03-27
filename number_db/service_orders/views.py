@@ -18,6 +18,8 @@ import json
 
 # Create your views here.
 
+default_header = ['Name', 'Username', 'Number', 'Mobex Texting', 'Texting', 'Requested Port Date', 'E911 number', 'E911 address', 'Calling Plan Type', 'Porting Pin']
+
 def parse_date(date_string):
     try:
         return datetime.datetime.strptime(date_string, '%Y-%m-%d').date()
@@ -73,6 +75,7 @@ def service_order_list(request):
         q_objects.append((Q(number_email_dates__sms_campaign__icontains = query)))
         q_objects.append((Q(number_email_dates__extension__icontains = query)))
         q_objects.append((Q(number_email_dates__e911_enabled_billed__icontains = query)))
+        q_objects.append((Q(number_email_dates__note__icontains = query)))
         q_objects.append((Q(number_email_dates__service_1__name__icontains = query)))
         q_objects.append((Q(number_email_dates__service_2__name__icontains = query)))
         q_objects.append((Q(number_email_dates__service_3__name__icontains = query)))
@@ -94,6 +97,91 @@ def service_order_list(request):
         service_list = paginator.get_page(page_number)
 
         return render(request, 'service_orders.html', {'service_orders': service_list, 'search': query})
+    
+    if request.method == 'POST':
+        try:
+            if request.FILES:
+                csv_file = request.FILES["csv_file"]
+
+                if len(csv_file) == 0:
+                    messages.warning(request, 'Empty File')
+
+                if not csv_file.name.endswith('.csv'):
+                    messages.warning(request, 'File is not CSV type')
+
+                if csv_file.multiple_chunks():
+                    messages.warning(request, 'Uploaded file is too big (%.2f MB).' % (csv_file.size / (1000 * 1000),))
+
+                data_df = pd.read_csv(csv_file, dtype=str)
+                data_dict = data_df.to_dict('records')
+                
+                if data_dict != []:
+                    if set(data_dict[0].keys()) == set(default_header):
+                        convert_data = data_df.fillna('')
+                        convert_data = convert_data.to_dict('records')
+
+                        number_email_date_data = []
+
+                        for item in convert_data:
+                            number_email_date_data.append({
+                                'name': item['Name'],
+                                'email': item['Username'],
+                                'number': item['Number'],
+                                'requested_port_date': item['Requested Port Date'].strftime('%Y-%m-%d') if item['Requested Port Date'] else '',
+                                'e911_number': item['E911 number'],
+                                'e911_address': item['E911 address'],
+                                'note': item['Porting Pin'],
+                            })
+
+                        customers_data = Customer.objects.values_list('record_id', 'full_name')
+                        status_data = Status.objects.all()
+                        voice_carrier_data = Voice_Carrier.objects.all()
+                        sms_type_data = SMS_Type.objects.all()
+                        term_location_data = Term_Location.objects.all()
+                        services_data = Service.objects.all()
+
+                        customers = []
+                        status = []
+                        voice_carrier = []
+                        sms_type = []
+                        term_location = []
+                        services = []
+
+                        for item in customers_data:
+                            if str(item[0]).isdigit():
+                                customers.append({'id': item[0], 'full_name': item[1]})
+
+                        for item in status_data:
+                            if str(item.record_id).isdigit():
+                                status.append({'id': item.record_id, 'name': item.name})
+
+                        for item in voice_carrier_data:
+                            if str(item.record_id).isdigit():
+                                voice_carrier.append({'id': item.record_id, 'name': item.name})
+
+                        for item in sms_type_data:
+                            if str(item.record_id).isdigit():
+                                sms_type.append({'id': item.record_id, 'name': item.name})
+
+                        for item in term_location_data:
+                            if str(item.record_id).isdigit():
+                                term_location.append({'id': item.record_id, 'name': item.name})
+
+                        for item in services_data:
+                            if str(item.record_id).isdigit():
+                                services.append({'id': item.record_id, 'name': item.name})
+
+                        return render(request, 'service_order_csv_edit.html', {'number_email_date_data': number_email_date_data, 'customers': customers, 'status': status, 'voice_carriers': voice_carrier, 'sms_carriers': voice_carrier, 'sms_types': sms_type, 'term_locations': term_location, 'services': services})
+                        
+                    else:
+                        messages.warning(request, "This file format is not correct. Please download `Sample CSV` and wirte the doc as it")
+                else: 
+                    messages.warning(request, "This file is empty!")
+            else:
+                messages.warning(request, "Please upload CSV file.")
+        except Exception as e:
+            messages.warning(request, "Unable to upload file." + e)
+        return redirect('/service_order')
     else:
         service_orders = Service_Order.objects.all()
     
@@ -101,9 +189,6 @@ def service_order_list(request):
             item.texting = "" if item.texting is None else item.texting
             item.status = switchStatus(item.status)
             item.updated_by = "" if item.updated_by is None else item.updated_by
-
-            print(item.number_email_dates.all())
-
             item.number = item.number_email_dates.all().order_by('id')[0].number if item.number_email_dates.all().order_by('id')[0].number else ""
             item.email = item.number_email_dates.all().order_by('id')[0].email if item.number_email_dates.all().order_by('id')[0].email else ""
             item.requested_port_date = item.number_email_dates.all().order_by('id')[0].requested_port_date if item.number_email_dates.all().order_by('id')[0].requested_port_date else ""
@@ -162,6 +247,7 @@ def service_order_create(request):
                     'extension' : int(item['extension']) if item['extension'] else None,
                     'onboard_date' : parse_date(item['onboard_date']),
                     'e911_enabled_billed' : item['e911_enabled_billed'],
+                    'note' : item['note'],
                     'service_1' : Service.objects.get(record_id=int(item['service_1'])) if item['service_1'] else None,
                     'service_2' : Service.objects.get(record_id=int(item['service_2'])) if item['service_2'] else None,
                     'service_3' : Service.objects.get(record_id=int(item['service_3'])) if item['service_3'] else None,
@@ -215,6 +301,7 @@ def service_order_update(request, id):
                     'extension' : int(item['extension']) if item['extension'] else None,
                     'onboard_date' : parse_date(item['onboard_date']),
                     'e911_enabled_billed' : item['e911_enabled_billed'],
+                    'note' : item['note'],
                     'service_1' : Service.objects.get(record_id=int(item['service_1'])) if item['service_1'] else None,
                     'service_2' : Service.objects.get(record_id=int(item['service_2'])) if item['service_2'] else None,
                     'service_3' : Service.objects.get(record_id=int(item['service_3'])) if item['service_3'] else None,
@@ -240,6 +327,7 @@ def service_order_update(request, id):
                     service_order_number_email_date_data.extension = int(item['extension']) if item['extension'] else None
                     service_order_number_email_date_data.onboard_date = parse_date(item['onboard_date']) if item['onboard_date'] else None
                     service_order_number_email_date_data.e911_enabled_billed = item['e911_enabled_billed']
+                    service_order_number_email_date_data.note = item['note']
                     service_order_number_email_date_data.service_1 = Service.objects.get(record_id=item['service_1']) if item['service_1'] else None
                     service_order_number_email_date_data.service_2 = Service.objects.get(record_id=item['service_2']) if item['service_2'] else None
                     service_order_number_email_date_data.service_3 = Service.objects.get(record_id=item['service_3']) if item['service_3'] else None
@@ -325,6 +413,7 @@ def service_order_update(request, id):
                 'extension': item['extension'] if item['extension'] else '',
                 'onboard_date': item['onboard_date'].strftime('%Y-%m-%d') if item['onboard_date'] else '',
                 'e911_enabled_billed': item['e911_enabled_billed'] if item['e911_enabled_billed'] else '',
+                'note': item['note'] if item['note'] else '',
                 'service_1': item['service_1_id'] if item['service_1_id'] else '',
                 'service_2': item['service_2_id'] if item['service_2_id'] else '',
                 'service_3': item['service_3_id'] if item['service_3_id'] else '',
@@ -473,6 +562,7 @@ def service_order_add_step_2(request):
                 'extension': request.POST['extension'],
                 'onboard_date': request.POST['onboard_date'],
                 'e911_enabled_billed': request.POST['e911_enabled_billed'],
+                'note': '',
                 'service_1': int(request.POST['service_1']) if str(request.POST['service_1']).isdigit() else '',
                 'service_2': int(request.POST['service_2']) if str(request.POST['service_2']).isdigit() else '',
                 'service_3': int(request.POST['service_3']) if str(request.POST['service_3']).isdigit() else '',
