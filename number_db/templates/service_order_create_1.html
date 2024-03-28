@@ -39,13 +39,13 @@
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input class="form-control" id="input_email" type="email" name="email" placeholder="Enter email" required/>
+                            <input class="form-control" id="input_email" type="email" name="email" placeholder="Enter email"/>
                             <label for="input_email">Enter email</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating mb-3 mb-md-0">
-                            <input class="form-control" name="requested_port_date" type="date"  placeholder="Select the requested port date" id="input_requested_port_date" required>
+                            <input class="form-control" name="requested_port_date" type="date"  placeholder="Select the requested port date" id="input_requested_port_date">
                             <label for="input_requested_port_date">Select the requested port date</label>
                         </div>
                     </div>
@@ -153,7 +153,7 @@
                         </div>
                     </div>
                     <div class="col">
-                        <select name="term_location" class="form-select p-3" aria-label="Choose term location" required>
+                        <select name="term_location" class="form-select p-3" aria-label="Choose term location">
                             <option value="" selected>Select term location</option>
                             {% for item in term_location %}
                             <option value="{{ item.id }}">{{ item.name }}</option>
