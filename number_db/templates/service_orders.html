@@ -20,9 +20,10 @@
                 <input type="file" class="form-control custom-file-input file" name="csv_file">
               </div>
             </div>
-            <div class="d-flex">
+            <div class="d-flex gap-2">
               <button class="btn btn-primary btn-block" type="submit">Submit</button>
-              <a class="btn btn-success ms-2" href="add_step_1/"><span class="fa fa-add"></span> Add</a>
+              <a class="btn-sm btn btn-success" href="{% static 'sample_service_order.csv' %}" download><span class="fa fa-download"></span> Download Sample CSV</a>
+              <a class="btn btn-success" href="add_step_1/"><span class="fa fa-add"></span> Add</a>
             </div>
           </div>
       </form>

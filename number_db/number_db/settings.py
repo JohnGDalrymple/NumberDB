@@ -113,7 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Cors enable
-ALLOWED_HOSTS = ['51.222.178.73', '127,0.0.1', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['147.135.94.228', 'localhost', '127.0.0.1']
 
 CSRF_COOKIE_ORIGIN = ['127.0.0.1:8000', 'localhost']
 

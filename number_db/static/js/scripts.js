@@ -261,7 +261,7 @@ function service_order_value_check() {
     if (document.getElementById('service_order_create_2')) {
         var currentStatus = true;
         const numberElements = document.querySelectorAll('[name="number"]');
-        currentStatus = !!document.getElementById('customer').value && !!document.getElementById('term_location').value && currentStatus;
+        currentStatus = !!document.getElementById('customer').value && currentStatus;
 
         numberElements.forEach((item, i)=> {
             if (!item.value && i != 0) {
@@ -504,10 +504,6 @@ function multi_number_check() {
             document.getElementById('service_order_step_2').disabled = true;
         }
     })
-}
-
-function username_validator() {
-    document.getElementById('service_order_create_2').disabled = !document.getElementById('input_username').value
 }
 
 function service_order_create() {

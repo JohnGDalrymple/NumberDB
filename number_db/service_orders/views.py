@@ -18,15 +18,13 @@ import json
 
 # Create your views here.
 
-default_header = ['Name', 'Username', 'Number', 'Mobex Texting', 'Texting', 'Requested Port Date', 'E911 number', 'E911 address', 'Calling Plan Type', 'Porting Pin']
+default_header = ['Name', 'Username', 'Number', 'Texting Y/N', 'Texting Type', 'Requested Port Date', 'E911 number if applicable', 'E911 address']
 
 def parse_date(date_string):
     try:
         return datetime.datetime.strptime(date_string, '%Y-%m-%d').date()
     except ValueError:
         return datetime.datetime.strptime(date_string, '%m/%d/%Y').date() if date_string else None
-
-default_data_header = ['username', 'email', 'number', 'texting', 'e911_number', 'e911_address', 'updated_by']
 
 def switchStatus(value):
     if value == 0:
@@ -128,9 +126,9 @@ def service_order_list(request):
                                 'email': item['Username'],
                                 'number': item['Number'],
                                 'requested_port_date': item['Requested Port Date'].strftime('%Y-%m-%d') if item['Requested Port Date'] else '',
-                                'e911_number': item['E911 number'],
+                                'e911_number': item['E911 number if applicable'],
                                 'e911_address': item['E911 address'],
-                                'note': item['Porting Pin'],
+                                'note': item['Texting Y/N'],
                             })
 
                         customers_data = Customer.objects.values_list('record_id', 'full_name')
@@ -218,45 +216,59 @@ def service_order_create(request):
     if request.method == 'POST':
         try:
             request_data = json.loads(request.body)
-            service_order = Service_Order(
-                username=request_data['username'],
-                customer=Customer.objects.get(record_id=int(request_data['customer'])) if request_data['customer'] else None,
-                texting=request_data['texting'],
-                term_location=Term_Location.objects.get(record_id=int(request_data['term_location'])) if request_data['term_location'] else None,
-                updated_by=str(request.user),
-            )
 
-            service_order.full_clean()
-            service_order.save()
+            number_email_date_status = False
 
             for item in request_data['number_email_date']:
-                number_email_date_dict = {
-                    'name' : item['name'],
-                    'number' : int(item['number']),
-                    'email' : item['email'],
-                    'reseller' : item['reseller'],
-                    'requested_port_date' : parse_date(item['requested_port_date']),
-                    'e911_number' : int(item['e911_number']) if item['e911_number'] else None,
-                    'e911_address' : item['e911_address'],
-                    'service_status' : Status.objects.get(record_id=int(item['service_status'])) if item['service_status'] else None,
-                    'voice_carrier' : Voice_Carrier.objects.get(record_id=int(item['voice_carrier'])) if item['voice_carrier'] else None,
-                    'sms_carrier' : Voice_Carrier.objects.get(record_id=int(item['sms_carrier'])) if item['sms_carrier'] else None,
-                    'sms_type' : SMS_Type.objects.get(record_id=int(item['sms_type'])) if item['sms_type'] else None,
-                    'sms_enabled' : item['sms_enabled'],
-                    'sms_campaign' : item['sms_campaign'],
-                    'extension' : int(item['extension']) if item['extension'] else None,
-                    'onboard_date' : parse_date(item['onboard_date']),
-                    'e911_enabled_billed' : item['e911_enabled_billed'],
-                    'note' : item['note'],
-                    'service_1' : Service.objects.get(record_id=int(item['service_1'])) if item['service_1'] else None,
-                    'service_2' : Service.objects.get(record_id=int(item['service_2'])) if item['service_2'] else None,
-                    'service_3' : Service.objects.get(record_id=int(item['service_3'])) if item['service_3'] else None,
-                    'service_4' : Service.objects.get(record_id=int(item['service_4'])) if item['service_4'] else None,
-                }
-                number_email_date = Number_Email_Date.objects.create(**number_email_date_dict)
-                service_order.number_email_dates.add(number_email_date)
+                try:
+                    Number_Email_Date.objects.get(number=int(item['number']))
+                    number_email_date_status = True
+                    break
+                except Exception:
+                    continue
 
-            messages.success(request, 'The service order was created successfully!')
+            if(number_email_date_status):
+                messages.warning(request, 'One of these number was excited in current database')
+            else:
+                service_order = Service_Order(
+                    username=request_data['username'],
+                    customer=Customer.objects.get(record_id=int(request_data['customer'])) if request_data['customer'] else None,
+                    texting=request_data['texting'],
+                    term_location=Term_Location.objects.get(record_id=int(request_data['term_location'])) if request_data['term_location'] else None,
+                    updated_by=str(request.user),
+                )
+
+                service_order.full_clean()
+                service_order.save()
+
+                for item in request_data['number_email_date']:
+                    number_email_date_dict = {
+                        'name' : item['name'],
+                        'number' : int(item['number']),
+                        'email' : item['email'],
+                        'reseller' : item['reseller'],
+                        'requested_port_date' : parse_date(item['requested_port_date']),
+                        'e911_number' : int(item['e911_number']) if item['e911_number'] else None,
+                        'e911_address' : item['e911_address'],
+                        'service_status' : Status.objects.get(record_id=int(item['service_status'])) if item['service_status'] else None,
+                        'voice_carrier' : Voice_Carrier.objects.get(record_id=int(item['voice_carrier'])) if item['voice_carrier'] else None,
+                        'sms_carrier' : Voice_Carrier.objects.get(record_id=int(item['sms_carrier'])) if item['sms_carrier'] else None,
+                        'sms_type' : SMS_Type.objects.get(record_id=int(item['sms_type'])) if item['sms_type'] else None,
+                        'sms_enabled' : item['sms_enabled'],
+                        'sms_campaign' : item['sms_campaign'],
+                        'extension' : int(item['extension']) if item['extension'] else None,
+                        'onboard_date' : parse_date(item['onboard_date']),
+                        'e911_enabled_billed' : item['e911_enabled_billed'],
+                        'note' : item['note'],
+                        'service_1' : Service.objects.get(record_id=int(item['service_1'])) if item['service_1'] else None,
+                        'service_2' : Service.objects.get(record_id=int(item['service_2'])) if item['service_2'] else None,
+                        'service_3' : Service.objects.get(record_id=int(item['service_3'])) if item['service_3'] else None,
+                        'service_4' : Service.objects.get(record_id=int(item['service_4'])) if item['service_4'] else None,
+                    }
+                    number_email_date = Number_Email_Date.objects.create(**number_email_date_dict)
+                    service_order.number_email_dates.add(number_email_date)
+
+                messages.success(request, 'The service order was created successfully!')
         except Exception as e:
             messages.warning(request, f"Error creating service order: {e}")
 
