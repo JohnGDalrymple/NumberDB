@@ -677,7 +677,7 @@ def did_sync_status_to_method(request):
                     'Authorization': 'APIKey ' + os.getenv('METHOD_API_KEY')
                     }
                 if item.record_id == None:
-                    payload = '{\r\n    "MISMSType": "'+ item.name + '",\r\n    "MIIsActive": "TRUE"\r\n}'
+                    payload = '{\r\n    "MITypeName": "'+ item.name + '",\r\n    "MIIsActive": "TRUE"\r\n}'
                     response = requests.request("POST", f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MIType", headers = headers, data = payload)
                     
                     if response.status_code == 201:
@@ -688,7 +688,7 @@ def did_sync_status_to_method(request):
                         messages.warning(request, response.json()['title'])
 
                 else:
-                    payload = '{ "MISMSType": "'+ item.name + '" }'
+                    payload = '{ "MITypeName": "'+ item.name + '" }'
                     response = requests.request("PATCH", f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MIType/{item.record_id}", headers = headers, data = payload)
                     
                     if response.status_code == 204:
@@ -725,7 +725,7 @@ def did_sync_sms_type_to_method(request):
                     'Authorization': 'APIKey ' + os.getenv('METHOD_API_KEY')
                     }
                 if item.record_id == None:
-                    payload = '{\r\n    "MITypeName": "'+ item.name + '",\r\n    "MIIsActive": "TRUE"\r\n}'
+                    payload = '{\r\n    "MISMSType": "'+ item.name + '",\r\n    "MIIsActive": "TRUE"\r\n}'
                     response = requests.request("POST", f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MISMSType", headers = headers, data = payload)
                     
                     if response.status_code == 201:
@@ -736,7 +736,7 @@ def did_sync_sms_type_to_method(request):
                         messages.warning(request, response.json()['title'])
 
                 else:
-                    payload = '{ "MITypeName": "'+ item.name + '" }'
+                    payload = '{ "MISMSType": "'+ item.name + '" }'
                     response = requests.request("PATCH", f"{os.getenv('METHOD_GET_TABLE_ENDPOINT')}MISMSType/{item.record_id}", headers = headers, data = payload)
                     
                     if response.status_code == 204:
